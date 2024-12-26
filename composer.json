@@ -8,14 +8,8 @@
     },
     "autoload": {
         "psr-4": {
-            "ZhenyaGR\\TGZ\\": "src/"
+            "ZhenyaGR\\TGZ\\": "src/" 
         }
     },
-    "authors": [
-        {
-            "name": "Женя",
-            "email": "ваша_почта@example.com"
-        }
-    ],
     "license": "MIT"
 }
