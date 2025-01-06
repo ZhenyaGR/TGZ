@@ -17,7 +17,7 @@ require_once __DIR__.'/vendor/autoload.php';
 require_once "tg-z/autoload.php";
 ```
 
-## Примеры ботов
+# Примеры ботов
 ```php
 <?php
 
