@@ -38,7 +38,7 @@ if ($type == 'bot_command') {
                 $tg->buttonCallback('Кнопка1', 'call1'),
                 $tg->buttonCallback('Кнопка2', 'call2')
             ],
-            [$tg->buttonUrl('Лучший бот в ВК', "vk.com/ternabot")]
+            [$tg->buttonUrl('Ссылка', "https://github.com/ZhenyaGR/TGZ")]
         ];
         $tg->msg("Библиотека в полной мере поддерживает кнопки телеграмма")->kbd($kbd, ['inline' => true])->send();
 
