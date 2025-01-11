@@ -11,6 +11,10 @@ class TGZ
     private $update;
     private $debug_mode = false;
 
+    public static function create($token) {
+        return new self($token);
+    }
+
     public function __construct($token)
     {
         $this->token = $token;
