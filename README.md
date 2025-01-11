@@ -21,8 +21,11 @@ require_once "tg-z/autoload.php";
 ```php
 <?php
 
+use ZhenyaGR\TGZ\TGZ as tg;
+
 $token = 'API_TOKEN';
-$tg = new TGZ($token);
+$tg = tg::create($token);
+
 
 $tg->debug_mode(0); 
 
