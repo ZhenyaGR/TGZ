@@ -26,11 +26,9 @@ use ZhenyaGR\TGZ\TGZ as tg;
 $token = 'API_TOKEN';
 $tg = tg::create($token);
 
-
-$tg->debug_mode(0); 
-
-$update = $tg->getWebhookUpdate();
+$update = $tg->getWebhookUpdate(); // Получаем обнновление
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+// Создаем переменные
 
 if ($type == 'bot_command') {
 
@@ -73,7 +71,7 @@ if ($type == 'bot_command') {
     $tg->msg("Вы написали обычный текст")->send();
 
 } elseif ($type == 'callback_query') {
-    $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]);
+    $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]); // Обязательно ответить при нажатии (текст не обязателен)
 
     if ($callback_data == 'call1') {
         $tg->msg("Вы нажали кнопку №1\nCallback data: $callback_data")->send();
@@ -96,3 +94,4 @@ if ($type == 'bot_command') {
 
 
 $tg->end_script();
+// Отправляем телеграмму "ok"
