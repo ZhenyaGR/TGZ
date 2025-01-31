@@ -11,5 +11,7 @@
             "ZhenyaGR\\TGZ\\": "src/" 
         }
     },
+    "minimum-stability": "alpha",
+    "prefer-stable": true,
     "license": "MIT"
 }
