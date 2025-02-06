@@ -28,28 +28,30 @@ class Message
         $this->update = $update;
     }
 
-    public function kbd($buttons, $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false])
-    {
-        $params = array_merge([
-            'inline' => false,
-            'one_time_keyboard' => false,
-            'resize_keyboard' => false
-        ], $params);
+    public function kbd(
+        $buttons,
+        $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false],
+        $inline = null,
+        $one_time_keyboard = null,
+        $resize_keyboard = null
+    ) {
 
+        $params = array_merge(['inline' => false, 'one_time_keyboard' => false, 'resize_keyboard' => false], $params);
 
-        if (!$params['inline']) {
-            $keyboard = [
+        if ($inline !== null || $one_time_keyboard !== null || $resize_keyboard !== null) {
+            $params['inline'] = $inline ?? $params['inline'];
+            $params['one_time_keyboard'] = $one_time_keyboard ?? $params['one_time_keyboard'];
+            $params['resize_keyboard'] = $resize_keyboard ?? $params['resize_keyboard'];
+        }
+
+        $this->kbd = $params['inline']
+            ? ['inline_keyboard' => $buttons]
+            : [
                 'keyboard' => $buttons,
                 'resize_keyboard' => $params["resize_keyboard"],
                 'one_time_keyboard' => $params["one_time_keyboard"]
             ];
-        } else {
-            $keyboard = [
-                'inline_keyboard' => $buttons
-            ];
-        }
 
-        $this->kbd = $keyboard;
         return $this;
     }
 
