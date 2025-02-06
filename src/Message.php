@@ -167,7 +167,7 @@ class Message
         return $result;
     }
 
-    public function sendEdit(int $messageId = false, ?int $chatId = null)
+    public function sendEdit(?int $messageId = false, ?int $chatId = null)
     {
         $tg = new TGZ($this->token);
 
