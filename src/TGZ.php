@@ -4,6 +4,7 @@ namespace ZhenyaGR\TGZ;
 
 class TGZ
 {
+    use ErrorHandler;
     private $token;
     private $apiUrl;
     private $botId;
@@ -11,11 +12,12 @@ class TGZ
     private $update;
     private $debug_mode = false;
 
-    public static function create($token) {
+    public static function create(string $token)
+    {
         return new self($token);
     }
 
-    public function __construct($token)
+    public function __construct(string $token)
     {
         $this->token = $token;
         $this->apiUrl = "https://api.telegram.org/bot{$token}/";
@@ -25,15 +27,14 @@ class TGZ
         if ($botInfo && isset($botInfo['result']['id'])) {
             $this->botId = $botInfo['result']['id'];
         } else {
-            throw new Exception("Не удалось получить информацию о боте.");
+            throw new \Exception("Не удалось получить информацию о боте.");
         }
     }
 
-    public function callAPI($method, $params = [])
+    public function callAPI(string $method, array $params = [])
     {
         $url = $this->apiUrl . $method;
         $ch = curl_init();
-
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -41,18 +42,19 @@ class TGZ
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
         ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
         curl_close($ch);
 
         if ($httpCode >= 200 && $httpCode < 300) {
             return json_decode($response, true);
         }
 
-        error_log("Telegram API call failed: $response");
-        return null;
+        throw new \Exception("Telegram API call failed: $response");
+        // return null;
     }
 
     public function getWebhookUpdate()
@@ -68,7 +70,7 @@ class TGZ
         return $update;
     }
 
-    public function __call($method, $args = [])
+    public function __call(string $method, array $args = [])
     {
         $args = (empty($args)) ? $args : $args[0];
         return $this->callAPI($method, $args);
@@ -116,7 +118,7 @@ class TGZ
         }
     }
 
-    public function debug_mode($flag = true)
+    public function debug_mode(bool $flag = true)
     {
         $this->debug_mode = $flag;
     }
@@ -127,13 +129,13 @@ class TGZ
         echo 'ok';
     }
 
-    public function msg($text = '')
+    public function msg(string $text = '')
     {
         return new Message($text, $this->token, $this->chatId, $this->update);
     }
 
 
-    public function sendMessage($chatId, $text)
+    public function sendMessage(int $chatId, string $text)
     {
         $params = [
             'chat_id' => $chatId,
@@ -142,7 +144,7 @@ class TGZ
         return $this->callAPI('sendMessage', $params);
     }
 
-    public function buttonCallback($buttonText, $buttonData)
+    public function buttonCallback(string $buttonText, string $buttonData)
     {
         return [
             'text' => $buttonText,
@@ -150,7 +152,7 @@ class TGZ
         ];
     }
 
-    public function buttonUrl($buttonText, $buttonUrl)
+    public function buttonUrl(string $buttonText, string $buttonUrl)
     {
         return [
             'text' => $buttonText,
@@ -159,7 +161,7 @@ class TGZ
     }
 
 
-    public function answerCallbackQuery($callbackId, $options = [])
+    public function answerCallbackQuery(int $callbackId, array $options = [])
     {
         $params = array_merge([
             'callback_query_id' => $callbackId,

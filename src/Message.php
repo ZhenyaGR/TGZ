@@ -29,11 +29,11 @@ class Message
     }
 
     public function kbd(
-        $buttons,
-        $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false],
-        $inline = null,
-        $one_time_keyboard = null,
-        $resize_keyboard = null
+        array $buttons,
+        array $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false],
+        ?bool $inline = null,
+        ?bool $one_time_keyboard = null,
+        ?bool $resize_keyboard = null
     ) {
 
         $params = array_merge(['inline' => false, 'one_time_keyboard' => false, 'resize_keyboard' => false], $params);
@@ -55,7 +55,7 @@ class Message
         return $this;
     }
 
-    public function parseMode($mode = '')
+    public function parseMode(string $mode = '')
     {
         if ($mode != 'HTML' && $mode != 'Markdown' && $mode != 'MarkdownV2' && $mode != '') {
             $mode = '';
@@ -72,13 +72,13 @@ class Message
 
     }
 
-    public function params($params = [])
+    public function params(array $params = [])
     {
         $this->params_additionally = $params;
         return $this;
     }
 
-    public function reply_to($reply_to_message_id = null)
+    public function reply_to(?string $reply_to_message_id = null)
     {
         if ($reply_to_message_id == null || is_numeric($reply_to_message_id) == false) {
             $msg_id = $this->update['message']['message_id'] ?? $this->update['callback_query']['message']['message_id'];
@@ -89,35 +89,35 @@ class Message
         return $this;
     }
 
-    public function img($url)
+    public function img(string $url)
     {
         $this->sendPhoto = true;
         $this->img_url = $url;
         return $this;
     }
 
-    public function audio($url)
+    public function audio(string $url)
     {
         $this->sendAudio = true;
         $this->audio_url = $url;
         return $this;
     }
 
-    public function doc($url)
+    public function doc(string $url)
     {
         $this->sendDocument = true;
         $this->doc_url = $url;
         return $this;
     }
 
-    public function urlImg($url)
+    public function urlImg(string $url)
     {
         $this->text = '<a href="' . htmlspecialchars($url) . '">​</a>' . $this->text; // Использует пробел нулевой ширины
         $this->parse_mode = "HTML";                                                          // с ссылкой в начале сообщения
         return $this;
     }
 
-    public function send($chatId = null)
+    public function send(?int $chatId = null)
     {
         $tg = new TGZ($this->token);
 
@@ -167,7 +167,7 @@ class Message
         return $result;
     }
 
-    public function sendEdit($messageId = false, $chatId = null)
+    public function sendEdit(int $messageId = false, ?int $chatId = null)
     {
         $tg = new TGZ($this->token);
 
