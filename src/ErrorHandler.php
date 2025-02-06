@@ -292,7 +292,7 @@ trait ErrorHandler
         $line = $trace['line'] ?? '?';
 
         $code_snippet = $this->getCodeSnippet($file, (int) $line);
-        $pattern = '#/(vendor|simplevk[^/]*/src)(/.*)#';
+        $pattern = '#/(vendor|tgz[^/]*/src|tgz-main[^/]*/src|tg-z[^/]*/src(/.*)#';
 
         $formatted_file = $this->filterPaths($file);
         if (isset($trace['file']) && preg_match($pattern, $formatted_file, $matches)) {
