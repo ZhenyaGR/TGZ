@@ -20,9 +20,9 @@ trait ErrorHandler
      * @param int|array<int>|callable $ids VK ID пользователя, массив ID или функция-обработчик.
      * @return self Возвращает текущий экземпляр для цепочки вызовов.
      */
-    public function setUserLogError(string $ids): self
+    public function setUserLogError(string|array $ids): self
     {
-        $this->user_error_handler_or_ids = $ids;
+        $this->user_error_handler_or_ids = (is_numeric($ids)) ? [$ids] : $ids;
 
         ini_set('error_reporting', E_ALL);
         ini_set('display_errors', 1);
@@ -191,15 +191,17 @@ trait ErrorHandler
         } else {
             $chatID = $this->user_error_handler_or_ids;
             if ($this->send_error_in_vk) {
-                try {
+                foreach ($chatId as $id) {
+try {
                     $this->callAPI('sendMessage', [
-                        'chat_id' => $chatID,
+                        'chat_id' => $id,
                         'text' => $message
                     ]);
                 } catch (\Exception $e) {
                     $this->send_error_in_vk = false;
                     $this->exceptionHandler($e, E_WARNING, true);
                 }
+} 
             }
         }
     }
