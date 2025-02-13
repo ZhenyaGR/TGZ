@@ -53,8 +53,9 @@ class TGZ
             return json_decode($response, true);
         }
 
-        throw new \Exception("Telegram API call failed: $response");
-        // return null;
+        $formattedResponse = json_encode(json_decode($response, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $formattedResponse = preg_replace('/^(  +?)\\1(?=[^ ])/m', '', $formattedResponse); // Заменяем специфические пробелы
+        throw new \Exception("Telegram API error:\n" . $formattedResponse);
     }
 
     public function getWebhookUpdate()
