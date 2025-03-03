@@ -20,58 +20,85 @@ require_once "tg-z/autoload.php";
 # Примеры ботов
 ```php
 <?php
-
+require 'TGZ/autoload.php';
 use ZhenyaGR\TGZ\TGZ as tg;
 
-$token = 'API_TOKEN';
 $tg = tg::create($token);
+$tg->jsonMode(0);
 
-$update = $tg->getWebhookUpdate(); // Получаем обнновление
+$update = $tg->getWebhookUpdate();
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
-// Создаем переменные
 
 if ($type == 'bot_command') {
 
-    if ($text == '/buttons') {
+    $img_url = 'https://12-kanal.ru/upload/iblock/62a/zb1mq2841smduhwwuv3jwjfv9eooyc50/fotograf3.jpg';
+
+    if ($text == '/info' || $text == '/start') {
+        $tg->msg("Самая лучшая библиотека для телеграмма – TG-Z!\n<a href=\"https://github.com/ZhenyaGR/TGZ\">Гитхаб</a>\n\nВ ней реализованы:\n1. Отправка сообщений c разным форматированием (/format)\n2. Создание кнопок и клавиатур (/buttons1 /buttons2)\n3. Отправка изображений двумя способами (/photo1, /photo2)\n4. Редактирование сообщений (/edit)\n5. Ответ на сообщение (/reply)\n6. Создание опросов (/poll)")
+            ->params(['disable_web_page_preview' => true])
+            ->parseMode("HTML")
+            ->send();
+
+    } else if ($text == '/buttons1') {
         $kbd = [
             [
                 $tg->buttonCallback('Кнопка1', 'call1'),
                 $tg->buttonCallback('Кнопка2', 'call2')
             ],
-            [$tg->buttonUrl('Ссылка', "https://github.com/ZhenyaGR/TGZ")]
+            [
+                $tg->buttonUrl('Лучшая библиотека', "https://github.com/ZhenyaGR/TGZ")
+            ]
         ];
-        $tg->msg("Библиотека в полной мере поддерживает кнопки телеграмма")->kbd($kbd, ['inline' => true])->send();
+        $tg->msg("Отправка кнопок с помощью kbd()")->kbd($kbd, inline: true)->send();
+
+    } else if ($text == '/buttons2') {
+        $kbd = [
+            [$tg->buttonText('Кнопка')],
+        ];
+        $tg->msg("Отправка клавиатуры с помощью kbd()")->kbd($kbd, inline: false, one_time_keyboard: true)->send();
 
     } else if ($text == '/photo1') {
-        $tg->msg("Отправка фотографии с использованием ссылки")->urlImg('https://12-kanal.ru/upload/iblock/62a/zb1mq2841smduhwwuv3jwjfv9eooyc50/fotograf3.jpg')->send();
+        $tg->msg("Отправка фотографии с использованием ссылки urlImg()")->urlImg($img_url)->send();
 
     } else if ($text == '/photo2') {
-        $tg->msg("Отправка фотографии с использованием sendPhoto")->img('https://12-kanal.ru/upload/iblock/62a/zb1mq2841smduhwwuv3jwjfv9eooyc50/fotograf3.jpg')->send();
+        $tg->msg("Отправка фотографии с использованием sendPhoto img()")->img($img_url)->send();
 
     } else if ($text == '/format') {
-        $twoEnter = "\n\n";
-        $msg = 'ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ MarkdownV2' . $twoEnter . '*Жирный*' . $twoEnter . '_Курсив_' . $twoEnter . '__Подчёркнутый__' . $twoEnter . '`Моноширинный`' . $twoEnter . '[Ссылка](https://vk.com/ternabot)' . $twoEnter . ' ||Спойлер||' . $twoEnter;
-        $tg->msg($msg)->parseMode("MarkdownV2")->send();
 
-        // $msg = 'ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ HTML' . $twoEnter . '<b>Жирный</b>' . $twoEnter . '<i>Курсив</i>' . $twoEnter . '<u>Подчёркнутый</u>' . $twoEnter . '<code>Моноширинный</code>' . $twoEnter . '<a href="https://vk.com/ternabot">Ссылка</a>' . $twoEnter . ' <span class="tg-spoiler">Спойлер</span>' . $twoEnter;
+        $msg = "ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ MarkdownV2\n\n*Жирный*\n\n_Курсив_\n\n__Подчёркнутый__\n\n`Моноширинный`\n\n[Ссылка](https://github.com/ZhenyaGR/TGZ)\n\n||Спойлер||";
+        $tg->msg($msg . "\n\nparseMode\(\)")
+            ->params(['disable_web_page_preview' => true])
+            ->parseMode("MarkdownV2")->send();
+
+        // $msg = "ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ HTML\n\n<b>Жирный</b>\n\n<i>Курсив</i>\n\n<u>Подчёркнутый</u>\n\n<code>Моноширинный</code>\n\n<a href="https://github.com/ZhenyaGR/TGZ">Ссылка</a>\n\n <span class="tg-spoiler">Спойлер</span>";
         // $tg->msg($msg)->parseMode("HTML")->send();
-    } else if ($text == '/audio') {
-        $tg->msg("Отправка аудио файлов!")->audio('url')->send();
-
-    } else if ($text = '/edit') {
+    } else if ($text == '/edit') {
         $kbd = [
             [$tg->buttonCallback('Редактировать Сообщение', 'edit')]
         ];
 
-        $tg->msg("Можно редактировать сообщения, используя конструктор")->kbd($kbd, ["inline" => true])->send();
+        $tg->msg("Можно редактировать сообщения, используя конструктор")->kbd($kbd, inline: true)->send();
 
+    } else if ($text == '/reply') {
+        $tg->msg("Ответ на сообщение с помощью функции reply()")->reply()->send();
+
+    } else if ($text == '/poll') {
+        $tg->msg()
+            ->poll('Создание опросов poll()')
+            ->addAnswer('Ответ 1')
+            ->addAnswer('Ответ 2')
+            ->addAnswer('Ответ 3')
+            ->isAnonymous(true)
+            ->pollType('regular')
+            ->send();
+        // Остальные поля нужно прописывать самостоятельно в params()
     }
 
 } else if ($type == 'text') {
     $tg->msg("Вы написали обычный текст")->send();
 
 } elseif ($type == 'callback_query') {
-    $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]); // Обязательно ответить при нажатии (текст не обязателен)
+    $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]);
 
     if ($callback_data == 'call1') {
         $tg->msg("Вы нажали кнопку №1\nCallback data: $callback_data")->send();
@@ -82,16 +109,16 @@ if ($type == 'bot_command') {
             [
                 $tg->buttonCallback('Кнопка1', 'call1'),
                 $tg->buttonCallback('Кнопка2', 'call2'),
-            ],
-
+            ]
         ];
 
-        $tg->msg("Cообщение отредактировано\nПри этом все параметры можно точно так же использовать, например, клавиатура")->kbd($kbd, ['inline' => true])->sendEdit($msg_id);
+        $tg->msg("Cообщение отредактировано sendEdit()\nСохраняется возможность отправить кнопки")->kbd($kbd, inline: true)->sendEdit();
 
     }
 
 }
 
 
-$tg->end_script();
+$tg->sendOK();
+
 // Отправляем телеграмму "ok"
