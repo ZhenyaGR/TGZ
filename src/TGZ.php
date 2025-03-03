@@ -10,7 +10,7 @@ class TGZ
     private $botId;
     private $chatId;
     private $update;
-    private $debug_mode = false;
+    private $json_mode = false;
 
     public static function create(string $token)
     {
@@ -31,7 +31,7 @@ class TGZ
         }
     }
 
-    public function callAPI(string $method, array $params = [])
+    public function callAPI(string $method, ?array $params = [])
     {
         $url = $this->apiUrl . $method;
         $ch = curl_init();
@@ -65,7 +65,7 @@ class TGZ
         $this->update = $update;
         $this->chatId = isset($update['message']) ? $update['message']['chat']['id'] : (isset($update['callback_query']) ? $update['callback_query']['message']['chat']['id'] : null);
 
-        if ($this->debug_mode == true) {
+        if ($this->json_mode == true) {
             $this->sendMessage($this->chatId, $input);
         }
         return $update;
@@ -119,12 +119,12 @@ class TGZ
         }
     }
 
-    public function debug_mode(bool $flag = true)
+    public function jsonMode(bool $flag = true)
     {
-        $this->debug_mode = $flag;
+        $this->json_mode = $flag;
     }
 
-    public function end_script()
+    public function sendOK()
     {
         http_response_code(200);
         echo 'ok';
@@ -134,7 +134,6 @@ class TGZ
     {
         return new Message($text, $this->token, $this->chatId, $this->update);
     }
-
 
     public function sendMessage(int $chatId, string $text)
     {
@@ -158,6 +157,13 @@ class TGZ
         return [
             'text' => $buttonText,
             "url" => $buttonUrl
+        ];
+    }
+
+    public function buttonText(string $buttonText)
+    {
+        return [
+            'text' => $buttonText
         ];
     }
 
