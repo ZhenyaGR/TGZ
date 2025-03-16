@@ -10,7 +10,7 @@ class Message
     private $update;
     private $reply_to = false;
     private $kbd = [];
-    private $parse_mode = '';
+    private $parse_mode;
     private $params_additionally = [];
     private $sendPhoto = false;
     private $sendPoll = false;
@@ -21,12 +21,13 @@ class Message
     private $pollType = "regular";
 
 
-    public function __construct($text, $token, $chatId, $update)
+    public function __construct($text, $token, $chatId, $update, $parse_mode)
     {
         $this->token = $token;
         $this->text = $text;
         $this->chatId_auto = $chatId;
         $this->update = $update;
+        $this->parse_mode = $parse_mode;
     }
 
     public function kbd(array $buttons, array $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false], ?bool $inline = null, ?bool $one_time_keyboard = null, ?bool $resize_keyboard = null)

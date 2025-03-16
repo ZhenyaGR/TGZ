@@ -141,7 +141,7 @@ class TGZ
 
     public function msg(string $text = '')
     {
-        return new Message($text, $this->token, $this->chatId, $this->update, $this->parseModeDefault);
+        return new Message($text, $this->token, $this->chatId, $this->update);
     }
 
     public function sendMessage(int $chatId, string $text)
