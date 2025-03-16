@@ -24,7 +24,8 @@ require 'TGZ/autoload.php';
 use ZhenyaGR\TGZ\TGZ as tg;
 
 $tg = tg::create($token);
-$tg->jsonMode(0);
+$tg->jsonMode(0);           // Сделать отправку json-запросов от телеграмм 
+$tg->defaultParseMode('');  // Сделать parseMode() по умолчанию 
 
 $update = $tg->getWebhookUpdate();
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
