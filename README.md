@@ -152,5 +152,3 @@ $tg->sendOK();
 \<code\>Моноширинный\</code\>  
 \<a href="https://github.com/ZhenyaGR/TGZ"\>Ссылка\</a\>  
 \<span class="tg-spoiler"\>Спойлер\</span\>
-
-test
