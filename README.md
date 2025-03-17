@@ -59,11 +59,20 @@ if ($type == 'bot_command') {
         $tg->msg("Отправка клавиатуры с помощью kbd()")->kbd($kbd, inline: false, one_time_keyboard: true)->send();
 
     } else if ($text == '/photo1') {
-        $tg->msg("Отправка фотографии с использованием ссылки urlImg()")->urlImg($img_url)->send();
+        $tg->msg("Отправка фотографии с использованием ссылки urlImg()")
+            ->urlImg($img_url)
+            ->send();
 
-    } else if ($text == '/photo2') {
-        $tg->msg("Отправка фотографии с использованием sendPhoto img()")->img($img_url)->send();
+    }  else if ($text == '/photo2') {
+        $tg->msg("Отправка фотографии с использованием sendPhoto img()")
+            ->img($img_url)
+            ->send();
 
+    } else if ($text == '/photo3') {
+        $tg->msg("Отправка нескольких фотографий с использованием sendMediaGroup img()")
+            ->img([$img_url, $img_url, $img_url])
+            ->send();
+            
     } else if ($text == '/format') {
 
         $msg = "ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ MarkdownV2\n\n*Жирный*\n\n_Курсив_\n\n__Подчёркнутый__\n\n`Моноширинный`\n\n[Ссылка](https://github.com/ZhenyaGR/TGZ)\n\n||Спойлер||";
