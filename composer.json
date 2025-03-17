@@ -3,7 +3,7 @@
     "description": "Библиотека для разработки ботов в Telegram методом WbHook",
     "type": "library",
     "require": {
-        "php": ">=7.1",
+        "php": ">=8.0",
         "ext-curl": "*"
     },
     "autoload": {

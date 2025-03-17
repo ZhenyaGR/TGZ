@@ -14,8 +14,10 @@ class Message
     private $params_additionally = [];
     private $sendPhoto = false;
     private $sendPoll = false;
-    private $img_url = '';
+    private $sendMediaGroup = false;
     private $question = '';
+    private $img_url = '';
+    private $media = [];
     private $options = [];
     private $is_anonymous = false;
     private $pollType = "regular";
@@ -54,7 +56,7 @@ class Message
 
     public function parseMode(string $mode = '')
     {
-        if ($mode != 'HTML' && $mode != 'Markdown' && $mode != 'MarkdownV2' && $mode != '') {
+        if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2' && $mode !== '') {
             $mode = '';
         }
         $this->parse_mode = $mode;
@@ -78,11 +80,28 @@ class Message
         return $this;
     }
 
-    public function img(string $url)
+    public function img(string|array $url)
     {
+        if (is_array($url)) {
+            $media = [];
+
+            foreach ($url as $file) {
+                $media[] = [
+                    'type' => 'photo',
+                    'media' => $file
+                ];
+            }
+
+            $this->sendMediaGroup = true;
+            $this->media = $media;
+            return $this;
+
+        }
+
         $this->sendPhoto = true;
         $this->img_url = $url;
         return $this;
+
     }
 
     public function urlImg(string $url)
@@ -111,7 +130,8 @@ class Message
         return $this;
     }
 
-    public function pollType(string $type) {
+    public function pollType(string $type)
+    {
         $this->pollType = $type;
         return $this;
     }
@@ -124,9 +144,9 @@ class Message
         $params = $this->kbd != [] ? array_merge($params, ['reply_markup' => $this->kbd]) : $params;
         $params = $this->reply_to !== false ? array_merge($params, ['reply_to_message_id' => $this->reply_to]) : $params;
         $params = $this->params_additionally != [] ? array_merge($params, $this->params_additionally) : $params;
+        $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
 
-        if (!$this->sendPhoto && !$this->sendPoll) {
-            $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
+        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
 
@@ -135,17 +155,15 @@ class Message
         }
 
         if ($this->sendPhoto) {
-            $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
             $params['caption'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
             $params['photo'] = $this->img_url;
-            
+
             $method = 'sendPhoto';
             return $tg->callAPI($method, $params);
         }
 
         if ($this->sendPoll) {
-            $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
             $params['question'] = $this->question;
             $params['options'] = $this->options;
             $params['is_anonymous'] = $this->is_anonymous;
@@ -153,10 +171,19 @@ class Message
 
             $method = 'sendPoll';
             return $tg->callAPI($method, $params);
+        }
 
-        }   
-        
+        if ($this->sendMediaGroup) {
+            $params1 = [];
+            $params1['caption'] = $this->text;
+            $params1['parse_mode'] = $this->parse_mode;
 
+            $this->media[0] = array_merge($this->media[0], $params1);
+            $array = array_chunk($this->media, 10);
+            foreach ($array as $media) {
+                $tg->sendMediaGroup(array_merge($params, ['media' => $media]));
+            }
+        }
     }
 
     public function sendEdit(?int $messageId = 0, ?int $chatId = 0)
