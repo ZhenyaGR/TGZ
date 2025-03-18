@@ -13,10 +13,12 @@ class Message
     private $parse_mode;
     private $params_additionally = [];
     private $sendPhoto = false;
+    private $sendAnimation = false;
     private $sendPoll = false;
     private $sendMediaGroup = false;
     private $question = '';
     private $img_url = '';
+    private $gif_url = '';
     private $media = [];
     private $options = [];
     private $is_anonymous = false;
@@ -78,6 +80,30 @@ class Message
         }
         $this->reply_to = $msg_id;
         return $this;
+    }
+
+    public function gif(string|array $url)
+    {
+        if (is_array($url)) {
+            $media = [];
+
+            foreach ($url as $file) {
+                $media[] = [
+                    'type' => 'document',
+                    'media' => $file
+                ];
+            }
+
+            $this->sendMediaGroup = true;
+            $this->media = $media;
+            return $this;
+
+        }
+
+        $this->sendAnimation = true;
+        $this->gif_url = $url;
+        return $this;
+
     }
 
     public function img(string|array $url)
@@ -146,7 +172,7 @@ class Message
         $params = $this->params_additionally != [] ? array_merge($params, $this->params_additionally) : $params;
         $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
 
-        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendAnimation && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
 
@@ -160,6 +186,15 @@ class Message
             $params['photo'] = $this->img_url;
 
             $method = 'sendPhoto';
+            return $tg->callAPI($method, $params);
+        }
+
+        if ($this->sendAnimation) {
+            $params['caption'] = $this->text;
+            $params['parse_mode'] = $this->parse_mode;
+            $params['animation'] = $this->gif_url;
+
+            $method = 'sendAnimation';
             return $tg->callAPI($method, $params);
         }
 

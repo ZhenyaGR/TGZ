@@ -33,6 +33,7 @@ $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $m
 if ($type == 'bot_command') {
 
     $img_url = 'https://12-kanal.ru/upload/iblock/62a/zb1mq2841smduhwwuv3jwjfv9eooyc50/fotograf3.jpg';
+    $gif_url = 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif';
 
     if ($text == '/info' || $text == '/start') {
         $tg->msg("Самая лучшая библиотека для телеграмма – TG-Z!\n<a href=\"https://github.com/ZhenyaGR/TGZ\">Гитхаб</a>\n\nВ ней реализованы:\n1. Отправка сообщений c разным форматированием (/format)\n2. Создание кнопок и клавиатур (/buttons1 /buttons2)\n3. Отправка изображений двумя способами (/photo1, /photo2)\n4. Редактирование сообщений (/edit)\n5. Ответ на сообщение (/reply)\n6. Создание опросов (/poll)")
@@ -73,6 +74,11 @@ if ($type == 'bot_command') {
             ->img([$img_url, $img_url, $img_url])
             ->send();
             
+    } else if ($text == '/gif') {
+        $tg->msg("Отправка gif-изображений с использованием sendAnimation gif()")
+            ->gif($gif_url)
+            ->send();
+
     } else if ($text == '/format') {
 
         $msg = "ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ MarkdownV2\n\n*Жирный*\n\n_Курсив_\n\n__Подчёркнутый__\n\n`Моноширинный`\n\n[Ссылка](https://github.com/ZhenyaGR/TGZ)\n\n||Спойлер||";
