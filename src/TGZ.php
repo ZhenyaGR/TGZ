@@ -22,14 +22,6 @@ class TGZ
     {
         $this->token = $token;
         $this->apiUrl = "https://api.telegram.org/bot{$token}/";
-
-        // Получение информации о боте
-        $botInfo = $this->callAPI('getMe');
-        if ($botInfo && isset($botInfo['result']['id'])) {
-            $this->botId = $botInfo['result']['id'];
-        } else {
-            throw new \Exception("Не удалось получить информацию о боте.");
-        }
     }
 
     public function callAPI(string $method, ?array $params = [])
