@@ -22,14 +22,6 @@ class TGZ
     {
         $this->token = $token;
         $this->apiUrl = "https://api.telegram.org/bot{$token}/";
-
-        // Получение информации о боте
-        $botInfo = $this->callAPI('getMe');
-        if ($botInfo && isset($botInfo['result']['id'])) {
-            $this->botId = $botInfo['result']['id'];
-        } else {
-            throw new \Exception("Не удалось получить информацию о боте.");
-        }
     }
 
     public function callAPI(string $method, ?array $params = [])
@@ -39,10 +31,8 @@ class TGZ
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
