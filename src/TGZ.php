@@ -53,7 +53,7 @@ class TGZ
         if ($httpCode >= 200 && $httpCode < 300) {
             return json_decode($response, true);
         }
-//
+
         $formattedResponse = json_encode(json_decode($response, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $formattedResponse = preg_replace('/^(  +?)\\1(?=[^ ])/m', '', $formattedResponse); // Заменяем специфические пробелы
         throw new \Exception("Telegram API error:\n" . $formattedResponse);
