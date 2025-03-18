@@ -58,7 +58,7 @@ class TGZ
         $formattedResponse = preg_replace('/^(  +?)\\1(?=[^ ])/m', '', $formattedResponse); // Заменяем специфические пробелы
         throw new \Exception("Telegram API error:\n" . $formattedResponse);
     }
-
+//мотик лох
     public function getWebhookUpdate()
     {
         $input = file_get_contents('php://input');
