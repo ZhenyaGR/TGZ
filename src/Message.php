@@ -61,7 +61,7 @@ class Message
             $params['resize_keyboard'] = $resize_keyboard ?? $params['resize_keyboard'];
         }
 
-        $kbd = $params['inline'] == true
+        $kbd = $params['inline']
             ? ['inline_keyboard' => $buttons]
             : [
                 'keyboard' => $buttons,
@@ -69,8 +69,7 @@ class Message
                 'one_time_keyboard' => $params["one_time_keyboard"]
             ];
 
-        $this->kbd = json_encode($kbd, JSON_THROW_ON_ERROR);
-
+        $this->kbd = $kbd;
         return $this;
     }
 
@@ -212,7 +211,7 @@ class Message
         $tg = new TGZ($this->token);
 
         $params = [];
-        $params = $this->kbd != [] ? array_merge($params, ['reply_markup' => $this->kbd]) : $params;
+        $params = $this->kbd != [] ? array_merge($params, ['reply_markup' => json_encode($this->kbd, JSON_THROW_ON_ERROR)]) : $params;
         $params = $this->reply_to !== false ? array_merge($params, ['reply_to_message_id' => $this->reply_to]) : $params;
         $params = $this->params_additionally != [] ? array_merge($params, $this->params_additionally) : $params;
         $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
