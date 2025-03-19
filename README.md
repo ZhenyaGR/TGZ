@@ -121,7 +121,9 @@ if ($type == 'bot_command') {
     }
 
 } else if ($type == 'text') {
-    $tg->msg("Вы написали обычный текст")->send();
+    $tg->msg("Вы написали обычный текст")
+        ->kbd(remove_keyboard: true) // удаление клавиатуры
+        ->send();
 
 } elseif ($type == 'callback_query') {
     $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]);
