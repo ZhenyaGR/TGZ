@@ -222,6 +222,26 @@ class Message
             return $tg->callAPI($method, $params);
         }
 
+        if ($this->sendDocument) {
+            $params['caption'] = $this->text;
+            $params['parse_mode'] = $this->parse_mode;
+            $params['document'] = new CURLFile($this->doc_url);
+
+            $method = 'sendDocument';
+            $url = $tg->apiUrl . $method;
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            return $response;
+
+        }
+
         if ($this->sendPoll) {
             $params['question'] = $this->question;
             $params['options'] = $this->options;
