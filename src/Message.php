@@ -111,7 +111,10 @@ class Message
         if (is_array($url)) {
             $media = [];
 
-            foreach ($url as $file) {
+            foreach ($url as $index => $file) {
+                $curlFile = new CURLFile($file);
+                $attachName = "file" . $index;
+
                 $media[] = [
                     'type' => 'document',
                     'media' => $file
