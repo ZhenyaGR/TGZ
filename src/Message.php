@@ -19,6 +19,8 @@ class Message
     private $question = '';
     private $img_url = '';
     private $gif_url = '';
+    private $doc_url = '';
+    private $files = [];
     private $media = [];
     private $options = [];
     private $is_anonymous = false;
