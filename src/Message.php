@@ -53,6 +53,8 @@ class Message
                 'one_time_keyboard' => $params["one_time_keyboard"]
             ];
 
+        $this->kbd = json_encode($kbd, JSON_THROW_ON_ERROR);
+
         return $this;
     }
 
