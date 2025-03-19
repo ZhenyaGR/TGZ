@@ -106,6 +106,30 @@ class Message
 
     }
 
+    public function doc(string|array $url)
+    {
+        if (is_array($url)) {
+            $media = [];
+
+            foreach ($url as $file) {
+                $media[] = [
+                    'type' => 'document',
+                    'media' => $file
+                ];
+            }
+
+            $this->sendMediaGroup = true;
+            $this->media = $media;
+            return $this;
+
+        }
+
+        $this->sendDocument = true;
+        $this->doc_url = $url;
+        return $this;
+
+    }
+
     public function img(string|array $url)
     {
         if (is_array($url)) {
