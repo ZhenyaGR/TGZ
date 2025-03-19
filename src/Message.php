@@ -46,10 +46,9 @@ class Message
         ?bool $one_time_keyboard = null,
         ?bool $resize_keyboard = null,
         ?bool $remove_keyboard = null
-    )
-    {
+    ) {
 
-        if ($remove_keyboard == true || $buttons == [[]] || $buttons == []) {
+        if ($remove_keyboard === true) {
             $this->kbd = ['remove_keyboard' => true];
             return $this;
         }
@@ -104,18 +103,22 @@ class Message
     {
         if (is_array($url)) {
             $media = [];
+            $this->files = [];
 
-            foreach ($url as $file) {
+            foreach ($url as $index => $file) {
+                $curlFile = new CURLFile($file);
+                $attachName = "file" . $index;
+
                 $media[] = [
                     'type' => 'document',
-                    'media' => $file
+                    'media' => "attach://$attachName"
                 ];
-            }
 
+                $this->files[$attachName] = $curlFile;
+            }
             $this->sendMediaGroup = true;
             $this->media = $media;
             return $this;
-
         }
 
         $this->sendAnimation = true;
@@ -155,18 +158,22 @@ class Message
     {
         if (is_array($url)) {
             $media = [];
+            $this->files = [];
 
-            foreach ($url as $file) {
+            foreach ($url as $index => $file) {
+                $curlFile = new CURLFile($file);
+                $attachName = "file" . $index;
+
                 $media[] = [
                     'type' => 'photo',
-                    'media' => $file
+                    'media' => "attach://$attachName"
                 ];
-            }
 
+                $this->files[$attachName] = $curlFile;
+            }
             $this->sendMediaGroup = true;
             $this->media = $media;
             return $this;
-
         }
 
         $this->sendPhoto = true;
@@ -228,7 +235,7 @@ class Message
         if ($this->sendPhoto) {
             $params['caption'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
-            $params['photo'] = $this->img_url;
+            $params['photo'] = new CURLFile($this->img_url);
 
             $method = 'sendPhoto';
             return $tg->callAPI($method, $params);
@@ -246,7 +253,7 @@ class Message
         if ($this->sendAnimation) {
             $params['caption'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
-            $params['animation'] = $this->gif_url;
+            $params['animation'] = new CURLFile($this->gif_url);
 
             $method = 'sendAnimation';
             return $tg->callAPI($method, $params);
