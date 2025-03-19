@@ -213,6 +213,15 @@ class Message
             return $tg->callAPI($method, $params);
         }
 
+        if ($this->sendDocument) {
+            $params['caption'] = $this->text;
+            $params['parse_mode'] = $this->parse_mode;
+            $params['document'] = new CURLFile($this->doc_url);
+
+            $method = 'sendDocument';
+            return $tg->callAPI($method, $params);
+        }
+
         if ($this->sendAnimation) {
             $params['caption'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
