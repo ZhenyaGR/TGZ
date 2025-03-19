@@ -196,7 +196,7 @@ class Message
         $params = $this->params_additionally != [] ? array_merge($params, $this->params_additionally) : $params;
         $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
 
-        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendAnimation && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
 
