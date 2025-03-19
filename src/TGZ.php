@@ -44,9 +44,7 @@ class TGZ
             return json_decode($response, true);
         }
 
-        $formattedResponse = json_encode(json_decode($response, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $formattedResponse = preg_replace('/^(  +?)\\1(?=[^ ])/m', '', $formattedResponse); // Заменяем специфические пробелы
-        throw new \Exception("Telegram API error:\n" . $formattedResponse);
+        throw new \Exception("Telegram API error:\n" . $response);
     }
 
     public function getWebhookUpdate()
@@ -165,7 +163,6 @@ class TGZ
             'text' => $buttonText
         ];
     }
-
 
     public function answerCallbackQuery(int $callbackId, array $options = [])
     {

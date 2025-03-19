@@ -2,6 +2,8 @@
 
 namespace ZhenyaGR\TGZ;
 
+use CURLFile;
+
 class Message
 {
     private $token;
@@ -15,6 +17,7 @@ class Message
     private $sendPhoto = false;
     private $sendAnimation = false;
     private $sendPoll = false;
+    private $sendDocument = false;
     private $sendMediaGroup = false;
     private $question = '';
     private $img_url = '';
@@ -47,7 +50,7 @@ class Message
             $params['resize_keyboard'] = $resize_keyboard ?? $params['resize_keyboard'];
         }
 
-        $this->kbd = $params['inline']
+        $kbd = $params['inline'] == true
             ? ['inline_keyboard' => $buttons]
             : [
                 'keyboard' => $buttons,
@@ -114,27 +117,27 @@ class Message
     {
         if (is_array($url)) {
             $media = [];
+            $this->files = [];
 
             foreach ($url as $index => $file) {
                 $curlFile = new CURLFile($file);
                 $attachName = "file" . $index;
 
                 $media[] = [
-                    'type' => 'document',
-                    'media' => $file
+                    'type'  => 'document',
+                    'media' => "attach://$attachName"
                 ];
-            }
 
+                $this->files[$attachName] = $curlFile;
+            }
             $this->sendMediaGroup = true;
             $this->media = $media;
             return $this;
-
         }
 
         $this->sendDocument = true;
         $this->doc_url = $url;
         return $this;
-
     }
 
     public function img(string|array $url)
@@ -164,7 +167,7 @@ class Message
     public function urlImg(string $url)
     {
         $this->text = '<a href="' . htmlspecialchars($url) . '">​</a>' . $this->text; // Использует пробел нулевой ширины
-        $this->parse_mode = "HTML";                                                          // с ссылкой в начале сообщения
+        $this->parse_mode = "HTML";                                                      // со ссылкой в начале сообщения
         return $this;
     }
 
@@ -236,26 +239,6 @@ class Message
 
             $method = 'sendAnimation';
             return $tg->callAPI($method, $params);
-        }
-
-        if ($this->sendDocument) {
-            $params['caption'] = $this->text;
-            $params['parse_mode'] = $this->parse_mode;
-            $params['document'] = new CURLFile($this->doc_url);
-
-            $method = 'sendDocument';
-            $url = $tg->apiUrl . $method;
-            $ch = curl_init();
-
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-            $response = curl_exec($ch);
-            curl_close($ch);
-
-            return $response;
-
         }
 
         if ($this->sendPoll) {
