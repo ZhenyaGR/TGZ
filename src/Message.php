@@ -244,7 +244,7 @@ class Message
 
         if ($this->sendPoll) {
             $params['question'] = $this->question;
-            $params['options'] = $this->options;
+            $params['options'] = json_encode($this->options, JSON_THROW_ON_ERROR);
             $params['is_anonymous'] = $this->is_anonymous;
             $params['type'] = $this->pollType;
 
