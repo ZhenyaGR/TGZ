@@ -258,9 +258,18 @@ class Message
             $params1['parse_mode'] = $this->parse_mode;
 
             $this->media[0] = array_merge($this->media[0], $params1);
-            $array = array_chunk($this->media, 10);
-            foreach ($array as $media) {
-                $tg->sendMediaGroup(array_merge($params, ['media' => $media]));
+            $mediaChunks = array_chunk($this->media, 10);
+            foreach ($mediaChunks as $media) {
+
+                $postFields = array_merge($params, [
+                    'media' => json_encode($media, JSON_THROW_ON_ERROR)
+                ]);
+
+                foreach ($this->files as $attachName => $curlFile) {
+                    $postFields[$attachName] = $curlFile;
+                }
+
+                $tg->sendMediaGroup($postFields);
             }
         }
     }
