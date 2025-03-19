@@ -39,8 +39,19 @@ class Message
         $this->parse_mode = $parse_mode;
     }
 
-    public function kbd(array $buttons, array $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false], ?bool $inline = null, ?bool $one_time_keyboard = null, ?bool $resize_keyboard = null)
-    {
+    public function kbd(
+        array $buttons = [],
+        array $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false],
+        ?bool $inline = null,
+        ?bool $one_time_keyboard = null,
+        ?bool $resize_keyboard = null,
+        ?bool $remove_keyboard = null
+    ) {
+
+        if ($remove_keyboard === true) {
+            $this->kbd = ['remove_keyboard' => true];
+            return $this;
+        }
 
         $params = array_merge(['inline' => false, 'one_time_keyboard' => false, 'resize_keyboard' => false], $params);
 
