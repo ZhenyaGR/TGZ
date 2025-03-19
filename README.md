@@ -79,6 +79,16 @@ if ($type == 'bot_command') {
             ->gif($gif_url)
             ->send();
 
+    } else if ($text == '/doc1') {
+        $tg->msg("Отправка документов с использованием sendDocument doc()")
+            ->doc('document.txt')
+            ->send();
+
+    } else if ($text == '/doc2') {
+        $tg->msg("Отправка нескольких документов с использованием sendMediaGroup doc()")
+            ->doc(['document.txt', 'document.txt', 'document.txt'])
+            ->send();
+
     } else if ($text == '/format') {
 
         $msg = "ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ MarkdownV2\n\n*Жирный*\n\n_Курсив_\n\n__Подчёркнутый__\n\n`Моноширинный`\n\n[Ссылка](https://github.com/ZhenyaGR/TGZ)\n\n||Спойлер||";
