@@ -6,7 +6,7 @@ class TGZ
 {
     use ErrorHandler;
     private $token;
-    private $apiUrl;
+    public $apiUrl;
     private $botId;
     private $chatId;
     private $update;
