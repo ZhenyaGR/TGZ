@@ -46,9 +46,10 @@ class Message
         ?bool $one_time_keyboard = null,
         ?bool $resize_keyboard = null,
         ?bool $remove_keyboard = null
-    ) {
+    )
+    {
 
-        if ($remove_keyboard === true) {
+        if ($remove_keyboard == true || $buttons == [[]] || $buttons == []) {
             $this->kbd = ['remove_keyboard' => true];
             return $this;
         }
@@ -134,7 +135,7 @@ class Message
                 $attachName = "file" . $index;
 
                 $media[] = [
-                    'type'  => 'document',
+                    'type' => 'document',
                     'media' => "attach://$attachName"
                 ];
 
