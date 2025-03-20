@@ -118,6 +118,11 @@ if ($type == 'bot_command') {
             ->pollType('regular')
             ->send();
         // Остальные поля нужно прописывать самостоятельно в params()
+        
+    } else if ($text == '/fileid') {
+            $msg = $bot->getFileID('final.gif', $chat_id, 'document');
+            $tg->msg($msg)->send();
+            
     }
 
 } else if ($type == 'text') {
