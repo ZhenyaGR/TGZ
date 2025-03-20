@@ -3,6 +3,7 @@
 namespace ZhenyaGR\TGZ;
 
 use CURLFile;
+use Exception;
 
 class TGZ
 {
@@ -45,8 +46,9 @@ class TGZ
         if ($httpCode >= 200 && $httpCode < 300) {
             return json_decode($response, true);
         }
+        throw new Exception("Telegram API error:\n" . $response);
+        return json_decode($response, true);
 
-        throw new \Exception("Telegram API error:\n" . $response);
     }
 
     public function getWebhookUpdate()

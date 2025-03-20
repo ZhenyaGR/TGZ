@@ -18,16 +18,12 @@ class Message
     private $sendAnimation = false;
     private $sendPoll = false;
     private $sendDocument = false;
+    private $sendVideo = false;
     private $sendMediaGroup = false;
     private $question = '';
-    private $img_url = '';
-    private $gif_url = '';
-    private $doc_url = '';
-    private $img_id = '';
-    private $gif_id = '';
-    private $doc_id = '';
-    private $files = [];
+    private $processMediaGroup = [];
     private $media = [];
+    private $files = [];
     private $options = [];
     private $is_anonymous = false;
     private $pollType = "regular";
@@ -49,7 +45,8 @@ class Message
         ?bool $one_time_keyboard = null,
         ?bool $resize_keyboard = null,
         ?bool $remove_keyboard = null
-    ) {
+    )
+    {
 
         if ($remove_keyboard === true) {
             $this->kbd = ['remove_keyboard' => true];
@@ -102,97 +99,76 @@ class Message
         return $this;
     }
 
-    public function gif(string|array $url)
+    private function processMediaGroup(array $files, string $type)
     {
-        if (is_array($url)) {
-            $media = [];
-            $this->files = [];
 
-            foreach ($url as $index => $file) {
-                $curlFile = new CURLFile($file);
-                $attachName = "file" . $index;
-
-                $media[] = [
-                    'type' => 'document',
-                    'media' => "attach://$attachName"
+        foreach ($files as $file) {
+            if ($this->detectInputType($file)) {
+                // Если требуется загрузка (локальный файл или URL)
+                $fileIndex = count($this->media) + 1;
+                $attachKey = 'attach://file' . $fileIndex;
+                $this->media[] = [
+                    'type' => $type,
+                    'media' => $attachKey
                 ];
-
-                $this->files[$attachName] = $curlFile;
+                // Сохраняем объект CURLFile в отдельном массиве
+                $this->files['file' . $fileIndex] = new CURLFile($file);
+            } else {
+                // Если передан file_id
+                $this->media[] = [
+                    'type' => $type,
+                    'media' => $file
+                ];
             }
-            $this->sendMediaGroup = true;
-            $this->media = $media;
-            return $this;
         }
+        return $this;
+    }
 
-        if (preg_match('/^[A-Za-z0-9_-]+$/', $url)) {
-            $this->gif_id = $url;
-        } else {
-            $this->gif_url = $url;
+
+    private function detectInputType($input)
+    {
+        // Проверка на URL
+        if (filter_var($input, FILTER_VALIDATE_URL)) {
+            return true;
         }
+        // Проверка на локальный файл
+        if (file_exists($input) && is_file($input)) {
+            return true;
+        }
+        // Иначе file_id
+        return false;
+
+    }
+
+    public function gif(string|array $url): self
+    {
+        $url = is_array($url) ? $url : [$url];
+        $this->processMediaGroup($url, 'document');
         $this->sendAnimation = true;
         return $this;
+    }
 
+    public function video(string|array $url): self
+    {
+        $url = is_array($url) ? $url : [$url];
+        $this->processMediaGroup($url, 'video');
+        $this->sendVideo = true;
+        return $this;
     }
 
     public function doc(string|array $url)
     {
-        if (is_array($url)) {
-            $media = [];
-            $this->files = [];
-
-            foreach ($url as $index => $file) {
-                $curlFile = new CURLFile($file);
-                $attachName = "file" . $index;
-
-                $media[] = [
-                    'type' => 'document',
-                    'media' => "attach://$attachName"
-                ];
-
-                $this->files[$attachName] = $curlFile;
-            }
-            $this->sendMediaGroup = true;
-            $this->media = $media;
-            return $this;
-        }
-
+        $url = is_array($url) ? $url : [$url];
+        $this->processMediaGroup($url, 'document');
         $this->sendDocument = true;
-        if (preg_match('/^[A-Za-z0-9_-]+$/', $url)) {
-            $this->doc_id = $url;
-        } else {
-            $this->doc_url = $url;
-        }
         return $this;
     }
 
     public function img(string|array $url)
     {
-        if (is_array($url)) {
-            $media = [];
-            $this->files = [];
-
-            foreach ($url as $index => $file) {
-                $curlFile = new CURLFile($file);
-                $attachName = "file" . $index;
-
-                $media[] = [
-                    'type' => 'photo',
-                    'media' => "attach://$attachName"
-                ];
-
-                $this->files[$attachName] = $curlFile;
-            }
-            $this->sendMediaGroup = true;
-            $this->media = $media;
-            return $this;
-        }
-
+        $url = is_array($url) ? $url : [$url];
+        $this->processMediaGroup($url, 'photo');
         $this->sendPhoto = true;
-        if (preg_match('/^[A-Za-z0-9_-]+$/', $url)) {
-            $this->img_id = $url;
-        } else {
-            $this->img_url = $url;
-        }
         return $this;
 
     }
@@ -229,6 +205,15 @@ class Message
         return $this;
     }
 
+    private function mediaSend($tg, $type, $params)
+    {
+        $params['caption'] = $this->text;
+        $params['parse_mode'] = $this->parse_mode;
+        $params[$type] = strpos($this->media[0]['media'], 'attach://') !== false ? $this->files['file1'] : $this->media[0]['media'];
+        $method = 'send' . ucfirst($type);
+        return $tg->callAPI($method, $params);
+    }
+
     public function send(?int $chatId = null)
     {
         $tg = new TGZ($this->token);
@@ -239,7 +224,7 @@ class Message
         $params = $this->params_additionally != [] ? array_merge($params, $this->params_additionally) : $params;
         $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
 
-        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
 
@@ -247,43 +232,29 @@ class Message
             return $tg->callAPI($method, $params);
         }
 
-        if ($this->sendPhoto) {
-            $params['caption'] = $this->text;
-            $params['parse_mode'] = $this->parse_mode;
-            if (empty($this->img_id)) {
-                $params['photo'] = new CURLFile($this->img_url);
-            } else {
-                $params['photo'] = $this->img_id;
-            }
+        if (count($this->media) > 1) {
+            $this->sendMediaGroup = true;
+            $this->sendPhoto = false;
+            $this->sendDocument = false;
+            $this->sendAnimation = false;
+            $this->sendVideo = false;
+            $this->sendPoll = false;
+        }
 
-            $method = 'sendPhoto';
-            return $tg->callAPI($method, $params);
+        if ($this->sendPhoto) {
+            $this->mediaSend($tg, 'photo', $params);
         }
 
         if ($this->sendDocument) {
-            $params['caption'] = $this->text;
-            $params['parse_mode'] = $this->parse_mode;
-            if (empty($this->doc_id)) {
-                $params['document'] = new CURLFile($this->doc_url);
-            } else {
-                $params['document'] = $this->doc_id;
-            }
+            $this->mediaSend($tg, 'document', $params);
+        }
 
-            $method = 'sendDocument';
-            return $tg->callAPI($method, $params);
+        if ($this->sendVideo) {
+            $this->mediaSend($tg, 'video', $params);
         }
 
         if ($this->sendAnimation) {
-            $params['caption'] = $this->text;
-            $params['parse_mode'] = $this->parse_mode;
-            if (empty($this->gif_id)) {
-                $params['animation'] = new CURLFile($this->gif_url);
-            } else {
-                $params['animation'] = $this->gif_id;
-            }
-
-            $method = 'sendAnimation';
-            return $tg->callAPI($method, $params);
+            $this->mediaSend($tg, 'animation', $params);
         }
 
         if ($this->sendPoll) {
@@ -297,28 +268,35 @@ class Message
         }
 
         if ($this->sendMediaGroup) {
-            $params1 = [];
-            $params1['caption'] = $this->text;
-            $params1['parse_mode'] = $this->parse_mode;
+
+            $params1 = [
+                'caption' => $this->text,
+                'parse_mode' => $this->parse_mode
+            ];
 
             $this->media[0] = array_merge($this->media[0], $params1);
             $mediaChunks = array_chunk($this->media, 10);
-            foreach ($mediaChunks as $media) {
+
+            foreach ($mediaChunks as $mediaChunk) {
 
                 $postFields = array_merge($params, [
-                    'media' => json_encode($media, JSON_THROW_ON_ERROR)
+                    'media' => json_encode($mediaChunk, JSON_THROW_ON_ERROR)
                 ]);
 
-                foreach ($this->files as $attachName => $curlFile) {
-                    $postFields[$attachName] = $curlFile;
+                foreach ($mediaChunk as $item) {
+                    if (strpos($item['media'], 'attach://') === 0) {
+                        $fileKey = str_replace('attach://', '', $item['media']);
+                        $postFields[$fileKey] = $this->files[$fileKey];
+                    }
                 }
+                return $tg->sendMediaGroup($postFields);
 
-                $tg->sendMediaGroup($postFields);
             }
         }
     }
 
-    public function sendEdit(?int $messageId = 0, ?int $chatId = 0)
+    public
+    function sendEdit(?int $messageId = 0, ?int $chatId = 0)
     {
         $tg = new TGZ($this->token);
 
@@ -337,6 +315,7 @@ class Message
         $result = $tg->callAPI($method, $params);
         return $result;
     }
+
 
 }
 
