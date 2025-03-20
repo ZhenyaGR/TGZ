@@ -87,7 +87,7 @@ class Message
 
     public function params(array $params = [])
     {
-        $this->params_additionally = json_encode($params, JSON_THROW_ON_ERROR);
+        $this->params_additionally = $params;
         return $this;
     }
 
