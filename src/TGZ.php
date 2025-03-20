@@ -132,6 +132,20 @@ class TGZ
         return new Message($text, $this->token, $this->chatId, $this->update, $this->parseModeDefault);
     }
 
+    public function getFileID(string $url, int $chat_id, string $type = 'document')
+    {
+        if (!in_array($type, ['document', 'audio', 'photo', 'animation', 'video', 'video_note', 'voice', 'sticker'])) {
+            $type = 'document';
+        }
+        $params[$type] = new CURLFile($url);
+        $params['chat_id'] = $chat_id;
+
+        $method = 'send' . ucfirst($type);
+        $result = $this->callAPI($method, $params);
+        return $result['result'][$type]['file_id'];
+        // Получить file_id в телеграм можно только при отправке файла
+    }
+
     public function sendMessage(int $chatId, string $text)
     {
         $params = [
