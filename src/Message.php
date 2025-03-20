@@ -124,8 +124,12 @@ class Message
             return $this;
         }
 
+        if (preg_match('/^[A-Za-z0-9_-]+$/', $url)) {
+            $this->gif_id = $url;
+        } else {
+            $this->gif_url = $url;
+        }
         $this->sendAnimation = true;
-        $this->gif_url = $url;
         return $this;
 
     }
@@ -153,7 +157,11 @@ class Message
         }
 
         $this->sendDocument = true;
-        $this->doc_url = $url;
+        if (preg_match('/^[A-Za-z0-9_-]+$/', $url)) {
+            $this->doc_id = $url;
+        } else {
+            $this->doc_url = $url;
+        }
         return $this;
     }
 
@@ -180,7 +188,11 @@ class Message
         }
 
         $this->sendPhoto = true;
-        $this->img_url = $url;
+        if (preg_match('/^[A-Za-z0-9_-]+$/', $url)) {
+            $this->img_id = $url;
+        } else {
+            $this->img_url = $url;
+        }
         return $this;
 
     }
@@ -238,7 +250,11 @@ class Message
         if ($this->sendPhoto) {
             $params['caption'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
-            $params['photo'] = new CURLFile($this->img_url);
+            if (empty($this->img_id)) {
+                $params['photo'] = new CURLFile($this->img_url);
+            } else {
+                $params['photo'] = $this->img_id;
+            }
 
             $method = 'sendPhoto';
             return $tg->callAPI($method, $params);
@@ -247,7 +263,11 @@ class Message
         if ($this->sendDocument) {
             $params['caption'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
-            $params['document'] = new CURLFile($this->doc_url);
+            if (empty($this->doc_id)) {
+                $params['document'] = new CURLFile($this->doc_url);
+            } else {
+                $params['document'] = $this->doc_id;
+            }
 
             $method = 'sendDocument';
             return $tg->callAPI($method, $params);
@@ -256,7 +276,11 @@ class Message
         if ($this->sendAnimation) {
             $params['caption'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
-            $params['animation'] = new CURLFile($this->gif_url);
+            if (empty($this->gif_id)) {
+                $params['animation'] = new CURLFile($this->gif_url);
+            } else {
+                $params['animation'] = $this->gif_id;
+            }
 
             $method = 'sendAnimation';
             return $tg->callAPI($method, $params);

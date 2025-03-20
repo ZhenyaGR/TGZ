@@ -74,6 +74,15 @@ if ($type == 'bot_command') {
             ->img([$img_url, $img_url, $img_url])
             ->send();
             
+    }  else if ($text == '/fileid') {
+        $msg = $tg->getFileID('test.jpg', $chat_id, 'photo');
+        $tg->msg($msg)->send();
+
+    } else if ($text == '/photoID') {
+        $tg->msg("Отправка нескольких фотографии с использованием sendPhoto и FileID img()")
+            ->img('AgACAgIAAxkDAAICUmfbEudQY2SXKgsMr00_b_ZAcYErAALP9TEbJsnZSlufCaTwR76hAQADAgADeQADNgQ')
+            ->send();
+
     } else if ($text == '/gif') {
         $tg->msg("Отправка gif-изображений с использованием sendAnimation gif()")
             ->gif($gif_url)
@@ -119,12 +128,8 @@ if ($type == 'bot_command') {
             ->send();
         // Остальные поля нужно прописывать самостоятельно в params()
         
-    } else if ($text == '/fileid') {
-            $msg = $bot->getFileID('final.gif', $chat_id, 'document');
-            $tg->msg($msg)->send();
-            
     }
-
+    
 } else if ($type == 'text') {
     $tg->msg("Вы написали обычный текст")
         ->kbd(remove_keyboard: true) // удаление клавиатуры
