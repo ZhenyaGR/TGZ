@@ -2,6 +2,8 @@
 
 namespace ZhenyaGR\TGZ;
 
+use CURLFile;
+
 class TGZ
 {
     use ErrorHandler;
