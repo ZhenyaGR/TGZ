@@ -23,6 +23,9 @@ class Message
     private $img_url = '';
     private $gif_url = '';
     private $doc_url = '';
+    private $img_id = '';
+    private $gif_id = '';
+    private $doc_id = '';
     private $files = [];
     private $media = [];
     private $options = [];
