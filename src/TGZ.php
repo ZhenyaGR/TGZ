@@ -10,7 +10,6 @@ class TGZ
     use ErrorHandler;
     private $token;
     public $apiUrl;
-    private $botId;
     private $chatId;
     private $update;
     private $json_mode = false;
@@ -133,7 +132,7 @@ class TGZ
 
     public function msg(string $text = '')
     {
-        return new Message($text, $this->token, $this->chatId, $this->update, $this->parseModeDefault);
+        return new Message($text, $this);
     }
 
 

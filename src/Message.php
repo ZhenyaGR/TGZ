@@ -6,11 +6,10 @@ use CURLFile;
 
 class Message
 {
-    private $token;
     private $text;
-    private $chatId_auto;
-    private $update;
-    private $reply_to = false;
+    private $TGZ;
+    private $chatID;
+    private $reply_to = [];
     private $kbd = [];
     private $parse_mode;
     private $params_additionally = [];
@@ -19,9 +18,9 @@ class Message
     private $sendPoll = false;
     private $sendDocument = false;
     private $sendVideo = false;
+    private $sendAudio = false;
     private $sendMediaGroup = false;
     private $question = '';
-    private $processMediaGroup = [];
     private $media = [];
     private $files = [];
     private $options = [];
@@ -29,27 +28,22 @@ class Message
     private $pollType = "regular";
 
 
-    public function __construct($text, $token, $chatId, $update, $parse_mode)
+    public function __construct($text, $TGZ)
     {
-        $this->token = $token;
         $this->text = $text;
-        $this->chatId_auto = $chatId;
-        $this->update = $update;
-        $this->parse_mode = $parse_mode;
+        $this->chatID = $TGZ->chatId;
+        $this->parse_mode = $TGZ->parseModeDefault;
+        $this->TGZ = $TGZ;
     }
 
-    public function kbd(
-        array $buttons = [],
-        array $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false],
-        ?bool $inline = null,
-        ?bool $one_time_keyboard = null,
-        ?bool $resize_keyboard = null,
-        ?bool $remove_keyboard = null
-    )
+    public function kbd(array $buttons = [], array $params = ['inline' => false, "one_time_keyboard" => false, "resize_keyboard" => false], ?bool $inline = null, ?bool $one_time_keyboard = null, ?bool $resize_keyboard = null, ?bool $remove_keyboard = null)
     {
 
-        if ($remove_keyboard === true) {
-            $this->kbd = ['remove_keyboard' => true];
+        if ($remove_keyboard) {
+            $keyboardConfig = ['remove_keyboard' => true];
+            $this->kbd = [
+                'reply_markup' => json_encode($keyboardConfig, JSON_THROW_ON_ERROR)
+            ];
             return $this;
         }
 
@@ -69,7 +63,9 @@ class Message
                 'one_time_keyboard' => $params["one_time_keyboard"]
             ];
 
-        $this->kbd = $kbd;
+        $this->kbd = [
+            'reply_markup' => json_encode($kbd, JSON_THROW_ON_ERROR)
+        ];
         return $this;
     }
 
@@ -88,14 +84,14 @@ class Message
         return $this;
     }
 
-    public function reply(?int $reply_to_message_id = 0)
+    public function reply(?int $reply_to_message_id = null)
     {
-        if ($reply_to_message_id === 0) {
-            $msg_id = $this->update['message']['message_id'] ?? $this->update['callback_query']['message']['message_id'];
+        if ($reply_to_message_id === null) {
+            $msg_id = $this->TGZ->update['message']['message_id'] ?? $this->TGZ->update['callback_query']['message']['message_id'];
         } else {
             $msg_id = $reply_to_message_id;
         }
-        $this->reply_to = $msg_id;
+        $this->reply_to = ['reply_to_message_id' => $msg_id];
         return $this;
     }
 
@@ -124,7 +120,6 @@ class Message
         return $this;
     }
 
-
     private function detectInputType($input)
     {
         // Проверка на URL
@@ -145,6 +140,14 @@ class Message
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'document');
         $this->sendAnimation = true;
+        return $this;
+    }
+
+    public function audio(string|array $url)
+    {
+        $url = is_array($url) ? $url : [$url];
+        $this->processMediaGroup($url, 'audio');
+        $this->sendAudio = true;
         return $this;
     }
 
@@ -170,7 +173,6 @@ class Message
         $this->processMediaGroup($url, 'photo');
         $this->sendPhoto = true;
         return $this;
-
     }
 
     public function urlImg(string $url)
@@ -205,117 +207,118 @@ class Message
         return $this;
     }
 
-    private function mediaSend($tg, $type, $params)
+    public function send(?int $chatID = null): array
+    {
+
+        $params = [
+            'chat_id' => $chatID ?: $this->chatID
+        ];
+        $params = array_merge($params, $this->params_additionally);
+        $params = array_merge($params, $this->reply_to);
+        $params = array_merge($params, $this->kbd);
+
+        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
+            $params['text'] = $this->text;
+            $params['parse_mode'] = $this->parse_mode;
+            return $this->TGZ->callAPI('sendMessage', $params);
+        }
+
+        if (count($this->media) > 1) {
+            return $this->sendMediaGroup($params);
+        }
+
+        return $this->sendMediaType($params);
+    }
+
+    public function sendEdit(?int $messageID = 0, ?int $chatID = null) : array
+    {
+
+        $params = [
+            'text' => $this->text,
+            'parse_mode' => $this->parse_mode,
+            'chat_id' => $chatID ?: $this->chatID,
+            'message_id' => $messageID ?: $this->TGZ->update['callback_query']['message']['message_id']
+        ];
+        $params = array_merge($params, $this->kbd);
+        $params = array_merge($params, $this->params_additionally);
+
+        $method = 'editMessageText';
+        return $this->TGZ->callAPI($method, $params);
+    }
+
+
+    private function sendMediaGroup($params): array
+    {
+        $params1 = [
+            'caption' => $this->text,
+            'parse_mode' => $this->parse_mode
+        ];
+
+        $this->media[0] = array_merge($this->media[0], $params1);
+        $mediaChunks = array_chunk($this->media, 10);
+
+        foreach ($mediaChunks as $mediaChunk) {
+
+            $postFields = array_merge($params, [
+                'media' => json_encode($mediaChunk, JSON_THROW_ON_ERROR)
+            ]);
+
+            foreach ($mediaChunk as $item) {
+                if (strpos($item['media'], 'attach://') === 0) {
+                    $fileKey = str_replace('attach://', '', $item['media']);
+                    $postFields[$fileKey] = $this->files[$fileKey];
+                }
+            }
+            $this->TGZ->callAPI('sendMediaGroup', $postFields);
+        }
+        return [];
+    }
+
+    private function sendPoll($params): array {
+        $params['question'] = $this->question;
+        $params['options'] = json_encode($this->options, JSON_THROW_ON_ERROR);
+        $params['is_anonymous'] = $this->is_anonymous;
+        $params['type'] = $this->pollType;
+
+        return $this->TGZ->callAPI('sendPoll', $params);
+    }
+
+    private function sendMediaType($params): array {
+        if ($this->sendPhoto) {
+            return $this->mediaSend('photo', $params);
+        }
+
+        if ($this->sendDocument) {
+            return $this->mediaSend('document', $params);
+        }
+
+        if ($this->sendVideo) {
+            return $this->mediaSend('video', $params);
+        }
+
+        if ($this->sendAnimation) {
+            return $this->mediaSend('animation', $params);
+        }
+
+        if ($this->sendAudio) {
+            return $this->mediaSend('audio', $params);
+        }
+
+        if ($this->sendPoll) {
+            return $this->sendPoll($params);
+        }
+
+        return [];
+    }
+
+    private function mediaSend($type, $params)
     {
         $params['caption'] = $this->text;
         $params['parse_mode'] = $this->parse_mode;
         $params[$type] = strpos($this->media[0]['media'], 'attach://') !== false ? $this->files['file1'] : $this->media[0]['media'];
-        $method = 'send' . ucfirst($type);
-        return $tg->callAPI($method, $params);
+        return $this->TGZ->callAPI('send' . ucfirst($type), $params);
     }
-
-    public function send(?int $chatId = null)
-    {
-        $tg = new TGZ($this->token);
-
-        $params = [];
-        $params = $this->kbd != [] ? array_merge($params, ['reply_markup' => json_encode($this->kbd, JSON_THROW_ON_ERROR)]) : $params;
-        $params = $this->reply_to !== false ? array_merge($params, ['reply_to_message_id' => $this->reply_to]) : $params;
-        $params = $this->params_additionally != [] ? array_merge($params, $this->params_additionally) : $params;
-        $params['chat_id'] = !empty($chatId) ? $chatId : $this->chatId_auto;
-
-        if (!$this->sendPhoto && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
-            $params['text'] = $this->text;
-            $params['parse_mode'] = $this->parse_mode;
-
-            $method = 'sendMessage';
-            return $tg->callAPI($method, $params);
-        }
-
-        if (count($this->media) > 1) {
-            $this->sendMediaGroup = true;
-            $this->sendPhoto = false;
-            $this->sendDocument = false;
-            $this->sendAnimation = false;
-            $this->sendVideo = false;
-            $this->sendPoll = false;
-        }
-
-        if ($this->sendPhoto) {
-            $this->mediaSend($tg, 'photo', $params);
-        }
-
-        if ($this->sendDocument) {
-            $this->mediaSend($tg, 'document', $params);
-        }
-
-        if ($this->sendVideo) {
-            $this->mediaSend($tg, 'video', $params);
-        }
-
-        if ($this->sendAnimation) {
-            $this->mediaSend($tg, 'animation', $params);
-        }
-
-        if ($this->sendPoll) {
-            $params['question'] = $this->question;
-            $params['options'] = json_encode($this->options, JSON_THROW_ON_ERROR);
-            $params['is_anonymous'] = $this->is_anonymous;
-            $params['type'] = $this->pollType;
-
-            $method = 'sendPoll';
-            return $tg->callAPI($method, $params);
-        }
-
-        if ($this->sendMediaGroup) {
-
-            $params1 = [
-                'caption' => $this->text,
-                'parse_mode' => $this->parse_mode
-            ];
-
-            $this->media[0] = array_merge($this->media[0], $params1);
-            $mediaChunks = array_chunk($this->media, 10);
-
-            foreach ($mediaChunks as $mediaChunk) {
-
-                $postFields = array_merge($params, [
-                    'media' => json_encode($mediaChunk, JSON_THROW_ON_ERROR)
-                ]);
-
-                foreach ($mediaChunk as $item) {
-                    if (strpos($item['media'], 'attach://') === 0) {
-                        $fileKey = str_replace('attach://', '', $item['media']);
-                        $postFields[$fileKey] = $this->files[$fileKey];
-                    }
-                }
-                return $tg->sendMediaGroup($postFields);
-
-            }
-        }
-    }
-
-    public
-    function sendEdit(?int $messageId = 0, ?int $chatId = 0)
-    {
-        $tg = new TGZ($this->token);
-
-        $params = [
-            'chat_id' => ($chatId !== 0) ? $chatId : $this->chatId_auto,
-            'text' => $this->text,
-            'parse_mode' => $this->parse_mode,
-            'message_id' => ($messageId !== 0) ? $messageId : $this->update['callback_query']['message']['message_id']
-        ];
-        $params = $this->kbd != [] ? array_merge($params, ['reply_markup' => $this->kbd]) : $params;
-        $params = $this->params_additionally != [] ? array_merge($params, $this->params_additionally) : $params;
-
-
-        $method = 'editMessageText';
-
-        $result = $tg->callAPI($method, $params);
-        return $result;
-    }
-
 
 }
+
 
