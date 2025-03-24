@@ -20,9 +20,9 @@ trait ErrorHandler
      * @param int|array<int>|callable $ids VK ID пользователя, массив ID или функция-обработчик.
      * @return self Возвращает текущий экземпляр для цепочки вызовов.
      */
-    public function setUserLogError(string|array $ids): self
+    public function setUserLogError(string $ids): self
     {
-        $this->user_error_handler_or_ids = (is_numeric($ids)) ? [$ids] : $ids;
+        $this->user_error_handler_or_ids = $ids;
 
         ini_set('error_reporting', E_ALL);
         ini_set('display_errors', 1);
@@ -191,17 +191,15 @@ trait ErrorHandler
         } else {
             $chatID = $this->user_error_handler_or_ids;
             if ($this->send_error_in_vk) {
-                foreach ($chatId as $id) {
-try {
+                try {
                     $this->callAPI('sendMessage', [
-                        'chat_id' => $id,
+                        'chat_id' => $chatID,
                         'text' => $message
                     ]);
                 } catch (\Exception $e) {
                     $this->send_error_in_vk = false;
                     $this->exceptionHandler($e, E_WARNING, true);
                 }
-} 
             }
         }
     }
@@ -294,7 +292,7 @@ try {
         $line = $trace['line'] ?? '?';
 
         $code_snippet = $this->getCodeSnippet($file, (int) $line);
-        $pattern = '#/(vendor|tgz[^/]*/src|tgz-main[^/]*/src|tg-z[^/]*/src(/.*)#';
+        $pattern = '#/(vendor|simplevk[^/]*/src)(/.*)#';
 
         $formatted_file = $this->filterPaths($file);
         if (isset($trace['file']) && preg_match($pattern, $formatted_file, $matches)) {

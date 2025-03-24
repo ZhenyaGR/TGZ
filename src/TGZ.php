@@ -139,7 +139,6 @@ class TGZ
     }
 
 
-
     public function getFileID(string $url, int $chat_id, string $type = 'document')
     {
         if (!in_array($type, ['document', 'audio', 'photo', 'animation', 'video', 'video_note', 'voice', 'sticker'])) {
@@ -151,7 +150,7 @@ class TGZ
         $method = 'send' . ucfirst($type);
         $result = $this->callAPI($method, $params);
 
-        if ($type == 'photo' && is_array($result['result']['photo'])) {
+        if ($type == 'photo') {
             // Берем последний элемент массива (наибольший по размеру вариант)
             return end($result['result']['photo'])['file_id'];
         }
@@ -161,8 +160,7 @@ class TGZ
         }
 
         if ($type == 'video') {
-            $id = $result['result']['video'];
-            return $id['file_id'];
+            return $result['result']['video']['file_id'];
         }
 
         return $result['result']['document']['file_id'];
