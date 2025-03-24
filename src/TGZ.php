@@ -153,8 +153,11 @@ class TGZ
 
         if ($type == 'photo' && is_array($result['result']['photo'])) {
             // Берем последний элемент массива (наибольший по размеру вариант)
-            $id = end($result['result']['photo']);
-            return $id['file_id'];
+            return end($result['result']['photo'])['file_id'];
+        }
+
+        if ($type == 'audio') {
+            return $result['result']['audio']['file_id'];
         }
 
         if ($type == 'video') {
