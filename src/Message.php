@@ -136,7 +136,7 @@ class Message
 
     }
 
-    public function gif(string|array $url): self
+    public function gif(string|array $url)
     {
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'document');
