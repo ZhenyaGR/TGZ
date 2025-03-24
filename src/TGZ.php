@@ -24,6 +24,7 @@ class TGZ
 
     public function __construct(string $token)
     {
+        $this->sendOK();
         $this->token = $token;
         $this->apiUrl = "https://api.telegram.org/bot{$token}/";
     }
