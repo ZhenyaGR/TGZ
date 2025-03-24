@@ -29,7 +29,7 @@ class TGZ
         $this->apiUrl = "https://api.telegram.org/bot{$token}/";
     }
 
-    public function callAPI(string $method, ?array $params = [])
+    public function callAPI(string $method, ?array $params = []): array
     {
         $url = $this->apiUrl . $method;
         $ch = curl_init();
@@ -45,12 +45,14 @@ class TGZ
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if ($httpCode >= 200 && $httpCode < 300) {
-            return json_decode($response, true);
-        }
-        throw new Exception("Telegram API error:\n" . $response);
-        return json_decode($response, true);
+        $response = json_decode($response, true);
 
+        if ($httpCode >= 200 && $httpCode < 300) {
+            return $response;
+        }
+
+        throw new Exception($this->TGAPIErrorMSG($response, $params));
+        return $response;
     }
 
     public function getWebhookUpdate()

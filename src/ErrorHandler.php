@@ -354,4 +354,32 @@ trait ErrorHandler {
         }
         return $path;
     }
+
+    private function formatArray(array $array, int $indent = 0): string
+    {
+        $space = str_repeat(" ", $indent * 2); // символ " " (U+2007, Figure Space)
+        $result = "Array (\n";
+
+        foreach ($array as $key => $value) {
+            if (is_string($value) && ($decoded = json_decode($value, true)) !== null) {
+                // Если значение — JSON, декодируем его в массив
+                $value = $decoded;
+            }
+
+            if (is_array($value)) {
+                $result .= $space . "  [$key] => " . $this->formatArray($value, $indent + 1);
+            } else {
+                $result .= $space . "  [$key] => " . ($value ?: 'null')  . "\n";
+            }
+        }
+        return $result . $space . ")\n";
+    }
+
+    private function TGAPIErrorMSG($response, $params): string
+    {
+        $function_params['error_code'] = $response['error_code'];
+        $function_params['description'] = $response['description'];
+        $function_params['request_params'] = $params;
+        return "Telegram API error:\n" . $this->formatArray($function_params);
+    }
 }
