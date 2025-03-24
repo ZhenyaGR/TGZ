@@ -19,6 +19,7 @@ class Message
     private $sendDocument = false;
     private $sendVideo = false;
     private $sendAudio = false;
+    private $sendVoice = false;
     private $sendMediaGroup = false;
     private $question = '';
     private $media = [];
@@ -143,6 +144,14 @@ class Message
         return $this;
     }
 
+    public function voice(string $url)
+    {
+        $url = is_array($url) ? $url : [$url];
+        $this->processMediaGroup($url, 'voice');
+        $this->sendVoice = true;
+        return $this;
+    }
+
     public function audio(string|array $url)
     {
         $url = is_array($url) ? $url : [$url];
@@ -217,13 +226,13 @@ class Message
         $params = array_merge($params, $this->reply_to);
         $params = array_merge($params, $this->kbd);
 
-        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendVoice  && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
             return $this->TGZ->callAPI('sendMessage', $params);
         }
 
-        if (count($this->media) > 1) {
+        if (count($this->media) > 1 && !$this->sendVoice ) {
             return $this->sendMediaGroup($params);
         }
 
@@ -302,6 +311,10 @@ class Message
 
         if ($this->sendAudio) {
             return $this->mediaSend('audio', $params);
+        }
+
+        if ($this->sendVoice) {
+            return $this->mediaSend('voice', $params);
         }
 
         if ($this->sendPoll) {
