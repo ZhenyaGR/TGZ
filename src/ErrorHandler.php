@@ -121,12 +121,12 @@ trait ErrorHandler {
                     $meta['stream_type'] === 'STDIO';
 
                 if(!$is_regular_console) {
-                    $clear_msg = "<pre>$clear_msg</pre>";
+                    $web_msg = "<pre>$clear_msg</pre>";
                 }
 
                 //Выводить цветное только если скрипт запущен из консоли и вывод не перенаправляется в файл
                 //При использовании nohup, crontab и т.д. вывод будет не цветным
-                print $is_regular_console ? $color_msg : $clear_msg;
+                print $is_regular_console ? $color_msg : $web_msg;
             }
 
             $this->dispatchErrorMessage($error_type, $clear_msg, $code, $exception);
