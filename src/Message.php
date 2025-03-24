@@ -20,6 +20,7 @@ class Message
     private $sendVideo = false;
     private $sendAudio = false;
     private $sendVoice = false;
+    private $sendDice = false;
     private $sendMediaGroup = false;
     private $question = '';
     private $media = [];
@@ -136,6 +137,13 @@ class Message
 
     }
 
+    public function dice(string $dice)
+    {
+        $this->sendDice = true;
+        $this->text = $dice;
+        return $this;
+    }
+
     public function gif(string|array $url)
     {
         $url = is_array($url) ? $url : [$url];
@@ -226,7 +234,7 @@ class Message
         $params = array_merge($params, $this->reply_to);
         $params = array_merge($params, $this->kbd);
 
-        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendVoice  && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendDice && !$this->sendVoice  && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
             return $this->TGZ->callAPI('sendMessage', $params);
@@ -315,6 +323,11 @@ class Message
 
         if ($this->sendVoice) {
             return $this->mediaSend('voice', $params);
+        }
+
+        if ($this->sendDice) {
+            $params['emoji'] = $this->text;
+            return $this->TGZ->callAPI('sendDice', $params);
         }
 
         if ($this->sendPoll) {
