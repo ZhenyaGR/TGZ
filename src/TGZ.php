@@ -8,12 +8,14 @@ use Exception;
 class TGZ
 {
     use ErrorHandler;
-    private $token;
-    public $apiUrl;
-    private $chatId;
-    private $update;
-    private $json_mode = false;
-    private $parseModeDefault = '';
+
+    private string $token;
+    public string $apiUrl;
+    public int $chatId;
+    public array $update;
+    private bool $json_mode = false;
+    public string $parseModeDefault = '';
+
 
     public static function create(string $token)
     {
