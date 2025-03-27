@@ -223,6 +223,27 @@ class Message
         $this->pollType = $type;
         return $this;
     }
+    
+    public function action(?string $action = 'typing')
+    {
+        if (in_array($action, [
+            'typing',
+            'upload_photo',
+            'upload_video',
+            'record_video',
+            'record_voice',
+            'upload_voice',
+            'upload_document',
+            'choose_sticker',
+            'find_location',
+            'record_video_note',
+            'upload_video_note'
+        ])) {
+            $action = 'typing';
+        }
+        $this->TGZ->callAPI('sendChatAction', ['chat_id' => $this->chatID, 'action' => $action]);
+        return $this;
+    }
 
     public function send(?int $chatID = null): array
     {
