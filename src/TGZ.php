@@ -60,7 +60,12 @@ class TGZ
         $input = file_get_contents('php://input');
         $update = json_decode($input, true);
         $this->update = $update;
-        $this->chatId = isset($update['message']) ? $update['message']['chat']['id'] : (isset($update['callback_query']) ? $update['callback_query']['message']['chat']['id'] : null);
+
+        $findChatID = $update;
+        if (isset($update['callback_query'])) {
+            $findChatID = $update['callback_query'];
+        }
+        $this->chatId = isset($findChatID['message']['chat']['id']) ? $findChatID['message']['chat']['id'] : null;
 
         if ($this->json_mode == true) {
             $this->sendMessage($this->chatId, $input);
