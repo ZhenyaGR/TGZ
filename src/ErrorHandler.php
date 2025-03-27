@@ -285,8 +285,8 @@ trait ErrorHandler {
             $first_trace = $trace_data[0] ?? null;
             if($first_trace
                 && !isset($first_trace['file'])
-                && $first_trace['function'] == 'userErrorHandler'
-                && $first_trace['class'] == 'ZhenyaGR\TGZ\TGZ') {
+                && $first_trace['function'] === 'userErrorHandler'
+                && $first_trace['class'] === 'ZhenyaGR\TGZ\TGZ') {
                 //поледний трейс идет из SimpleVK класса, потому что он использует трейт ErrorHandler
                 array_shift($trace_data); //удаляем userErrorHandler()
             }
