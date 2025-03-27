@@ -88,7 +88,7 @@ class TGZ
             $user_id = $update['message']['from']['id'];
             $msg_id = $update['message']['message_id'];
             $is_bot = $update['message']['from']['is_bot'];
-            $is_command = (isset($update['message']['entities'][0]['type']) && $update['message']['entities'][0]['type'] == 'bot_command') ? true : false;
+            $is_command = (isset($update['message']['entities'][0]['type']) && $update['message']['entities'][0]['type'] === 'bot_command') ? true : false;
             $callback_data = false;
             $callback_id = false;
 
@@ -152,16 +152,16 @@ class TGZ
         $method = 'send' . ucfirst($type);
         $result = $this->callAPI($method, $params);
 
-        if ($type == 'photo') {
+        if ($type === 'photo') {
             // Берем последний элемент массива (наибольший по размеру вариант)
             return end($result['result']['photo'])['file_id'];
         }
 
-        if ($type == 'audio') {
+        if ($type === 'audio') {
             return $result['result']['audio']['file_id'];
         }
 
-        if ($type == 'video') {
+        if ($type === 'video') {
             return $result['result']['video']['file_id'];
         }
 
