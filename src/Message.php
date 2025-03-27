@@ -154,7 +154,7 @@ class Message
 
     public function voice(string $url)
     {
-        $url = is_array($url) ? $url : [$url];
+        $url = [$url];
         $this->processMediaGroup($url, 'voice');
         $this->sendVoice = true;
         return $this;
