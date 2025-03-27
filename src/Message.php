@@ -223,7 +223,7 @@ class Message
         $this->pollType = $type;
         return $this;
     }
-    
+
     public function action(?string $action = 'typing')
     {
         if (in_array($action, [
