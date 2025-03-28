@@ -13,7 +13,6 @@ class TGZ
     public string $apiUrl;
     public int $chatId;
     public array $update;
-    private bool $json_mode = false;
     public string $parseModeDefault = '';
 
 
@@ -27,6 +26,16 @@ class TGZ
         $this->sendOK();
         $this->token = $token;
         $this->apiUrl = "https://api.telegram.org/bot{$token}/";
+        $input = file_get_contents('php://input');
+        $update = json_decode($input, true);
+        $this->update = $update;
+
+        $findChatID = $update;
+        if (isset($update['callback_query'])) {
+            $findChatID = $update['callback_query'];
+        }
+        $this->chatId = isset($findChatID['message']['chat']['id']) ? $findChatID['message']['chat']['id'] : null;
+
     }
 
     public function callAPI(string $method, ?array $params = []): array
@@ -57,20 +66,7 @@ class TGZ
 
     public function getWebhookUpdate()
     {
-        $input = file_get_contents('php://input');
-        $update = json_decode($input, true);
-        $this->update = $update;
-
-        $findChatID = $update;
-        if (isset($update['callback_query'])) {
-            $findChatID = $update['callback_query'];
-        }
-        $this->chatId = isset($findChatID['message']['chat']['id']) ? $findChatID['message']['chat']['id'] : null;
-
-        if ($this->json_mode == true) {
-            $this->sendMessage($this->chatId, $input);
-        }
-        return $update;
+        return $this->update;
     }
 
     public function __call(string $method, array $args = [])
@@ -127,11 +123,6 @@ class TGZ
             $mode = '';
         }
         $this->parseModeDefault = $mode;
-    }
-
-    public function jsonMode(bool $flag = true)
-    {
-        $this->json_mode = $flag;
     }
 
     public function sendOK()
