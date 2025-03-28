@@ -7,7 +7,7 @@ composer require zhenyagr/tg-z:dev-main
 
 2\. Подключить `autoload.php`
 ```php
-require_once __DIR__.'/vendor/autoload.php';
+require_once '/vendor/autoload.php';
 ```
 ### Вручную
 1. Скачать последний релиз c [github](https://github.com/ZhenyaGR/TGZ)
@@ -17,166 +17,299 @@ require_once __DIR__.'/vendor/autoload.php';
 require_once "tg-z/autoload.php";
 ```
 
-# Примеры ботов
+### [Первоначальная настройка, создание бота и получение токена](TokenCreate.md)
+
+---
+# Примеры использования
+
+### Вызов любых методов BOT API. Например copyMessage
+```php
+<?php
+require 'TGZ/autoload.php';  // Подключаем библиотеку
+use ZhenyaGR\TGZ\TGZ as tg;  // Используем основной класс
+
+$tg = tg::create(BOT_TOKEN); // Создаем объект бота
+$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id); 
+// Инициализируем переменные
+
+if ($type == 'text' || $type == 'bot_command') {
+    $tg->copyMessage([
+        'chat_id' => $chat_id, 
+        'message_id' => $msg_id
+    ]); 
+    // Используем метод телеграма, передаем 2 параметра: chat_id и message_id
+}
+```
+### Эхо-бот с конструктором сообщений
+```php
+<?php
+require 'TGZ/autoload.php'; 
+use ZhenyaGR\TGZ\TGZ as tg; 
+
+$tg = tg::create(BOT_TOKEN);
+$tg->initVars($chat_id, $user_id, $text, $type);
+
+if ($type == 'text' || $type == 'bot_command') {
+    $tg->msg($text)->send(); // Отправляем сообщение с таким-же текстом
+}
+```
+### Отправка медиа-файлов
+```php
+<?php
+require 'TGZ/autoload.php'; 
+use ZhenyaGR\TGZ\TGZ as tg; 
+
+$tg = tg::create(BOT_TOKEN);
+$tg->initVars($chat_id, $user_id, $text, $type);
+
+if ($type == 'text' || $type == 'bot_command') {
+    switch ($text) {
+    
+        case '/fileid':
+            $id = $tg->getFileID('file url', $chat_id, 'file type');
+            // Получаем ID медиа-файла, загружая его на сервер телеграма
+            $tg->msg($id)->send();
+            // Этот File_id можно использовать для повторной отправки файла
+            break;
+    
+        case '/img':
+            $tg->msg()
+                ->img('img.jpg') // Отправка Изображений
+                ->send();
+            break;
+            
+        case '/img_url':
+            $tg->msg("Текст сообщения")
+                ->urlImg($img_url)
+                ->send();
+            // Добавляет ссылку в текст сообщения, используя пробел нулевой ширины
+            break;
+            
+        case '/gif':
+            $tg->msg()
+                ->gif('gif.gif') // Отправка Гиф
+                ->send();
+            break;
+            
+        case '/video':
+            $tg->msg()
+                ->video('video.mp4') // Отправка Видео
+                ->send();
+            break;
+            
+        case '/audio':
+            $tg->msg()
+                ->audio('audio.mp3') // Отправка Аудио
+                ->send();
+            break;
+            
+        case '/voice':
+            $tg->msg()
+                ->voice('voice.mp3') // Отправка Голосового сообщения
+                ->send();
+            break;
+            
+        case '/dice':
+            $emoji = ["🎲", "🎯", "🏀", "⚽", "🎳", "🎰"];
+            $tg->msg()
+                ->dice($emoji[array_rand($emoji)]) // Отправка Интерактивного сообщения
+                ->send();
+            break;
+            
+        case '/doc':
+            $tg->msg()
+                ->doc('doc.txt') // Отправка Документа
+                ->send();
+            break;
+            
+        case '/combine':
+            $tg->msg()
+                ->img('img.jpg')
+                ->video('video.mp4')
+                ->send(); // Отправка нескольких файлов
+            break;
+    }
+}
+```
+### Отправка клавиатуры и Кнопок
+```php
+<?php    
+require 'TGZ/autoload.php'; 
+use ZhenyaGR\TGZ\TGZ as tg; 
+
+$tg = tg::create(BOT_TOKEN);
+$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+
+if ($type == 'text' || $type == 'bot_command') {
+    switch ($text) {
+        case '/inline':
+            // Создаем массив с кнопками
+            $kbd = [
+                [   // Создаем callback-кнопки
+                    $tg->buttonCallback('Кнопка 1', 'call1'),
+                    $tg->buttonCallback('Кнопка 2', 'call2')
+                ],
+                [
+                    $tg->buttonCallback('Кнопка-Редактирование', 'edit')
+                ],
+                [   // Создаем url-кнопку
+                    $tg->buttonUrl('GitHub Библиотеки', "https://github.com/ZhenyaGR/TGZ")
+                ]
+            ];
+            $tg->msg("Текст сообщения")
+                ->kbd($kbd, inline: true)
+                ->send();
+            // Отправляем с параметром inline: true
+            break;
+
+        case '/keyboard':
+            // Создаем массив с кнопками
+            $kbd = [ // Создаем текстовые кнопки
+                [$tg->buttonText('Текстовая кнопка')],
+                [$tg->buttonText('Удалить клавиатуру')]
+            ];
+            $tg->msg("Текст сообщения")
+                ->kbd($kbd, inline: false, resize_keyboard: true, one_time_keyboard: false)
+                ->send();
+            // Отправляем с параметрами inline: false, resize_keyboard: true, one_time_keyboard: false
+            break;
+            
+        case 'Текстовая кнопка':
+            // Приходит как обычное сообщение
+            $tg->msg("Вы нажали текстовую кнопку")->send();        
+            break;
+            
+        case 'Удалить клавиатуру':
+            $tg->msg("Клавиатура удалена")
+                ->kbd(remove_keyboard: true)
+                ->send();
+            // Удаляем клавиатуру
+            break;
+    }
+} else if ($type == 'callback_query') {
+    $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]);    
+    // Отправляем уведомление об нажатии
+    switch ($callback_data) {
+        case 'call1':
+            $tg->msg("Вы нажали кнопку №1")->send();
+            break;
+            
+        case 'call2':
+            $tg->msg("Вы нажали кнопку №2")->send();
+            break;
+        
+        case 'edit':
+            $tg->msg("Сообщение отредактировано")->sendEdit();
+            // Редактируем сообщение
+            break;
+    }
+}
+```
+### Отправка Опросов
+```php
+<?php    
+require 'TGZ/autoload.php'; 
+use ZhenyaGR\TGZ\TGZ as tg; 
+
+$tg = tg::create(BOT_TOKEN);
+$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+
+if ($type == 'text' || $type == 'bot_command') {
+    switch ($text) {
+        case '/poll':
+            $tg->msg()
+                ->poll('Вопрос опроса') // Отображаемый вопрос
+                ->addAnswer('Ответ 1')  // Добавляем ответы
+                ->addAnswer('Ответ 2')  
+                ->addAnswer('Ответ 3')
+                ->isAnonymous(true)     // Анонимный опрос
+                ->pollType('regular')   // Тип опроса
+                ->send();
+            break;
+    }
+}
+```
+### Дополнительные функции конструктора сообщений
+```php
+<?php    
+require 'TGZ/autoload.php'; 
+use ZhenyaGR\TGZ\TGZ as tg; 
+
+$tg = tg::create(BOT_TOKEN);
+$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+
+if ($type == 'text' || $type == 'bot_command') {
+    switch ($text) {
+        case '/reply':
+            $tg->msg('Ответ на сообщение')
+                ->reply()
+                ->send();
+            break;
+            
+        case '/action':
+            $send = $tg->msg('Отображение действий бота с помощью sendChatAction')
+                ->action('typing');
+                // Пока бот не отправит сообщение, будет отображаться "Печатает..."
+            sleep(3);
+            $send->send();
+            break;
+        
+        case '/params':
+            $tg->msg("Дополнительные параметры сообщения")
+                ->params(['disable_web_page_preview' => true]) // Отключаем предпросмотр ссылок
+                ->send();
+            break;
+    }
+}
+```
+## Форматирование сообщений
+
 ```php
 <?php
 require 'TGZ/autoload.php';
 use ZhenyaGR\TGZ\TGZ as tg;
 
-$tg = tg::create($token);
-$tg->jsonMode(0);           // Сделать отправку json-запросов от телеграмм 
-$tg->defaultParseMode('');  // Сделать parseMode() по умолчанию 
-
-$update = $tg->getWebhookUpdate();
+$tg = tg::create(BOT_TOKEN);
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
 
-if ($type == 'bot_command') {
-
-    $img_url = 'https://12-kanal.ru/upload/iblock/62a/zb1mq2841smduhwwuv3jwjfv9eooyc50/fotograf3.jpg';
-    $gif_url = 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif';
-
-    if ($text == '/info' || $text == '/start') {
-        $tg->msg("Самая лучшая библиотека для телеграмма – TG-Z!\n<a href=\"https://github.com/ZhenyaGR/TGZ\">Гитхаб</a>\n\nВ ней реализованы:\n1. Отправка сообщений c разным форматированием (/format)\n2. Создание кнопок и клавиатур (/buttons1 /buttons2)\n3. Отправка изображений двумя способами (/photo1, /photo2)\n4. Редактирование сообщений (/edit)\n5. Ответ на сообщение (/reply)\n6. Создание опросов (/poll)")
-            ->params(['disable_web_page_preview' => true])
-            ->parseMode("HTML")
-            ->send();
-
-    } else if ($text == '/buttons1') {
-        $kbd = [
-            [
-                $tg->buttonCallback('Кнопка1', 'call1'),
-                $tg->buttonCallback('Кнопка2', 'call2')
-            ],
-            [
-                $tg->buttonUrl('Лучшая библиотека', "https://github.com/ZhenyaGR/TGZ")
-            ]
-        ];
-        $tg->msg("Отправка кнопок с помощью kbd()")->kbd($kbd, inline: true)->send();
-
-    } else if ($text == '/buttons2') {
-        $kbd = [
-            [$tg->buttonText('Кнопка')],
-        ];
-        $tg->msg("Отправка клавиатуры с помощью kbd()")->kbd($kbd, inline: false, one_time_keyboard: true)->send();
-
-    } else if ($text == '/photo1') {
-        $tg->msg("Отправка фотографии с использованием ссылки urlImg()")
-            ->urlImg($img_url)
-            ->send();
-
-    }  else if ($text == '/photo2') {
-        $tg->msg("Отправка фотографии с использованием sendPhoto img()")
-            ->img($img_url)
-            ->send();
-
-    } else if ($text == '/photo3') {
-        $tg->msg("Отправка нескольких фотографий с использованием sendMediaGroup img()")
-            ->img([$img_url, $img_url, $img_url])
-            ->send();
+if ($type == 'text' || $type == 'bot_command') {    
+    switch ($text) {
+        case '/html':
+            $tg->msg("<b>Отправка сообщений с форматированием HTML</b>")
+                ->parseMode('HTML')
+                ->send();
+            break;
             
-    }  else if ($text == '/fileid') {
-        $msg = $tg->getFileID('test.jpg', $chat_id, 'photo');
-        $tg->msg($msg)->send();
-
-    } else if ($text == '/photoID') {
-        $tg->msg("Отправка нескольких фотографии с использованием sendPhoto и FileID img()")
-            ->img('AgACAgIAAxkDAAICUmfbEudQY2SXKgsMr00_b_ZAcYErAALP9TEbJsnZSlufCaTwR76hAQADAgADeQADNgQ')
-            ->send();
-
-    } else if ($text == '/gif') {
-        $tg->msg("Отправка gif-изображений с использованием sendAnimation gif()")
-            ->gif($gif_url)
-            ->send();
-
-    } else if ($text == '/doc1') {
-        $tg->msg("Отправка документов с использованием sendDocument doc()")
-            ->doc('document.txt')
-            ->send();
-
-    } else if ($text == '/doc2') {
-        $tg->msg("Отправка нескольких документов с использованием sendMediaGroup doc()")
-            ->doc(['document.txt', 'document.txt', 'document.txt'])
-            ->send();
-
-    } else if ($text == '/format') {
-
-        $msg = "ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ MarkdownV2\n\n*Жирный*\n\n_Курсив_\n\n__Подчёркнутый__\n\n`Моноширинный`\n\n[Ссылка](https://github.com/ZhenyaGR/TGZ)\n\n||Спойлер||";
-        $tg->msg($msg . "\n\nparseMode\(\)")
-            ->params(['disable_web_page_preview' => true])
-            ->parseMode("MarkdownV2")->send();
-
-        // $msg = "ВАРИАНТ С ИСПОЛЬЗОВАНИЕМ HTML\n\n<b>Жирный</b>\n\n<i>Курсив</i>\n\n<u>Подчёркнутый</u>\n\n<code>Моноширинный</code>\n\n<a href="https://github.com/ZhenyaGR/TGZ">Ссылка</a>\n\n <span class="tg-spoiler">Спойлер</span>";
-        // $tg->msg($msg)->parseMode("HTML")->send();
-    } else if ($text == '/edit') {
-        $kbd = [
-            [$tg->buttonCallback('Редактировать Сообщение', 'edit')]
-        ];
-
-        $tg->msg("Можно редактировать сообщения, используя конструктор")->kbd($kbd, inline: true)->send();
-
-    } else if ($text == '/reply') {
-        $tg->msg("Ответ на сообщение с помощью функции reply()")->reply()->send();
-
-    } else if ($text == '/poll') {
-        $tg->msg()
-            ->poll('Создание опросов poll()')
-            ->addAnswer('Ответ 1')
-            ->addAnswer('Ответ 2')
-            ->addAnswer('Ответ 3')
-            ->isAnonymous(true)
-            ->pollType('regular')
-            ->send();
-        // Остальные поля нужно прописывать самостоятельно в params()
-        
+        case '/markdown':
+            $tg->msg("*Отправка сообщений с форматированием Markdown*")
+                ->parseMode('MarkdownV2')
+                ->send();
+            break;
     }
-    
-} else if ($type == 'text') {
-    $tg->msg("Вы написали обычный текст")
-        ->kbd(remove_keyboard: true) // удаление клавиатуры
-        ->send();
-
-} elseif ($type == 'callback_query') {
-    $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]);
-
-    if ($callback_data == 'call1') {
-        $tg->msg("Вы нажали кнопку №1\nCallback data: $callback_data")->send();
-    } else if ($callback_data == 'call2') {
-        $tg->msg("Вы нажали кнопку №2\nCallback data: $callback_data")->send();
-    } else if ($callback_data == 'edit') {
-        $kbd = [
-            [
-                $tg->buttonCallback('Кнопка1', 'call1'),
-                $tg->buttonCallback('Кнопка2', 'call2'),
-            ]
-        ];
-
-        $tg->msg("Cообщение отредактировано sendEdit()\nСохраняется возможность отправить кнопки")->kbd($kbd, inline: true)->sendEdit();
-
-    }
-
 }
-
-
-$tg->sendOK();
-
-// Отправляем телеграмму "ok"
 ```
-## Ссылка на этого бота @DemTGZ_bot
+---
+### **MarkdownV2**
+```markdown
+*Жирный*  
+_Курсив_  
+__Подчёркнутый__  
+`Моноширинный`  
+[Ссылка](https://github.com/ZhenyaGR/TGZ)  
+||Спойлер||
+```
 
-## Форматирование сообщений
+### **HTML**
+```html
+<b>Жирный</b>  
+<i>Курсив</i>  
+<u>Подчёркнутый</u>  
+<code>Моноширинный</code>  
+<a href="https://github.com/ZhenyaGR/TGZ">Ссылка</a>  
+<span class="tg-spoiler">Спойлер</span>
+```
 
-### Вариант с ипользованием MarkdownV2  
-\*Жирный\*  
-\_Курсив\_  
-\_\_Подчёркнутый\_\_  
-\`Моноширинный\`  
-\[Ссылка\]\(https://github.com/ZhenyaGR/TGZ\)  
-\|\|Спойлер\|\|  
+### Примечания:
+Для MarkdownV2 экранируйте символы `_*[]()~>#+-=|{}.!` с помощью `\`, например: `\_некурсив\_`
 
-### Вариант с ипользованием HTML  
-\<b\>Жирный\</b\>  
-\<i\>Курсив\</i\>  
-\<u\>Подчёркнутый\</u\>  
-\<code\>Моноширинный\</code\>  
-\<a href="https://github.com/ZhenyaGR/TGZ"\>Ссылка\</a\>  
-\<span class="tg-spoiler"\>Спойлер\</span\>
+## Ссылка на демонстрационного бота: https://t.me/DemTGZ_bot
