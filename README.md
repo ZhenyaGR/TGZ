@@ -12,9 +12,9 @@ require_once '/vendor/autoload.php';
 ### Вручную
 1. Скачать последний релиз c [github](https://github.com/ZhenyaGR/TGZ)
 2. Подключить `autoload.php`.  
-> Вот так будет происходить подключение, если ваш бот находится в той же папке, что и папка `tg-z`
+> Вот так будет происходить подключение, если ваш бот находится в той же папке, что и папка `TGZ`
 ```php
-require_once "tg-z/autoload.php";
+require_once "TGZ/autoload.php";
 ```
 
 ### [Первоначальная настройка, создание бота и получение токена](TokenCreate.md)
