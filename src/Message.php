@@ -17,6 +17,7 @@ class Message
     private $sendAnimation = false;
     private $sendPoll = false;
     private $sendDocument = false;
+    private $sendSticker = false;
     private $sendVideo = false;
     private $sendAudio = false;
     private $sendVoice = false;
@@ -24,6 +25,7 @@ class Message
     private $sendMediaGroup = false;
     private $question = '';
     private $media = [];
+    private $sticker_id = '';
     private $files = [];
     private $options = [];
     private $is_anonymous = false;
@@ -206,6 +208,13 @@ class Message
         return $this;
     }
 
+    public function sticker(string $file_id)
+    {
+        $this->sendSticker = true;
+        $this->sticker_id = $file_id;
+        return $this;
+    }
+
     public function addAnswer(string $text)
     {
         $this->options[] = $text;
@@ -255,20 +264,20 @@ class Message
         $params = array_merge($params, $this->reply_to);
         $params = array_merge($params, $this->kbd);
 
-        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendDice && !$this->sendVoice  && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendDice && !$this->sendVoice && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
             return $this->TGZ->callAPI('sendMessage', $params);
         }
 
-        if (count($this->media) > 1 && !$this->sendVoice ) {
+        if (count($this->media) > 1 && !$this->sendVoice) {
             return $this->sendMediaGroup($params);
         }
 
         return $this->sendMediaType($params);
     }
 
-    public function sendEdit(?int $messageID = 0, ?int $chatID = null) : array
+    public function sendEdit(?int $messageID = 0, ?int $chatID = null): array
     {
 
         $params = [
@@ -312,7 +321,8 @@ class Message
         return [];
     }
 
-    private function sendPoll($params): array {
+    private function sendPoll($params): array
+    {
         $params['question'] = $this->question;
         $params['options'] = json_encode($this->options, JSON_THROW_ON_ERROR);
         $params['is_anonymous'] = $this->is_anonymous;
@@ -321,7 +331,14 @@ class Message
         return $this->TGZ->callAPI('sendPoll', $params);
     }
 
-    private function sendMediaType($params): array {
+    private function sendSticker($params): array
+    {
+        $params['sticker'] = $this->sticker_id;
+        return $this->TGZ->callAPI('sendSticker', $params);
+    }
+
+    private function sendMediaType($params): array
+    {
         if ($this->sendPhoto) {
             return $this->mediaSend('photo', $params);
         }
@@ -353,6 +370,10 @@ class Message
 
         if ($this->sendPoll) {
             return $this->sendPoll($params);
+        }
+
+        if ($this->sendSticker) {
+            return $this->sendSticker($params);
         }
 
         return [];

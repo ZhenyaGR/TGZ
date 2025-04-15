@@ -122,6 +122,12 @@ if ($type == 'text' || $type == 'bot_command') {
                 ->send();
             break;
             
+        case '/sticker':
+            $tg->msg()
+                ->sticker('sticker_id')
+                ->send(); // Отправка стикеров
+            break;
+            
         case '/combine':
             $tg->msg()
                 ->img('img.jpg')
