@@ -8,7 +8,7 @@ class Message
 {
     private $text;
     private $TGZ;
-    private $chatID;
+    private $chatID = null;
     private $reply_to = [];
     private $kbd = [];
     private $parse_mode;
