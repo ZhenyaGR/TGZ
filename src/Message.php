@@ -6,30 +6,30 @@ use CURLFile;
 
 class Message
 {
-    private $text;
-    private $TGZ;
-    private $chatID = null;
-    private $reply_to = [];
-    private $kbd = [];
-    private $parse_mode;
-    private $params_additionally = [];
-    private $sendPhoto = false;
-    private $sendAnimation = false;
-    private $sendPoll = false;
-    private $sendDocument = false;
-    private $sendSticker = false;
-    private $sendVideo = false;
-    private $sendAudio = false;
-    private $sendVoice = false;
-    private $sendDice = false;
-    private $sendMediaGroup = false;
-    private $question = '';
-    private $media = [];
-    private $sticker_id = '';
-    private $files = [];
-    private $options = [];
-    private $is_anonymous = false;
-    private $pollType = "regular";
+    private ?string $text;
+    private object $TGZ;
+    private int $chatID = 0;
+    private array $reply_to = [];
+    private array $kbd = [];
+    private string $parse_mode;
+    private array $params_additionally = [];
+    private bool $sendPhoto = false;
+    private bool $sendAnimation = false;
+    private bool $sendPoll = false;
+    private bool $sendDocument = false;
+    private bool $sendSticker = false;
+    private bool $sendVideo = false;
+    private bool $sendAudio = false;
+    private bool $sendVoice = false;
+    private bool $sendDice = false;
+    private bool $sendMediaGroup = false;
+    private string $question = '';
+    private array $media = [];
+    private string $sticker_id = '';
+    private array $files = [];
+    private array $options = [];
+    private bool $is_anonymous = false;
+    private string $pollType = "regular";
 
 
     public function __construct($text, $TGZ)
