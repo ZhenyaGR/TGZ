@@ -11,7 +11,6 @@ class TGZ
 
     private string $token;
     public string $apiUrl;
-    public int $chatId;
     public array $update;
     public string $parseModeDefault = '';
 
@@ -24,17 +23,13 @@ class TGZ
     public function __construct(string $token)
     {
         $this->sendOK();
+
         $this->token = $token;
         $this->apiUrl = "https://api.telegram.org/bot{$token}/";
+
         $input = file_get_contents('php://input');
         $update = json_decode($input, true);
         $this->update = $update;
-
-        $findChatID = $update;
-        if (isset($update['callback_query'])) {
-            $findChatID = $update['callback_query'];
-        }
-        $this->chatId = isset($findChatID['message']['chat']['id']) ? $findChatID['message']['chat']['id'] : null;
 
     }
 
@@ -79,42 +74,72 @@ class TGZ
     {
         $update = $this->update;
 
-        if (isset($update['message'])) {
+        $test = $this->initUserID($user_id)
+            ->initChatID($chat_id)
+            ->initText($text)
+            ->initMsgID($msg_id)
+            ->initType($type);
 
-            $chat_id = $update['message']['chat']['id'];
-            $text = $update['message']['text'] ?? null;
-            if ($text == null) {
-                $text = $update['message']['caption'] ?? null;
-            }
-            $user_id = $update['message']['from']['id'];
-            $msg_id = $update['message']['message_id'];
+        if (isset($update['message'])) {
             $is_bot = $update['message']['from']['is_bot'];
             $is_command = (isset($update['message']['entities'][0]['type']) && $update['message']['entities'][0]['type'] === 'bot_command') ? true : false;
             $callback_data = false;
             $callback_id = false;
 
-            if ($is_command) {
-                $type = 'bot_command';
-            } else {
-                $type = 'text';
-            }
-
         } else if (isset($update['callback_query'])) {
-
-            $chat_id = $update['callback_query']['message']['chat']['id'];
-            $text = $update['callback_query']['message']['text'] ?? null;
-            if ($text == null) {
-                $text = $update['callback_query']['message']['caption'] ?? null;
-            }
-            $user_id = $update['callback_query']['from']['id'];
-            $msg_id = $update['callback_query']['message']['message_id'];
             $is_bot = $update['callback_query']['from']['is_bot'];
             $is_command = false;
-
-            $type = 'callback_query';
             $callback_data = $update['callback_query']['data'];
             $callback_id = $update['callback_query']['id'];
         }
+    }
+
+    public function initType(&$type)
+    {
+        if (isset($this->update['message'])) {
+            $type = (isset($this->update['message']['entities'][0]['type']) && $this->update['message']['entities'][0]['type'] === 'bot_command') ? 'bot_command' : 'text';
+        } else if (isset($this->update['callback_query'])) {
+            $type = 'callback_query';
+        }
+
+        return $this;
+    }
+
+    public function initMsgID(&$msg_id)
+    {
+        $msg_id = $this->update['message']['message_id'] ??             // обычное сообщение
+            $this->update['callback_query']['message']['message_id'];   // нажатие inline-кнопки
+
+        return $this;
+    }
+
+    public function initText(&$text)
+    {
+        $text = $this->update['message']['text'] ??                  // обычное сообщение
+            $this->update['message']['caption'] ??                   // описание медиа
+            $this->update['callback_query']['message']['text'] ??    // нажатие inline-кнопки
+            $this->update['callback_query']['message']['caption'] ?? // описание медиа
+            '';
+
+        return $this;
+    }
+
+    public function initUserID(&$user_id)
+    {
+        $user_id = $this->update['message']['from']['id'] ?? // обычное сообщение
+            $this->update['callback_query']['from']['id'] ?? // нажатие inline-кнопки
+            null;
+
+        return $this;
+    }
+
+    public function initChatID(&$chat_id)
+    {
+        $chat_id = $this->update['message']['chat']['id'] ?? // обычное сообщение
+            $this->update['callback_query']['message']['chat']['id'] ?? // нажатие inline-кнопки
+            null;
+
+        return $this;
     }
 
     public function defaultParseMode(string $mode = '')
@@ -136,6 +161,15 @@ class TGZ
         return new Message($text, $this);
     }
 
+    public function delMsg(array|int $msg_ids, int $chat_id = null): array
+    {
+        if ($chat_id === null) {
+            $this->initChatID($chat_id);
+        }
+        $method = is_array($msg_ids) ? 'deleteMessages' : 'deleteMessage';
+
+        return $this->callAPI($method, ['chat_id' => $chat_id, 'messages_id' => $msg_ids]);
+    }
 
     public function getFileID(string $url, int $chat_id, string $type = 'document')
     {

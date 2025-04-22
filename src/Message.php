@@ -35,7 +35,7 @@ class Message
     public function __construct($text, $TGZ)
     {
         $this->text = $text;
-        $this->chatID = $TGZ->chatId;
+        $TGZ->initChatID($this->chatID);
         $this->parse_mode = $TGZ->parseModeDefault;
         $this->TGZ = $TGZ;
     }
