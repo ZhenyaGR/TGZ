@@ -1,6 +1,6 @@
 {
     "name": "zhenyagr/tg-z",
-    "description": "Библиотека для разработки ботов в Telegram методом WbHook",
+    "description": "Библиотека для разработки ботов в Telegram методом WebHook",
     "type": "library",
     "require": {
         "php": ">=8.0",
