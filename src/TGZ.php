@@ -30,7 +30,6 @@ class TGZ
         $input = file_get_contents('php://input');
         $update = json_decode($input, true);
         $this->update = $update;
-
     }
 
     public function callAPI(string $method, ?array $params = []): array
@@ -59,18 +58,18 @@ class TGZ
         return $response;
     }
 
-    public function getWebhookUpdate()
+    public function getWebhookUpdate(): array
     {
         return $this->update;
     }
 
-    public function __call(string $method, array $args = [])
+    public function __call(string $method, array $args = []): array
     {
         $args = (empty($args)) ? $args : $args[0];
         return $this->callAPI($method, $args);
     }
 
-    public function initVars(&$chat_id = null, &$user_id = null, &$text = null, &$type = null, &$callback_data = null, &$callback_id = null, &$msg_id = null, &$is_bot = null, &$is_command = null)
+    public function initVars(&$chat_id = null, &$user_id = null, &$text = null, &$type = null, &$callback_data = null, &$callback_id = null, &$msg_id = null, &$is_bot = null, &$is_command = null): array
     {
         $update = $this->update;
 
@@ -92,9 +91,11 @@ class TGZ
             $callback_data = $update['callback_query']['data'];
             $callback_id = $update['callback_query']['id'];
         }
+
+        return $update;
     }
 
-    public function initType(&$type)
+    public function initType(&$type): self
     {
         if (isset($this->update['message'])) {
             $type = (isset($this->update['message']['entities'][0]['type']) && $this->update['message']['entities'][0]['type'] === 'bot_command') ? 'bot_command' : 'text';
@@ -105,7 +106,7 @@ class TGZ
         return $this;
     }
 
-    public function initMsgID(&$msg_id)
+    public function initMsgID(&$msg_id): self
     {
         $msg_id = $this->update['message']['message_id'] ??             // обычное сообщение
             $this->update['callback_query']['message']['message_id'];   // нажатие inline-кнопки
@@ -113,7 +114,7 @@ class TGZ
         return $this;
     }
 
-    public function initText(&$text)
+    public function initText(&$text): self
     {
         $text = $this->update['message']['text'] ??                  // обычное сообщение
             $this->update['message']['caption'] ??                   // описание медиа
@@ -124,7 +125,7 @@ class TGZ
         return $this;
     }
 
-    public function initUserID(&$user_id)
+    public function initUserID(&$user_id): self
     {
         $user_id = $this->update['message']['from']['id'] ?? // обычное сообщение
             $this->update['callback_query']['from']['id'] ?? // нажатие inline-кнопки
@@ -133,7 +134,7 @@ class TGZ
         return $this;
     }
 
-    public function initChatID(&$chat_id)
+    public function initChatID(&$chat_id): self
     {
         $chat_id = $this->update['message']['chat']['id'] ?? // обычное сообщение
             $this->update['callback_query']['message']['chat']['id'] ?? // нажатие inline-кнопки
@@ -142,21 +143,22 @@ class TGZ
         return $this;
     }
 
-    public function defaultParseMode(string $mode = '')
+    public function defaultParseMode(string $mode = ''): self
     {
         if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2' && $mode !== '') {
             $mode = '';
         }
         $this->parseModeDefault = $mode;
+        return $this;
     }
 
-    public function sendOK()
+    public function sendOK(): void
     {
         http_response_code(200);
         echo 'ok';
     }
 
-    public function msg(string $text = '')
+    public function msg(string $text = ''): Message
     {
         return new Message($text, $this);
     }
@@ -171,7 +173,7 @@ class TGZ
         return $this->callAPI($method, ['chat_id' => $chat_id, 'messages_id' => $msg_ids]);
     }
 
-    public function getFileID(string $url, int $chat_id, string $type = 'document')
+    public function getFileID(string $url, int $chat_id, string $type = 'document'): string
     {
         if (!in_array($type, ['document', 'audio', 'photo', 'animation', 'video', 'video_note', 'voice', 'sticker'])) {
             $type = 'document';
@@ -198,7 +200,7 @@ class TGZ
         return $result['result']['document']['file_id'];
     }
 
-    public function sendMessage(int $chatId, string $text)
+    public function sendMessage(int $chatId, string $text): array
     {
         $params = [
             'chat_id' => $chatId,
@@ -207,7 +209,7 @@ class TGZ
         return $this->callAPI('sendMessage', $params);
     }
 
-    public function buttonCallback(string $buttonText, string $buttonData)
+    public function buttonCallback(string $buttonText, string $buttonData): array
     {
         return [
             'text' => $buttonText,
@@ -215,7 +217,7 @@ class TGZ
         ];
     }
 
-    public function buttonUrl(string $buttonText, string $buttonUrl)
+    public function buttonUrl(string $buttonText, string $buttonUrl): array
     {
         return [
             'text' => $buttonText,
@@ -223,14 +225,14 @@ class TGZ
         ];
     }
 
-    public function buttonText(string $buttonText)
+    public function buttonText(string $buttonText): array
     {
         return [
             'text' => $buttonText
         ];
     }
 
-    public function answerCallbackQuery(int $callbackId, array $options = [])
+    public function answerCallbackQuery(int $callbackId, array $options = []): array
     {
         $params = array_merge([
             'callback_query_id' => $callbackId,
