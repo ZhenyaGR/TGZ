@@ -35,10 +35,10 @@ $tg->initUserID($user_id)
     ->initText($text)
     ->initMsgID($msg_id)
     ->initType($type);
-// Некоторые можно инициализировать по отдельности
+// Некоторые переменные можно инициализировать по отдельности
 
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id, $is_bot, $is_command);
-// Все сразу одной командой
+// Все переменные сразу одним методом
 ```
 
 
