@@ -35,21 +35,22 @@ $tg->initUserID($user_id)
     ->initText($text)
     ->initMsgID($msg_id)
     ->initType($type);
-// Некоторые переменные можно инициализировать по отдельности
+// Некоторые можно инициализировать по отдельности
 
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id, $is_bot, $is_command);
-// Все переменные сразу одним методом
+// Все сразу одной командой
 ```
 
 
 ### Вызов любых методов BOT API. Например copyMessage
 ```php
 <?php
-require 'TGZ/autoload.php'; 
-use ZhenyaGR\TGZ\TGZ as tg; 
+require 'TGZ/autoload.php';  // Подключаем библиотеку
+use ZhenyaGR\TGZ\TGZ as tg;  // Используем основной класс
 
-$tg = tg::create(BOT_TOKEN);
+$tg = tg::create(BOT_TOKEN); // Создаем объект бота
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id); 
+// Инициализируем переменные
 
 if ($type == 'text' || $type == 'bot_command') {
     $tg->copyMessage([
