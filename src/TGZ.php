@@ -74,7 +74,7 @@ class TGZ
     {
         $update = $this->update;
 
-        $test = $this->initUserID($user_id)
+        $this->initUserID($user_id)
             ->initChatID($chat_id)
             ->initText($text)
             ->initMsgID($msg_id)
