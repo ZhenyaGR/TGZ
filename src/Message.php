@@ -259,7 +259,7 @@ final class Message
         $params = array_merge($params, $this->reply_to);
         $params = array_merge($params, $this->kbd);
 
-        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendDice && !$this->sendVoice && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendSticker && !$this->sendDice && !$this->sendVoice && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
             return $this->TGZ->callAPI('sendMessage', $params);
