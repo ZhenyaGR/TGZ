@@ -11,6 +11,7 @@ final class TGZ
 
 
     public string $apiUrl;
+    public string $token;
     public array $update;
     public string $parseModeDefault = '';
 
