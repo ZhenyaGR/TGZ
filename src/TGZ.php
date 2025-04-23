@@ -168,9 +168,12 @@ class TGZ
         if ($chat_id === null) {
             $this->initChatID($chat_id);
         }
-        $method = is_array($msg_ids) ? 'deleteMessages' : 'deleteMessage';
+        
+        $bool = is_array($msg_ids);
+        $method = $bool ? 'deleteMessages' : 'deleteMessage';
+        $param = $bool ? 'messages_id' : 'message_id';
 
-        return $this->callAPI($method, ['chat_id' => $chat_id, 'messages_id' => $msg_ids]);
+        return $this->callAPI($method, ['chat_id' => $chat_id, $param => $msg_ids]);
     }
 
     public function getFileID(string $url, int $chat_id, string $type = 'document'): string
