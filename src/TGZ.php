@@ -5,17 +5,17 @@ namespace ZhenyaGR\TGZ;
 use CURLFile;
 use Exception;
 
-class TGZ
+final class TGZ
 {
     use ErrorHandler;
 
-    private string $token;
+
     public string $apiUrl;
     public array $update;
     public string $parseModeDefault = '';
 
 
-    public static function create(string $token)
+    public static function create(string $token): self
     {
         return new self($token);
     }
@@ -69,8 +69,17 @@ class TGZ
         return $this->callAPI($method, $args);
     }
 
-    public function initVars(&$chat_id = null, &$user_id = null, &$text = null, &$type = null, &$callback_data = null, &$callback_id = null, &$msg_id = null, &$is_bot = null, &$is_command = null): array
-    {
+    public function initVars(
+        &$chat_id = null,
+        &$user_id = null,
+        &$text = null,
+        &$type = null,
+        &$callback_data = null,
+        &$callback_id = null,
+        &$msg_id = null,
+        &$is_bot = null,
+        &$is_command = null
+    ): array {
         $update = $this->update;
 
         $this->initUserID($user_id)
@@ -84,29 +93,32 @@ class TGZ
             $is_command = (isset($update['message']['entities'][0]['type']) && $update['message']['entities'][0]['type'] === 'bot_command') ? true : false;
             $callback_data = false;
             $callback_id = false;
-
-        } else if (isset($update['callback_query'])) {
-            $is_bot = $update['callback_query']['from']['is_bot'];
-            $is_command = false;
-            $callback_data = $update['callback_query']['data'];
-            $callback_id = $update['callback_query']['id'];
+        } else {
+            if (isset($update['callback_query'])) {
+                $is_bot = $update['callback_query']['from']['is_bot'];
+                $is_command = false;
+                $callback_data = $update['callback_query']['data'];
+                $callback_id = $update['callback_query']['id'];
+            }
         }
 
         return $update;
     }
 
-    public function initType(&$type): self
+    public function initType(&$type): static
     {
         if (isset($this->update['message'])) {
             $type = (isset($this->update['message']['entities'][0]['type']) && $this->update['message']['entities'][0]['type'] === 'bot_command') ? 'bot_command' : 'text';
-        } else if (isset($this->update['callback_query'])) {
-            $type = 'callback_query';
+        } else {
+            if (isset($this->update['callback_query'])) {
+                $type = 'callback_query';
+            }
         }
 
         return $this;
     }
 
-    public function initMsgID(&$msg_id): self
+    public function initMsgID(&$msg_id): static
     {
         $msg_id = $this->update['message']['message_id'] ??             // обычное сообщение
             $this->update['callback_query']['message']['message_id'];   // нажатие inline-кнопки
@@ -114,7 +126,7 @@ class TGZ
         return $this;
     }
 
-    public function initText(&$text): self
+    public function initText(&$text): static
     {
         $text = $this->update['message']['text'] ??                  // обычное сообщение
             $this->update['message']['caption'] ??                   // описание медиа
@@ -125,7 +137,7 @@ class TGZ
         return $this;
     }
 
-    public function initUserID(&$user_id): self
+    public function initUserID(&$user_id): static
     {
         $user_id = $this->update['message']['from']['id'] ?? // обычное сообщение
             $this->update['callback_query']['from']['id'] ?? // нажатие inline-кнопки
@@ -134,7 +146,7 @@ class TGZ
         return $this;
     }
 
-    public function initChatID(&$chat_id): self
+    public function initChatID(&$chat_id): static
     {
         $chat_id = $this->update['message']['chat']['id'] ?? // обычное сообщение
             $this->update['callback_query']['message']['chat']['id'] ?? // нажатие inline-кнопки
@@ -143,7 +155,7 @@ class TGZ
         return $this;
     }
 
-    public function defaultParseMode(string $mode = ''): self
+    public function defaultParseMode(string $mode = ''): static
     {
         if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2' && $mode !== '') {
             $mode = '';
@@ -168,7 +180,7 @@ class TGZ
         if ($chat_id === null) {
             $this->initChatID($chat_id);
         }
-        
+
         $bool = is_array($msg_ids);
         $method = $bool ? 'deleteMessages' : 'deleteMessage';
         $param = $bool ? 'messages_id' : 'message_id';
@@ -212,6 +224,11 @@ class TGZ
         return $this->callAPI('sendMessage', $params);
     }
 
+    /**
+     * @return string[]
+     *
+     * @psalm-return array{text: string, callback_data: string}
+     */
     public function buttonCallback(string $buttonText, string $buttonData): array
     {
         return [
@@ -220,6 +237,11 @@ class TGZ
         ];
     }
 
+    /**
+     * @return string[]
+     *
+     * @psalm-return array{text: string, url: string}
+     */
     public function buttonUrl(string $buttonText, string $buttonUrl): array
     {
         return [
@@ -228,6 +250,11 @@ class TGZ
         ];
     }
 
+    /**
+     * @return string[]
+     *
+     * @psalm-return array{text: string}
+     */
     public function buttonText(string $buttonText): array
     {
         return [

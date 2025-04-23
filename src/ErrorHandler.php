@@ -4,7 +4,8 @@ namespace ZhenyaGR\TGZ;
 
 use Throwable, Exception;
 
-trait ErrorHandler {
+trait ErrorHandler
+{
 
     private mixed $user_error_handler_or_ids = null;
 
@@ -17,11 +18,15 @@ trait ErrorHandler {
     private bool $is_exis_exiting = false;
 
     /**
+     *
      * Устанавливает обработчик ошибок и исключений, перенаправляя их для логирования и вывода.
+     *
      * @param int|array<int>|callable $ids VK ID пользователя, массив ID или функция-обработчик.
-     * @return TGZ|ErrorHandler Возвращает текущий экземпляр для цепочки вызовов.
+     *
+     * @return TGZ Возвращает текущий экземпляр для цепочки вызовов.
      */
-    public function setUserLogError(callable|array|int $ids): self {
+    public function setUserLogError(callable|array|int $ids): TGZ
+    {
         $this->user_error_handler_or_ids = is_numeric($ids) ? [$ids] : $ids;
 
         ini_set('error_reporting', E_ALL);
@@ -44,17 +49,22 @@ trait ErrorHandler {
      * @param string|array $pathes Путь или массив путей
      * @return void
      */
-    public function setTracePathFilter(string|array $pathes): void {
+    public function setTracePathFilter(string|array $pathes): void
+    {
         $pathes = is_string($pathes) ? [$pathes] : $pathes;
         $this->paths_to_filter = array_map(static fn($path) => str_replace('\\', '/', $path), $pathes);
     }
 
     /**
+     *
      * Оставляет в трейсе только пользовательские файлы, без файлов библиотеки
+     *
      * @param bool $enable - вкл/выкл отображение короткого трейса
-     * @return TGZ|ErrorHandler Возвращает текущий экземпляр для цепочки вызовов.
+     *
+     * @return TGZ Возвращает текущий экземпляр для цепочки вызовов.
      */
-    public function shortTrace(bool $enable = true): self {
+    public function shortTrace(bool $enable = true): TGZ
+    {
         $this->short_trace = $enable;
         return $this;
     }
@@ -62,8 +72,11 @@ trait ErrorHandler {
     /**
      * Публичный, потому что исключения могут вызываться и обрабатываться за пределами текущего класса
      */
-    public function exceptionHandler(Throwable $exception, int $set_type = E_ERROR, bool $is_artificial_trace = false): void {
-
+    public function exceptionHandler(
+        Throwable $exception,
+        int $set_type = E_ERROR,
+        bool $is_artificial_trace = false
+    ): void {
         $message = $this->normalizeMessage($exception->getMessage());
         $message = $this->filterPaths($message);
         $message = $this->coloredLog($message, 'RED');
@@ -79,14 +92,34 @@ trait ErrorHandler {
         }
         $trace = $this->buildNewTrace($trace, $file, $line, $is_artificial_trace);
 
-        $this->userErrorHandler($set_type, $message . "\n\n\n$trace", $file, $line, $code, $exception, $is_artificial_trace);
+        $this->userErrorHandler(
+            $set_type,
+            $message . "\n\n\n$trace",
+            $file,
+            $line,
+            $code,
+            $exception,
+            $is_artificial_trace
+        );
     }
 
     /**
+     *
      * Публичный, потому что исключения могут вызываться и обрабатываться за пределами текущего класса
+     *
+     * @return true
      */
-    public function userErrorHandler(int $type, string $message, string $file, int $line, ?int $code = null, ?Throwable $exception = null, bool $is_artificial_trace = false): bool {
+    public function userErrorHandler(
+        int $type,
+        string $message,
+        string $file,
+        int $line,
+        ?int $code = null,
+        ?Throwable $exception = null,
+        bool $is_artificial_trace = false
+    ): bool {
         // если ошибка попадает в отчет (при использовании оператора "@" error_reporting() вернет 0)
+        $web_msg = null;
         if (error_reporting() & $type) {
             $error_type_without_trace = [
                 E_WARNING,   // Системные предупреждения
@@ -120,8 +153,7 @@ trait ErrorHandler {
                     $meta['wrapper_type'] === 'PHP' &&
                     $meta['stream_type'] === 'STDIO';
 
-                if(!$is_regular_console) {
-                    $web_msg = "<pre>$clear_msg</pre>";
+                if (!$is_regular_console) {
                 }
 
                 //Выводить цветное только если скрипт запущен из консоли и вывод не перенаправляется в файл
@@ -131,7 +163,7 @@ trait ErrorHandler {
 
             $this->dispatchErrorMessage($error_type, $clear_msg, $code, $exception);
 
-            if(in_array($error_level, ['ERROR', 'CRITICAL'])) {
+            if (in_array($error_level, ['ERROR', 'CRITICAL'])) {
                 $this->is_exis_exiting = true; //чтобы не сработала register_shutdown_function()
                 exit();
             }
@@ -139,8 +171,9 @@ trait ErrorHandler {
         return true;
     }
 
-    private function checkForFatalError(): void {
-        if($this->is_exis_exiting) {
+    private function checkForFatalError(): void
+    {
+        if ($this->is_exis_exiting) {
             return;
         }
         if ($error = error_get_last()) {
@@ -152,7 +185,13 @@ trait ErrorHandler {
         }
     }
 
-    private function defaultErrorLevelMap(): array {
+    /**
+     * @return string[][]
+     *
+     * @psalm-return array{1: list{'CRITICAL', 'E_ERROR'}, 2: list{'WARNING', 'E_WARNING'}, 4: list{'ERROR', 'E_PARSE'}, 8: list{'NOTICE', 'E_NOTICE'}, 16: list{'CRITICAL', 'E_CORE_ERROR'}, 32: list{'WARNING', 'E_CORE_WARNING'}, 64: list{'CRITICAL', 'E_COMPILE_ERROR'}, 128: list{'WARNING', 'E_COMPILE_WARNING'}, 256: list{'ERROR', 'E_USER_ERROR'}, 512: list{'WARNING', 'E_USER_WARNING'}, 1024: list{'NOTICE', 'E_USER_NOTICE'}, 4096: list{'ERROR', 'E_RECOVERABLE_ERROR'}, 8192: list{'NOTICE', 'E_DEPRECATED'}, 16384: list{'NOTICE', 'E_USER_DEPRECATED'}}
+     */
+    private function defaultErrorLevelMap(): array
+    {
         return [
             E_ERROR => ['CRITICAL', 'E_ERROR'],
             E_WARNING => ['WARNING', 'E_WARNING'],
@@ -171,7 +210,8 @@ trait ErrorHandler {
         ];
     }
 
-    private function formatErrorLevel(string $level): string {
+    private function formatErrorLevel(string $level): string
+    {
         return match ($level) {
             'ERROR', 'CRITICAL' => $this->coloredLog('‼Fatal Error: ', 'RED'),
             'WARNING' => $this->coloredLog('⚠️Warning: ', 'YELLOW'),
@@ -180,23 +220,29 @@ trait ErrorHandler {
         };
     }
 
-    private function coloredLog(string $text, string $color) {
+    private function coloredLog(string $text, string $color): string
+    {
         $color_codes = [
-            'RED'     => "\033[31m",
-            'GREEN'   => "\033[32m",
-            'YELLOW'  => "\033[33m",
-            'BLUE'    => "\033[34m",
-            'WHITE'   => "\033[37m",
+            'RED' => "\033[31m",
+            'GREEN' => "\033[32m",
+            'YELLOW' => "\033[33m",
+            'BLUE' => "\033[34m",
+            'WHITE' => "\033[37m",
         ];
         $color_code = $color_codes[$color];
         return "$color_code$text\033[0m";
     }
 
-    private function dispatchErrorMessage(string $type, string $message, ?int $code = null, ?Throwable $exception = null): void {
+    private function dispatchErrorMessage(
+        string $type,
+        string $message,
+        ?int $code = null,
+        ?Throwable $exception = null
+    ): void {
         if (is_callable($this->user_error_handler_or_ids)) {
             call_user_func($this->user_error_handler_or_ids, $type, $message, $code, $exception);
         } else {
-            if($this->send_error_in_vk) {
+            if ($this->send_error_in_vk) {
                 foreach ($this->user_error_handler_or_ids as $chatID) {
                     try {
                         //Ошибки не вызываются при недоставке юзеру, потому что у peer_ids другой формат ответа
@@ -213,7 +259,11 @@ trait ErrorHandler {
         }
     }
 
-    protected function getCodeSnippet(string $file, int $line, int $padding = 0): string {
+    /**
+     * @return false|string
+     */
+    protected function getCodeSnippet(string $file, int $line, int $padding = 0): string|false
+    {
         static $files_cache = [];
 
         if (!isset($files_cache[$file]) && is_readable($file)) {
@@ -239,7 +289,8 @@ trait ErrorHandler {
         return $snippet;
     }
 
-    private function normalizeMessage(string $message): string {
+    private function normalizeMessage(string $message): string
+    {
         // Шаг 1: Нормализуем запись Array (
         $message = preg_replace('/Array\s*\n?\s*\(/is', '[', $message);
 
@@ -276,14 +327,15 @@ trait ErrorHandler {
         return trim(implode("\n", $result));
     }
 
-    private function buildNewTrace(array $trace_data, string $file, int $line, bool $is_artificial_trace): string {
+    private function buildNewTrace(array $trace_data, string $file, int $line, bool $is_artificial_trace): string
+    {
         $trace = '';
 
         //при отсутствии изначального трейса или это user_error()
         //трейс был создан искуственно
-        if($is_artificial_trace) {
+        if ($is_artificial_trace) {
             $first_trace = $trace_data[0] ?? null;
-            if($first_trace
+            if ($first_trace
                 && !isset($first_trace['file'])
                 && $first_trace['function'] === 'userErrorHandler'
                 && $first_trace['class'] === 'ZhenyaGR\TGZ\TGZ') {
@@ -304,7 +356,8 @@ trait ErrorHandler {
         return $trace;
     }
 
-    private function formatTraceLine(array $trace, int $num): string {
+    private function formatTraceLine(array $trace, int $num): string
+    {
 //        $type = $trace['type'] ?? '';
         $function = $trace['function'] ?? '{unknown function}';
         $class = $trace['class'] ?? '';
@@ -331,9 +384,9 @@ trait ErrorHandler {
 
         // Если короткий трейс выключен или это не файл библиотеки
         if (!$this->short_trace || !empty($user_file_marker)) {
-            if(!isset($trace['file']) && !isset($trace['line'])) {
+            if (!isset($trace['file']) && !isset($trace['line'])) {
                 $trace_line .= $this->coloredLog("$user_file_marker#$num ", 'GREEN')
-                    . $this->coloredLog('[internal function]', 'BLUE'). "\n"
+                    . $this->coloredLog('[internal function]', 'BLUE') . "\n"
                     . $this->coloredLog("?:", 'YELLOW')
                     . $this->coloredLog(" $class->$function()", 'WHITE') . "\n\n";
             } else {
@@ -347,7 +400,8 @@ trait ErrorHandler {
         return $trace_line;
     }
 
-    private function filterPaths(string $path): string {
+    private function filterPaths(string $path): string
+    {
         $path = str_replace('\\', '/', $path);
         foreach ($this->paths_to_filter as $filter) {
             $path = str_replace($filter, '..', $path);
@@ -369,7 +423,7 @@ trait ErrorHandler {
             if (is_array($value)) {
                 $result .= $space . "  [$key] => " . $this->formatArray($value, $indent + 1);
             } else {
-                $result .= $space . "  [$key] => " . ($value ?: 'null')  . "\n";
+                $result .= $space . "  [$key] => " . ($value ?: 'null') . "\n";
             }
         }
         return $result . $space . ")\n";
