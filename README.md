@@ -73,6 +73,25 @@ if ($type == 'text' || $type == 'bot_command') {
     $tg->msg($text)->send(); // Отправляем сообщение с таким-же текстом
 }
 ```
+### Все доступные типы
+```php
+<?php
+require 'TGZ/autoload.php'; 
+use ZhenyaGR\TGZ\TGZ as tg; 
+
+$tg = tg::create(BOT_TOKEN);
+$tg->initVars(type: $type);
+
+if ($type == 'text') {
+    // Текстовое сообщение    
+} else if ($type == 'bot_command') {
+    // Команда бота (/start, /help и т.д.)
+} else if ($type == 'edited_message') {
+    // Редактирование сообщения
+} else if ($type == 'callback_query') {
+    // Callback-запрос
+}
+```
 ### Отправка медиа-файлов
 ```php
 <?php
