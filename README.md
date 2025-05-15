@@ -311,6 +311,7 @@ if ($type == 'text' || $type == 'bot_command') {
 }
 ```
 ### Inline-Mode
+#### [Подробнее об inline-режиме](inline.md)
 ###### Пока что реализован только текстовый тип
 ```php
 <?php
