@@ -78,7 +78,7 @@ final class TGZ
         &$text = null,
         &$type = null,
         &$callback_data = null,
-        &$callback_id = null,
+        &$query_id = null,
         &$msg_id = null,
         &$is_bot = null,
         &$is_command = null,
@@ -93,29 +93,24 @@ final class TGZ
             ->initType($type);
 
         if (isset($update['message'])) {
-
             $is_bot = $update['message']['from']['is_bot'];
             $is_command = (isset($update['message']['entities'][0]['type'])
                 && $update['message']['entities'][0]['type'] === 'bot_command')
                 ? true : false;
             $callback_data = false;
-            $callback_id = false;
+            $query_id = false;
 
         } elseif (isset($update['callback_query'])) {
-
             $is_bot = $update['callback_query']['from']['is_bot'];
             $is_command = false;
             $callback_data = $update['callback_query']['data'];
-            $callback_id = $update['callback_query']['id'];
+            $query_id = $update['callback_query']['id'];
 
-        } elseif (isset($update['edited_message'])) {
-
-            $is_bot = $update['edited_message']['from']['is_bot'];
-            $is_command = (isset($update['edited_message']['entities'][0]['type'])
-                && $update['edited_message']['entities'][0]['type'] === 'bot_command')
-                ? true : false;
+        } elseif (isset($update['inline_query'])) {
+            $is_bot = $update['inline_query']['from']['is_bot'];
+            $is_command = false;
             $callback_data = false;
-            $callback_id = false;
+            $query_id = $update['inline_query']['id'];
 
         }
 
@@ -142,11 +137,9 @@ final class TGZ
     public function initMsgID(&$msg_id): static
     {
         $msg_id = $this->update['message']['message_id'] ??
-            // обычное сообщение
             $this->update['edited_message']['message_id'] ??
-            // редактирование сообщения
             $this->update['callback_query']['message']['message_id'] ??
-            // нажатие inline-кнопки
+            $this->update['callback_query']['inline_message_id'] ??
             null;
 
         return $this;
@@ -155,17 +148,12 @@ final class TGZ
     public function initText(&$text): static
     {
         $text = $this->update['message']['text'] ??
-            // обычное сообщение
             $this->update['message']['caption'] ??
-            // описание медиа
             $this->update['edited_message']['text'] ??
-            // новый текст
             $this->update['edited_message']['caption'] ??
-            // новое описание
             $this->update['callback_query']['message']['text'] ??
-            // нажатие inline-кнопки
             $this->update['callback_query']['message']['caption'] ??
-            // описание медиа
+            $this->update['inline_query']['query'] ??
             '';
 
         return $this;
@@ -174,11 +162,9 @@ final class TGZ
     public function initUserID(&$user_id): static
     {
         $user_id = $this->update['message']['from']['id'] ??
-            // обычное сообщение
             $this->update['edited_message']['from']['id'] ??
-            // нажатие inline-кнопки
             $this->update['callback_query']['from']['id'] ??
-            // нажатие inline-кнопки
+            $this->update['inline_query']['from']['id'] ??
             null;
 
         return $this;
@@ -187,11 +173,8 @@ final class TGZ
     public function initChatID(&$chat_id): static
     {
         $chat_id = $this->update['message']['chat']['id'] ??
-            // обычное сообщение
             $this->update['edited_message']['chat']['id'] ??
-            // редактирование сообщения
             $this->update['callback_query']['message']['chat']['id'] ??
-            // нажатие inline-кнопки
             null;
 
         return $this;
@@ -218,6 +201,11 @@ final class TGZ
     public function msg(string $text = ''): Message
     {
         return new Message($text, $this);
+    }
+
+    public function inline(string $type = ''): Inline
+    {
+        return new Inline($type, $this);
     }
 
     public function delMsg(array|int $msg_ids, int $chat_id = null): array

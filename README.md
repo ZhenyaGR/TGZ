@@ -37,7 +37,7 @@ $tg->initUserID($user_id)
     ->initType($type);
 // Некоторые переменные можно инициализировать по отдельности
 
-$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id, $is_bot, $is_command);
+$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_id, $is_bot, $is_command);
 // Все переменные сразу одним методом
 ```
 
@@ -49,7 +49,7 @@ require 'TGZ/autoload.php';
 use ZhenyaGR\TGZ\TGZ as tg;  
 
 $tg = tg::create(BOT_TOKEN); 
-$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id); 
+$tg->initVars($chat_id, $user_id, $text, $type, msg_id: $msg_id); 
 // Инициализируем переменные
 
 if ($type == 'text' || $type == 'bot_command') {
@@ -90,6 +90,8 @@ if ($type == 'text') {
     // Редактирование сообщения
 } else if ($type == 'callback_query') {
     // Callback-запрос
+} else if ($type == 'inline_query') {
+    // Inline-запрос
 }
 ```
 ### Отправка медиа-файлов
@@ -183,7 +185,7 @@ require 'TGZ/autoload.php';
 use ZhenyaGR\TGZ\TGZ as tg; 
 
 $tg = tg::create(BOT_TOKEN);
-$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_id);
 
 if ($type == 'text' || $type == 'bot_command') {
     switch ($text) {
@@ -232,7 +234,7 @@ if ($type == 'text' || $type == 'bot_command') {
             break;
     }
 } else if ($type == 'callback_query') {
-    $tg->answerCallbackQuery($callback_id, ['text' => "Вы нажали кнопку!"]);    
+    $tg->answerCallbackQuery($query_id, ['text' => "Вы нажали кнопку!"]);    
     // Отправляем уведомление об нажатии
     switch ($callback_data) {
         case 'call1':
@@ -251,13 +253,14 @@ if ($type == 'text' || $type == 'bot_command') {
 }
 ```
 ### Отправка Опросов
+
 ```php
 <?php    
 require 'TGZ/autoload.php'; 
 use ZhenyaGR\TGZ\TGZ as tg; 
 
 $tg = tg::create(BOT_TOKEN);
-$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+$tg->initVars($chat_id, $user_id, $text, $type);
 
 if ($type == 'text' || $type == 'bot_command') {
     switch ($text) {
@@ -281,7 +284,7 @@ require 'TGZ/autoload.php';
 use ZhenyaGR\TGZ\TGZ as tg; 
 
 $tg = tg::create(BOT_TOKEN);
-$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+$tg->initVars($chat_id, $user_id, $text, $type);
 
 if ($type == 'text' || $type == 'bot_command') {
     switch ($text) {
@@ -307,6 +310,66 @@ if ($type == 'text' || $type == 'bot_command') {
     }
 }
 ```
+### Inline-Mode
+###### Пока что реализован только текстовый тип
+```php
+<?php
+require 'TGZ/autoload.php';
+use ZhenyaGR\TGZ\TGZ as tg;
+
+$tg = tg::create(BOT_TOKEN);
+$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id);
+
+if ($type === 'inline_query') {
+
+    // Приходит запрос с параметром query. Его содержимое находится в переменной $text
+    if ($text === '') {
+        // Начало ввода
+        $inline_params = [ 
+            // Создаём параметры для вывода информации с помощью конструктора
+            $tg->inline('article')          // Тип сообщения
+            ->id('inline')                  // Уникальный идентификатор
+            ->title('Title')                // Заголовок
+            ->description('Description')    // Описание
+            ->text('Hello, World!')         // Текст, который отправит бот
+            ->create(),                     // Создаём сообщение
+            
+            // Т.к. это массив, он может содержать несколько элементов
+            
+            $tg->inline('article')
+            ->id('inline')
+            ->title('Title')
+            ->description('Description')
+            ->text('This – <b>Inline</b>')
+            ->parseMode('HTML')             // Парсинг HTML
+            ->kbd([[$tg->buttonCallback('Кнопка', 'call')]])
+            // Inline-клавиатура
+            ->create(),
+            
+            // Можно передать объект класса Message для сообщения
+            
+            $tg->inline('article')
+            ->id('inline')
+            ->title('Title')
+            ->description('Description')
+            ->msg(
+                $tg->msg('It`s <i>Kool</i>')->parseMode('HTML')
+            )
+            ->create(),
+        ]; 
+    }
+} else if ($type === 'callback_query') {
+    
+    // Запрос приходит как и при обычной inline клавиатуры
+    if ($callback_data === 'call') {
+        $tg->msg('Вы нажали кнопку')
+            ->sendEdit();
+        // send() в данном случае использовать нельзя
+    }
+    
+}
+```
+
 ## Форматирование сообщений
 
 ```php
@@ -315,7 +378,7 @@ require 'TGZ/autoload.php';
 use ZhenyaGR\TGZ\TGZ as tg;
 
 $tg = tg::create(BOT_TOKEN);
-$tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $callback_id, $msg_id);
+$tg->initVars($chat_id, $user_id, $text, $type);
 
 if ($type == 'text' || $type == 'bot_command') {    
     switch ($text) {

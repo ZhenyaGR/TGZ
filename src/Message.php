@@ -6,30 +6,31 @@ use CURLFile;
 
 final class Message
 {
-    private ?string $text;
-    private object $TGZ;
-    private int $chatID = 0;
-    private array $reply_to = [];
-    private array $kbd = [];
-    private string $parse_mode;
-    private array $params_additionally = [];
-    private bool $sendPhoto = false;
-    private bool $sendAnimation = false;
-    private bool $sendPoll = false;
-    private bool $sendDocument = false;
-    private bool $sendSticker = false;
-    private bool $sendVideo = false;
-    private bool $sendAudio = false;
-    private bool $sendVoice = false;
-    private bool $sendDice = false;
-    private bool $sendMediaGroup = false;
-    private string $question = '';
-    private array $media = [];
-    private string $sticker_id = '';
-    private array $files = [];
-    private array $options = [];
-    private bool $is_anonymous = false;
-    private string $pollType = "regular";
+    public ?string $text;
+    public object $TGZ;
+    public int $chatID = 0;
+    public array $reply_to = [];
+    public array $kbd = [];
+    public string $parse_mode;
+    public array $params_additionally = [];
+    public bool $sendPhoto = false;
+    public bool $sendAnimation = false;
+    public bool $sendPoll = false;
+    public bool $sendDocument = false;
+    public bool $sendSticker = false;
+    public bool $sendVideo = false;
+    public bool $sendAudio = false;
+    public bool $sendVoice = false;
+    public bool $sendDice = false;
+    public bool $sendMediaGroup = false;
+    public string $question = '';
+    public array $media = [];
+    public string $sticker_id = '';
+    public array $files = [];
+    public array $options = [];
+    public array $buttons = [];
+    public bool $is_anonymous = false;
+    public string $pollType = "regular";
 
 
     public function __construct($text, $TGZ)
@@ -45,53 +46,64 @@ final class Message
         bool $inline = false,
         bool $one_time_keyboard = false,
         bool $resize_keyboard = false,
-        bool $remove_keyboard = false
-    ): static {
+        bool $remove_keyboard = false,
+    ): self {
         if ($remove_keyboard) {
             $keyboardConfig = ['remove_keyboard' => true];
             $this->kbd = [
-                'reply_markup' => json_encode($keyboardConfig, JSON_THROW_ON_ERROR)
+                'reply_markup' => json_encode(
+                    $keyboardConfig, JSON_THROW_ON_ERROR,
+                ),
             ];
+
             return $this;
         }
 
-        $kbd = $inline ? ['inline_keyboard' => $buttons]
+        $kbd = $inline
+            ? ['inline_keyboard' => $buttons]
             : [
-                'keyboard' => $buttons,
-                'resize_keyboard' => $resize_keyboard,
-                'one_time_keyboard' => $one_time_keyboard
+                'keyboard'          => $buttons,
+                'resize_keyboard'   => $resize_keyboard,
+                'one_time_keyboard' => $one_time_keyboard,
             ];
 
         $this->kbd = [
-            'reply_markup' => json_encode($kbd, JSON_THROW_ON_ERROR)
+            'reply_markup' => json_encode($kbd, JSON_THROW_ON_ERROR),
         ];
+        $this->buttons = $buttons;
 
         return $this;
     }
 
     public function parseMode(string $mode = ''): static
     {
-        if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2' && $mode !== '') {
+        if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2'
+            && $mode !== ''
+        ) {
             $mode = '';
         }
         $this->parse_mode = $mode;
+
         return $this;
     }
 
     public function params(array $params = []): static
     {
         $this->params_additionally = $params;
+
         return $this;
     }
 
     public function reply(?int $reply_to_message_id = null): static
     {
         if ($reply_to_message_id === null) {
-            $msg_id = $this->TGZ->update['message']['message_id'] ?? $this->TGZ->update['callback_query']['message']['message_id'];
+            $msg_id = $this->TGZ->update['message']['message_id'] ??
+                $this->TGZ->update['callback_query']['message']['message_id'];
         } else {
             $msg_id = $reply_to_message_id;
         }
         $this->reply_to = ['reply_to_message_id' => $msg_id];
+
         return $this;
     }
 
@@ -101,21 +113,22 @@ final class Message
             if ($this->detectInputType($file)) {
                 // Если требуется загрузка (локальный файл или URL)
                 $fileIndex = count($this->media) + 1;
-                $attachKey = 'attach://file' . $fileIndex;
+                $attachKey = 'attach://file'.$fileIndex;
                 $this->media[] = [
-                    'type' => $type,
-                    'media' => $attachKey
+                    'type'  => $type,
+                    'media' => $attachKey,
                 ];
                 // Сохраняем объект CURLFile в отдельном массиве
-                $this->files['file' . $fileIndex] = new CURLFile($file);
+                $this->files['file'.$fileIndex] = new CURLFile($file);
             } else {
                 // Если передан file_id
                 $this->media[] = [
-                    'type' => $type,
-                    'media' => $file
+                    'type'  => $type,
+                    'media' => $file,
                 ];
             }
         }
+
         return $this;
     }
 
@@ -129,6 +142,7 @@ final class Message
         if (file_exists($input) && is_file($input)) {
             return true;
         }
+
         // Иначе file_id
         return false;
     }
@@ -137,6 +151,7 @@ final class Message
     {
         $this->sendDice = true;
         $this->text = $dice;
+
         return $this;
     }
 
@@ -145,6 +160,7 @@ final class Message
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'document');
         $this->sendAnimation = true;
+
         return $this;
     }
 
@@ -153,6 +169,7 @@ final class Message
         $url = [$url];
         $this->processMediaGroup($url, 'voice');
         $this->sendVoice = true;
+
         return $this;
     }
 
@@ -161,6 +178,7 @@ final class Message
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'audio');
         $this->sendAudio = true;
+
         return $this;
     }
 
@@ -169,6 +187,7 @@ final class Message
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'video');
         $this->sendVideo = true;
+
         return $this;
     }
 
@@ -177,6 +196,7 @@ final class Message
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'document');
         $this->sendDocument = true;
+
         return $this;
     }
 
@@ -185,15 +205,18 @@ final class Message
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'photo');
         $this->sendPhoto = true;
+
         return $this;
     }
 
     public function urlImg(string $url): static
     {
-        $this->text = '<a href="' . htmlspecialchars(
-                $url
-            ) . '">​</a>' . $this->text; // Использует пробел нулевой ширины
-        $this->parse_mode = "HTML";                                                      // со ссылкой в начале сообщения
+        $this->text = '<a href="'.htmlspecialchars(
+                $url,
+            ).'">​</a>'.$this->text; // Использует пробел нулевой ширины
+        $this->parse_mode               // со ссылкой в начале сообщения
+            = "HTML";
+
         return $this;
     }
 
@@ -201,6 +224,7 @@ final class Message
     {
         $this->sendPoll = true;
         $this->question = $text;
+
         return $this;
     }
 
@@ -208,30 +232,34 @@ final class Message
     {
         $this->sendSticker = true;
         $this->sticker_id = $file_id;
+
         return $this;
     }
 
     public function addAnswer(string $text): static
     {
         $this->options[] = $text;
+
         return $this;
     }
 
     public function isAnonymous(?bool $anon = true): static
     {
         $this->is_anonymous = $anon;
+
         return $this;
     }
 
     public function pollType(string $type): static
     {
         $this->pollType = $type;
+
         return $this;
     }
 
     public function action(?string $action = 'typing'): static
     {
-        if (in_array($action, [
+        if (!in_array($action, [
             'typing',
             'upload_photo',
             'upload_video',
@@ -242,26 +270,39 @@ final class Message
             'choose_sticker',
             'find_location',
             'record_video_note',
-            'upload_video_note'
-        ])) {
+            'upload_video_note',
+        ])
+        ) {
             $action = 'typing';
         }
-        $this->TGZ->callAPI('sendChatAction', ['chat_id' => $this->chatID, 'action' => $action]);
+        $this->TGZ->callAPI(
+            'sendChatAction', ['chat_id' => $this->chatID, 'action' => $action],
+        );
+
         return $this;
     }
 
     public function send(?int $chatID = null): array
     {
         $params = [
-            'chat_id' => $chatID ?: $this->chatID
+            'chat_id' => $chatID ?: $this->chatID,
         ];
         $params = array_merge($params, $this->params_additionally);
         $params = array_merge($params, $this->reply_to);
         $params = array_merge($params, $this->kbd);
 
-        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendSticker && !$this->sendDice && !$this->sendVoice && !$this->sendPoll && !$this->sendVideo && !$this->sendAnimation && !$this->sendDocument && !$this->sendMediaGroup) {
+        if (!$this->sendPhoto && !$this->sendAudio && !$this->sendSticker
+            && !$this->sendDice
+            && !$this->sendVoice
+            && !$this->sendPoll
+            && !$this->sendVideo
+            && !$this->sendAnimation
+            && !$this->sendDocument
+            && !$this->sendMediaGroup
+        ) {
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
+
             return $this->TGZ->callAPI('sendMessage', $params);
         }
 
@@ -274,22 +315,34 @@ final class Message
 
     public function sendEdit(?int $messageID = 0, ?int $chatID = null): array
     {
+        if (isset($this->TGZ->update['callback_query']['message']['message_id'])) {
+            $identifier = [
+                'chat_id'    => $chatID ?: $this->chatID,
+                'message_id' => $messageID ?: $this->TGZ->initMsgID($messageID),
+            ];
+        } else {
+            $identifier = [
+                'inline_message_id' => $this->TGZ->update['callback_query']['inline_message_id'],
+            ];
+        }
+
         $params = [
-            'text' => $this->text,
+            'text'       => $this->text,
             'parse_mode' => $this->parse_mode,
-            'chat_id' => $chatID ?: $this->chatID,
-            'message_id' => $messageID ?: $this->TGZ->update['callback_query']['message']['message_id']
         ];
+
+        $params = array_merge($params, $identifier);
         $params = array_merge($params, $this->kbd);
         $params = array_merge($params, $this->params_additionally);
 
         $method = 'editMessageText';
+
         return $this->TGZ->callAPI($method, $params);
     }
 
 
     /**
-     * @param (int|mixed)[] $params
+     * @param (int|mixed)[]                       $params
      *
      * @psalm-param array{chat_id: int|mixed,...} $params
      *
@@ -298,8 +351,8 @@ final class Message
     private function sendMediaGroup(array $params): array
     {
         $params1 = [
-            'caption' => $this->text,
-            'parse_mode' => $this->parse_mode
+            'caption'    => $this->text,
+            'parse_mode' => $this->parse_mode,
         ];
 
         $this->media[0] = array_merge($this->media[0], $params1);
@@ -307,7 +360,7 @@ final class Message
 
         foreach ($mediaChunks as $mediaChunk) {
             $postFields = array_merge($params, [
-                'media' => json_encode($mediaChunk, JSON_THROW_ON_ERROR)
+                'media' => json_encode($mediaChunk, JSON_THROW_ON_ERROR),
             ]);
 
             foreach ($mediaChunk as $item) {
@@ -318,6 +371,7 @@ final class Message
             }
             $this->TGZ->callAPI('sendMediaGroup', $postFields);
         }
+
         return [];
     }
 
@@ -334,11 +388,12 @@ final class Message
     private function sendSticker($params): array
     {
         $params['sticker'] = $this->sticker_id;
+
         return $this->TGZ->callAPI('sendSticker', $params);
     }
 
     /**
-     * @param (int|mixed)[] $params
+     * @param (int|mixed)[]                       $params
      *
      * @psalm-param array{chat_id: int|mixed,...} $params
      */
@@ -370,6 +425,7 @@ final class Message
 
         if ($this->sendDice) {
             $params['emoji'] = $this->text;
+
             return $this->TGZ->callAPI('sendDice', $params);
         }
 
@@ -390,9 +446,10 @@ final class Message
         $params['parse_mode'] = $this->parse_mode;
         $params[$type] = strpos(
             $this->media[0]['media'],
-            'attach://'
+            'attach://',
         ) !== false ? $this->files['file1'] : $this->media[0]['media'];
-        return $this->TGZ->callAPI('send' . ucfirst($type), $params);
+
+        return $this->TGZ->callAPI('send'.ucfirst($type), $params);
     }
 
 }
