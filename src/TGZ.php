@@ -304,12 +304,23 @@ final class TGZ
         ];
     }
 
-    public function answerCallbackQuery(int $callbackId, array $options = [],
+    public function answerCallbackQuery(string $callbackID, array $options = [],
     ): array {
         $params = array_merge([
-            'callback_query_id' => $callbackId,
+            'callback_query_id' => $callbackID,
         ], $options);
 
         return $this->callAPI('answerCallbackQuery', $params);
+    }
+
+    public function answerInlineQuery(string $inlineQueryID, array $results,
+        array $extra = [],
+    ): array {
+        $params = array_merge([
+            'inline_query_id' => $inlineQueryID,
+            'results'         => json_encode($results),
+        ], $extra);
+
+        return $this->callAPI('answerInlineQuery', $params);
     }
 }
