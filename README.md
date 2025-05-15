@@ -358,6 +358,9 @@ if ($type === 'inline_query') {
             )
             ->create(),
         ]; 
+        // Отправляем запрос Телеграму
+        $tg->answerInlineQuery($query_id, $inline_params);
+        
     }
 } else if ($type === 'callback_query') {
     
