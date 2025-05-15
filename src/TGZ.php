@@ -132,6 +132,8 @@ final class TGZ
             $type = 'callback_query';
         } elseif (isset($this->update['edited_message'])) {
             $type = 'edited_message';
+        } elseif (isset($this->update['inline_query'])) {
+            $type = 'inline_query';
         }
 
         return $this;
