@@ -117,11 +117,14 @@ class Inline
             'title'                 => $this->title,
             'description'           => $this->description,
             'input_message_content' => $message,
-            'reply_markup'          => $this->kbd,
         ];
 
         if (!empty($this->thumb)) {
             $params = array_merge($params, $this->thumb);
+        }
+
+        if (!empty($this->kbd)) {
+            $params = array_merge($params, ['reply_markup' => $this->kbd]);
         }
 
         return $params;
