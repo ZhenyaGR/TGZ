@@ -8,7 +8,7 @@ final class Message
 {
     public ?string $text;
     public object $TGZ;
-    public int $chatID = 0;
+    public ?int $chatID = 0;
     public array $reply_to = [];
     public array $kbd = [];
     public string $parse_mode;
@@ -313,16 +313,18 @@ final class Message
         return $this->sendMediaType($params);
     }
 
-    public function sendEdit(?int $messageID = 0, ?int $chatID = null): array
+    public function sendEdit(?string $messageID = null, ?int $chatID = null, ?string $messageIDInit = null): array
     {
+        $this->TGZ->initMsgID($messageIDInit);
         if (isset($this->TGZ->update['callback_query']['message']['message_id'])) {
+
             $identifier = [
                 'chat_id'    => $chatID ?: $this->chatID,
-                'message_id' => $messageID ?: $this->TGZ->initMsgID($messageID),
+                'message_id' => $messageID ?: $messageIDInit,
             ];
         } else {
             $identifier = [
-                'inline_message_id' => $this->TGZ->update['callback_query']['inline_message_id'],
+                'inline_message_id' => $messageIDInit,
             ];
         }
 
@@ -339,6 +341,7 @@ final class Message
 
         return $this->TGZ->callAPI($method, $params);
     }
+
 
 
     /**

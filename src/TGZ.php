@@ -95,8 +95,7 @@ final class TGZ
         if (isset($update['message'])) {
             $is_bot = $update['message']['from']['is_bot'];
             $is_command = (isset($update['message']['entities'][0]['type'])
-                && $update['message']['entities'][0]['type'] === 'bot_command')
-                ? true : false;
+                && $update['message']['entities'][0]['type'] === 'bot_command');
             $callback_data = false;
             $query_id = false;
 
