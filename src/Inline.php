@@ -126,8 +126,8 @@ class Inline
             'input_message_content' => $message,
         ];
 
-        if (!empty($this->thumb)) {
-            $params = array_merge($params, $this->thumb);
+        if (!empty($this->thumbUrl)) {
+            $params = array_merge($params, ['thumb_url' => $this->thumbUrl]);
         }
 
         if (!empty($this->kbd)) {
@@ -146,7 +146,7 @@ class Inline
             'description'  => $this->description,
             'caption'      => $this->message_text,
             'photo_url'    => $this->imgUrl,
-            'thumb_url'    => $this->thumbUrl ?? $this->imgUrl,
+            'thumb_url'    => empty($this->thumbUrl) ? $this->imgUrl : $this->thumbUrl,
             'parse_mode'   => $this->parse_mode,
         ];
 
