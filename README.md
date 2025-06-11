@@ -22,7 +22,7 @@ require_once "TGZ/autoload.php";
 ---
 # Примеры использования
 
-### Инициализация переменных
+### Инициализация переменных (WEBHOOK)
 ```php
 <?php
 require 'TGZ/autoload.php';  // Подключаем библиотеку
@@ -41,8 +41,30 @@ $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_
 // Все переменные сразу одним методом
 ```
 
+### Инициализация переменных (LONGPOLL)
+```php
+<?php
+require 'TGZ/autoload.php';  // Подключаем библиотеку
+use ZhenyaGR\TGZ\LongPoll as tg;  // Используем класс LongPoll
 
-### Вызов любых методов BOT API. Например copyMessage
+$tg = tg::create(BOT_TOKEN); // Создаем объект бота
+
+$tg->listen(function() use ($tg) {
+        
+    $tg->initUserID($user_id)
+        ->initChatID($chat_id)
+        ->initText($text)
+        ->initMsgID($msg_id)
+        ->initType($type);
+    // Некоторые переменные можно инициализировать по отдельности
+    
+    $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_id, $is_bot, $is_command);
+    // Все переменные сразу одним методом
+});
+```
+
+
+### Вызов любых методов BOT API. Например copyMessage (WEBHOOK)
 ```php
 <?php
 require 'TGZ/autoload.php';  
@@ -55,12 +77,14 @@ $tg->initVars($chat_id, $user_id, $text, $type, msg_id: $msg_id);
 if ($type == 'text' || $type == 'bot_command') {
     $tg->copyMessage([
         'chat_id' => $chat_id, 
+        'from_chat_id' => $chat_id,
         'message_id' => $msg_id
     ]); 
-    // Используем метод телеграма, передаем 2 параметра: chat_id и message_id
+    // Используем метод телеграма, в который передаем 3 параметра:
+    // chat_id, from_chat_id и message_id
 }
 ```
-### Эхо-бот с конструктором сообщений
+### Эхо-бот с конструктором сообщений (WEBHOOK)
 ```php
 <?php
 require 'TGZ/autoload.php'; 
@@ -70,9 +94,54 @@ $tg = tg::create(BOT_TOKEN);
 $tg->initVars($chat_id, $user_id, $text, $type);
 
 if ($type == 'text' || $type == 'bot_command') {
-    $tg->msg($text)->send(); // Отправляем сообщение с таким-же текстом
+    $tg->msg($text)->send(); 
+    // Отправляем сообщение с таким-же текстом
 }
 ```
+### Вызов любых методов BOT API. Например copyMessage (LONGPOLL)
+```php
+<?php
+require 'TGZ/autoload.php';  
+use ZhenyaGR\TGZ\LongPoll as tg;  // Меняем класс
+
+$tg = tg::create(BOT_TOKEN); 
+
+$tg->listen(function() use ($tg) {
+    // Ждём новый update
+    
+    $tg->initVars($chat_id, $user_id, $text, $type, msg_id: $msg_id); 
+    // Инициализируем переменные
+    
+    if ($type == 'text' || $type == 'bot_command') {
+        $tg->copyMessage([
+            'chat_id' => $chat_id, 
+            'from_chat_id' => $chat_id,
+            'message_id' => $msg_id,
+        ]); 
+        // Используем метод телеграма, в который передаем 3 параметра:
+        // chat_id, from_chat и message_id
+    }
+
+});
+```
+### Эхо-бот с конструктором сообщений (LONGPOLL)
+```php
+<?php
+require 'TGZ/autoload.php'; 
+use ZhenyaGR\TGZ\LongPoll as tg; 
+
+$tg = tg::create(BOT_TOKEN);
+
+$tg->listen(function() use ($tg) {
+
+    $tg->initVars($chat_id, $user_id, $text, $type);
+    
+    if ($type == 'text' || $type == 'bot_command') {
+        $tg->msg($text)->send(); // Отправляем сообщение с таким-же текстом
+    }
+});
+```
+#### `Все остальные примеры будут показаны на Webhook`
 ### Все доступные типы
 ```php
 <?php

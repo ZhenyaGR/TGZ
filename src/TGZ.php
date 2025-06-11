@@ -5,14 +5,13 @@ namespace ZhenyaGR\TGZ;
 use CURLFile;
 use Exception;
 
-final class TGZ
+class TGZ
 {
     use ErrorHandler;
 
-
     public string $apiUrl;
     public string $token;
-    public array $update;
+    public ?array $update;
     public string $parseModeDefault = '';
 
 
@@ -30,7 +29,7 @@ final class TGZ
 
         $input = file_get_contents('php://input');
         $update = json_decode($input, true);
-        $this->update = $update;
+        $this->update = $update ?? null;
     }
 
     public function callAPI(string $method, ?array $params = []): array
