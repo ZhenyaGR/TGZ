@@ -47,7 +47,9 @@ $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_
 require 'TGZ/autoload.php';  // Подключаем библиотеку
 use ZhenyaGR\TGZ\LongPoll as tg;  // Используем класс LongPoll
 
-$tg = tg::create(BOT_TOKEN); // Создаем объект бота
+$tg = tg::create(BOT_TOKEN, 10); 
+// Создаем объект бота
+// Указываем задержку между запросами (По умолчанию 10 секунд)
 
 $tg->listen(function() use ($tg) {
         
@@ -482,11 +484,11 @@ __Подчёркнутый__
 
 ### **HTML**
 ```html
-<b>Жирный</b>  
-<i>Курсив</i>  
-<u>Подчёркнутый</u>  
-<code>Моноширинный</code>  
-<a href="https://github.com/ZhenyaGR/TGZ">Ссылка</a>  
+<b>Жирный</b>
+<i>Курсив</i>
+<u>Подчёркнутый</u>
+<code>Моноширинный</code>
+<a href="https://github.com/ZhenyaGR/TGZ">Ссылка</a>
 <span class="tg-spoiler">Спойлер</span>
 ```
 
