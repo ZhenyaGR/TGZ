@@ -146,7 +146,7 @@ class Inline
             'description'  => $this->description,
             'caption'      => $this->message_text,
             'photo_url'    => $this->imgUrl,
-            'trumb_url'    => $this->thumbUrl ?? $this->imgUrl,
+            'thumb_url'    => $this->thumbUrl ?? $this->imgUrl,
             'parse_mode'   => $this->parse_mode,
         ];
 
