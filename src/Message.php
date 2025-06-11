@@ -203,10 +203,10 @@ final class Message
 
     public function img(string|array $url): static
     {
+        $this->imgUrl = $url;
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'photo');
         $this->sendPhoto = true;
-        $this->imgUrl = $url;
 
         return $this;
     }
