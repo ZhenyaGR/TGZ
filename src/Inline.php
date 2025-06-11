@@ -97,6 +97,16 @@ class Inline
         return $this;
     }
 
+    public function parseMode(string $mode = ''): self
+    {
+        if (!in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', ''], true)) {
+            $mode = '';
+        }
+        $this->parse_mode = $mode;
+
+        return $this;
+    }
+
     private function createText(): array
     {
         $message = [
