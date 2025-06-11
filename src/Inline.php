@@ -140,14 +140,15 @@ class Inline
     private function createPhoto(): array
     {
         $params = [
-            'type'         => $this->type,
-            'id'           => $this->id,
-            'title'        => $this->title,
-            'description'  => $this->description,
-            'caption'      => $this->message_text,
-            'photo_url'    => $this->imgUrl,
-            'thumb_url'    => empty($this->thumbUrl) ? $this->imgUrl : $this->thumbUrl,
-            'parse_mode'   => $this->parse_mode,
+            'type'          => $this->type,
+            'id'            => $this->id,
+            'title'         => $this->title,
+            'description'   => $this->description,
+            'caption'       => $this->message_text,
+            'photo_url'     => $this->imgUrl,
+            'thumbnail_url' => empty($this->thumbUrl) ? $this->imgUrl
+                : $this->thumbUrl,
+            'parse_mode'    => $this->parse_mode,
         ];
 
         if (!empty($this->kbd)) {
