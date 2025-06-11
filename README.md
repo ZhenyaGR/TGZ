@@ -396,8 +396,10 @@ if ($type === 'inline_query') {
 
     // Приходит запрос с параметром query. Его содержимое находится в переменной $text
     if ($text === '') {
+    
         // Начало ввода
         $inline_params = [ 
+        
             // Создаём параметры для вывода информации с помощью конструктора
             $tg->inline('article')          // Тип сообщения
             ->id('inline')                  // Уникальный идентификатор
@@ -407,38 +409,37 @@ if ($type === 'inline_query') {
             ->create(),                     // Создаём сообщение
             
             // Т.к. это массив, он может содержать несколько элементов
-            
             $tg->inline('article')
-            ->id('inline')
-            ->title('Title')
-            ->description('Description')
-            ->text('This – <b>Inline</b>')
-            ->parseMode('HTML')             // Парсинг HTML
-            ->kbd([[$tg->buttonCallback('Кнопка', 'call')]])
-            // Inline-клавиатура
-            ->create(),
+                ->id('inline')
+                ->title('Title')
+                ->description('Description')
+                ->text('This – <b>Inline</b>')
+                ->parseMode('HTML')             // Парсинг HTML
+                ->kbd([[$tg->buttonCallback('Кнопка', 'call')]])
+                // Inline-клавиатура
+                ->create(),
             
             // Можно передать объект класса Message для сообщения
-            
             $tg->inline('article')
-            ->id('inline')
-            ->title('Title')
-            ->description('Description')
-            ->msg(
-                $tg->msg('It`s <i>Kool</i>')->parseMode('HTML')
-            )
-            ->create(),
+                ->id('inline')
+                ->title('Title')
+                ->description('Description')
+                ->msg(
+                    $tg->msg('It`s <i>Kool</i>')->parseMode('HTML')
+                )
+                ->create(),
             
             // Тип photo
             $tg->inline('photo')
-            ->id('photo')
-            ->title('Title')
-            ->description('Description')
-            ->text('text'),     // Не обязательно 
-            ->img($img_url),    // Ссылка на фото, которое отправит бот
-            ->thumb($thumb_url), // Ссылка на миниатюру
-            ->create(),
+                ->id('photo')
+                ->title('Title')
+                ->description('Description')
+                ->text('text'),     // Не обязательно 
+                ->img($img_url),    // Ссылка на фото, которое отправит бот
+                ->thumb($thumb_url), // Ссылка на миниатюру
+                ->create(),
         ]; 
+        
         // Отправляем запрос Телеграму
         $tg->answerInlineQuery($query_id, $inline_params);
         
