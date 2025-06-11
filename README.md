@@ -428,6 +428,16 @@ if ($type === 'inline_query') {
                 $tg->msg('It`s <i>Kool</i>')->parseMode('HTML')
             )
             ->create(),
+            
+            // Тип photo
+            $tg->inline('photo')
+            ->id('photo')
+            ->title('Title')
+            ->description('Description')
+            ->text('text'),     // Не обязательно 
+            ->img($img_url),    // Ссылка на фото, которое отправит бот
+            ->thumb($thumb_url), // Ссылка на миниатюру
+            ->create(),
         ]; 
         // Отправляем запрос Телеграму
         $tg->answerInlineQuery($query_id, $inline_params);
