@@ -13,10 +13,19 @@ class Inline
     public string $message_text = '';
     public array $kbd = [];
     public array $params_additionally = [];
-    public array $thumb = [];
+    public string $imgUrl = '';
+    public string $thumbUrl = '';
 
     public function __construct(string $type, TGZ $TGZ)
     {
+        if (!in_array(
+            $type,
+            ['article', 'contact', 'location', 'mpeg4_gif', 'venue', 'photo',
+             'gif', 'video', 'audio', 'voice', 'document'],
+        )
+        ) {
+            $type = 'article';
+        }
         $this->type = $type;
         $this->parse_mode = $TGZ->parseModeDefault;
         $this->TGZ = $TGZ;
@@ -50,6 +59,20 @@ class Inline
         return $this;
     }
 
+    public function img(string $url = ''): self
+    {
+        $this->imgUrl = $url;
+
+        return $this;
+    }
+
+    public function thumb(string $url = ''): self
+    {
+        $this->thumbUrl = $url;
+
+        return $this;
+    }
+
     public function kbd(array $buttons = []): self
     {
         $this->kbd = ['inline_keyboard' => $buttons];
@@ -70,33 +93,6 @@ class Inline
         $this->parse_mode = $msg->parse_mode;
         $this->params_additionally = $msg->params_additionally;
         $this->kbd($msg->buttons);
-
-        return $this;
-    }
-
-    public function parseMode(string $mode = ''): self
-    {
-        if (!in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', ''], true)) {
-            $mode = '';
-        }
-        $this->parse_mode = $mode;
-
-        return $this;
-    }
-
-    public function thumb(string $url, int $width = 0, int $height = 0): self
-    {
-        $this->thumb = [
-            'thumb_url' => $url,
-        ];
-
-        if ($width > 0) {
-            $this->thumb['thumb_width'] = $width;
-        }
-
-        if ($height > 0) {
-            $this->thumb['thumb_height'] = $height;
-        }
 
         return $this;
     }
@@ -130,12 +126,37 @@ class Inline
         return $params;
     }
 
+    private function createPhoto(): array
+    {
+        $params = [
+            'type'         => $this->type,
+            'id'           => $this->id,
+            'title'        => $this->title,
+            'description'  => $this->description,
+            'caption'      => $this->message_text,
+            'photo_url'    => $this->imgUrl,
+            'trumb_url'    => $this->thumbUrl,
+            'parse_mode'   => $this->parse_mode,
+        ];
+
+        if (!empty($this->kbd)) {
+            $params = array_merge($params, ['reply_markup' => $this->kbd]);
+        }
+
+        return array_merge($params, $this->params_additionally);
+    }
+
+
     public function create(): array
     {
         $return = [];
         switch ($this->type) {
             case 'article':
                 $return = $this->createText();
+                break;
+
+            case 'photo':
+                $return = $this->createPhoto();
                 break;
 
         }
