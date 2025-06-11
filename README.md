@@ -48,7 +48,7 @@ require 'TGZ/autoload.php';  // Подключаем библиотеку
 use ZhenyaGR\TGZ\LongPoll as tg;  // Используем класс LongPoll
 
 $tg = tg::create(BOT_TOKEN, 10); 
-// Создаем объект бота
+// Создаем объект бота 
 // Указываем задержку между запросами (По умолчанию 10 секунд)
 
 $tg->listen(function() use ($tg) {
