@@ -31,6 +31,7 @@ final class Message
     public array $buttons = [];
     public bool $is_anonymous = false;
     public string $pollType = "regular";
+    public ?string $imgUrl;
 
 
     public function __construct($text, $TGZ)
@@ -205,6 +206,7 @@ final class Message
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'photo');
         $this->sendPhoto = true;
+        $this->imgUrl = $url;
 
         return $this;
     }

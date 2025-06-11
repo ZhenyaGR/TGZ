@@ -93,6 +93,7 @@ class Inline
         $this->parse_mode = $msg->parse_mode;
         $this->params_additionally = $msg->params_additionally;
         $this->kbd($msg->buttons);
+        $this->imgUrl = $msg->imgUrl;
 
         return $this;
     }
@@ -145,7 +146,7 @@ class Inline
             'description'  => $this->description,
             'caption'      => $this->message_text,
             'photo_url'    => $this->imgUrl,
-            'trumb_url'    => $this->thumbUrl,
+            'trumb_url'    => $this->thumbUrl ?? $this->imgUrl,
             'parse_mode'   => $this->parse_mode,
         ];
 
