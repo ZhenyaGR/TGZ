@@ -48,11 +48,8 @@ Telegram сразу показывает **варианты ответов от 
 | `audio`     | Аудиофайл (музыка, подкаст и т. д.)                               |
 | `voice`     | Голосовое сообщение (OGG/Opus)                                    |
 | `document`  | Файл                                                              |
-| `contact`   | Контакт с телефоном и именем                                      |
 | `location`  | Геопозиция (карта)                                                |
 | `venue`     | Место (название, адрес, локация)                                  |
-| `sticker`   | Стикер из набора                                                  |
-| `game`      | Игра (бот должен быть игровым)                                    |
 
 ---
 
@@ -72,3 +69,132 @@ Telegram сразу показывает **варианты ответов от 
 * После выбора: `inline_message_id` (если нужно редактировать сообщение)
 
 ---
+
+### 7. Примеры реализации каждого типа inline-результата
+
+```php
+$results = [
+
+    // Простой текст
+    $tg->inline('article')  // Тип результата
+        ->id('article')     // Уникальный идентификатор
+        ->title('Команда')  // Заголовок
+        ->description('Описание команды')   // Описание (Не обязательно)
+        ->text('text')      // Текст, который отправит бот
+        ->create(),         // Создание результата
+
+    // Фотография
+    $tg->inline('photo')
+        ->id('photo')
+        ->title('Фото')
+        ->description('Описание фото') 
+        ->text('text')          // (Не обязательно)
+        ->fileUrl($img_url)     // URL фотографии
+        ->thumbUrl($thumb_url)  // URL миниатюры (Если её не передать, библиотека возьмет URL фотографии)
+        ->create(),
+
+    // Анимация
+    $tg->inline('gif')
+        ->id('gif')
+        ->title('Анимация')
+        ->text('text')          // (Не обязательно)
+        ->fileUrl($gif_url)     // URL анимации
+        ->thumbUrl($thumb_url)  // URL миниатюры (Если её не передать, библиотека возьмет URL анимации)        
+        ->create(),
+    
+    // Короткое видео (Второй вариант анимации)
+    $tg->inline('mpeg4_gif')
+        ->id('mpeg4_gif')
+        ->title('Анимация 2')
+        ->text('text')              // (Не обязательно)
+        ->fileUrl($mpeg4_gif_url)   // URL анимации или mpeg4
+        ->thumbUrl($thumb_url)      // URL миниатюры (Если её не передать, библиотека возьмет URL анимации)
+        ->create(),
+
+    // Аудио
+    $tg->inline('audio')
+        ->id('audio')
+        ->title('Аудио')
+        ->text('text')          // (Не обязательно)
+        ->fileUrl($audio_url)   // URL аудио
+        ->create(),
+
+    // Голосовое сообщение
+    $tg->inline('voice')
+        ->id('voice')
+        ->title('Голосовое сообщение')
+        ->fileUrl($voice_url)   // URL голосового сообщения
+        ->create(),
+
+    // Видео
+    $tg->inline('video')
+        ->id('video')
+        ->title('Видео')
+        ->description('Описание видео')
+        ->fileUrl($video_url)   // URL видео (до 20 МБ)
+        ->mimeType('video/mp4') // “text/html” или “video/mp4” (Если не передать, библиотека возьмет video/mp4)
+        ->thumb($thumb_url)     // URL миниатюры (Если её не передать, библиотека возьмет URL видео)
+        ->create(),
+
+    // Документ
+    $tg->inline('document')
+        ->id('document')
+        ->title('Документ')
+        ->description('Описание документа')
+        ->fileUrl($document_url)        // URL документа
+        ->mimeType('application/zip')   // “application/zip” или “application/pdf”
+        ->create(),
+
+    // Местоположение
+    $tg->inline('location')
+        ->id('location')
+        ->title('Местоположение')       
+        ->coordinates(55.7558, 37.6173) // Широта, долгота
+        ->create(),
+
+    // Адрес (место)
+    $tg->inline('venue')
+        ->id('venue')
+        ->title('Адрес')
+        ->coordinates(55.7558, 37.6173) // Широта, долгота
+        ->address('Улица Пушкина, дом Колотушкина') // Подпись 
+        ->create(),
+];
+
+$tg->answerInlineQuery($query_id, $results);
+```
+
+### Дополнительные параметры
+Их можно указывать в каждом результате.
+* **parse_mode**: `HTML` | `Markdown` | `MarkdownV2` - Устанавливает форматирование сообщений
+* **kbd** - Массив с callback-кнопками
+* **params** - Массив с дополнительными параметрами
+
+---
+### Пример
+```php
+$kbd = [
+    [$tg->buttonCallback('Кнопка 1', 'call1')],
+    [$tg->buttonCallback('Кнопка 2', 'call2')]
+];
+
+$results = [
+    $tg->inline('article')
+        ->id('article')
+        ->title('Команда')
+        ->description('Описание команды')
+        ->text('*text*')
+        ->kbd($kbd)                 // Массив с callback-кнопками
+        ->parseMode('MarkdownV2')   // HTML | Markdown | MarkdownV2
+        ->create(),   
+        
+    $tg->inline('photo')
+        ->id('photo')
+        ->title('Фото')
+        ->text('text')
+        ->photoUrl($photo_url)
+        ->params([
+            'show_caption_above_media' => true
+        ])      // Массив с дополнительными параметрами. В примере показано, что текст будет выше картинки
+        ->create(),
+]

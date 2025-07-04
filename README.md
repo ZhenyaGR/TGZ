@@ -383,7 +383,7 @@ if ($type == 'text' || $type == 'bot_command') {
 ```
 ### Inline-Mode
 #### [Подробнее об inline-режиме](inline.md)
-###### Пока что реализован только текстовый тип
+###### Подробный разбор каждого типа описан по ссылке выше
 ```php
 <?php
 require 'TGZ/autoload.php';
@@ -407,37 +407,7 @@ if ($type === 'inline_query') {
             ->description('Description')    // Описание
             ->text('Hello, World!')         // Текст, который отправит бот
             ->create(),                     // Создаём сообщение
-            
-            // Т.к. это массив, он может содержать несколько элементов
-            $tg->inline('article')
-                ->id('inline')
-                ->title('Title')
-                ->description('Description')
-                ->text('This – <b>Inline</b>')
-                ->parseMode('HTML')             // Парсинг HTML
-                ->kbd([[$tg->buttonCallback('Кнопка', 'call')]])
-                // Inline-клавиатура
-                ->create(),
-            
-            // Можно передать объект класса Message для сообщения
-            $tg->inline('article')
-                ->id('inline')
-                ->title('Title')
-                ->description('Description')
-                ->msg(
-                    $tg->msg('It`s <i>Kool</i>')->parseMode('HTML')
-                )
-                ->create(),
-            
-            // Тип photo
-            $tg->inline('photo')
-                ->id('photo')
-                ->title('Title')
-                ->description('Description')
-                ->text('text'),     // Не обязательно 
-                ->img($img_url),    // Ссылка на фото, которое отправит бот
-                ->thumb($thumb_url), // Ссылка на миниатюру
-                ->create(),
+           
         ]; 
         
         // Отправляем запрос Телеграму
