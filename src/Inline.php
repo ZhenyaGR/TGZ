@@ -4,6 +4,13 @@ namespace ZhenyaGR\TGZ;
 
 class Inline
 {
+
+    // Лимиты Telegram в байтах
+//    private const VIDEO_SIZE_LIMIT = 20971520; // 20 MB
+//    private const AUDIO_SIZE_LIMIT = 20971520; // 20 MB
+//    private const GIF_SIZE_LIMIT   = 20971520; // 20 MB
+//    private const PHOTO_SIZE_LIMIT = 5242880;  // 5 MB
+
     public string $type = 'article';
     public TGZ $TGZ;
     public string $parse_mode = '';
@@ -13,19 +20,25 @@ class Inline
     public string $message_text = '';
     public array $kbd = [];
     public array $params_additionally = [];
-    public string $imgUrl = '';
+    public string $fileUrl = '';
+    public string $fileId = '';
     public string $thumbUrl = '';
+    public string $mimeType = '';
+    public float $latitude = 0;
+    public float $longitude = 0;
+    public string $address = '';
 
     public function __construct(string $type, TGZ $TGZ)
     {
         if (!in_array(
             $type,
-            ['article', 'contact', 'location', 'mpeg4_gif', 'venue', 'photo',
+            ['article', 'location', 'mpeg4_gif', 'venue', 'photo',
              'gif', 'video', 'audio', 'voice', 'document'],
         )
         ) {
             $type = 'article';
         }
+
         $this->type = $type;
         $this->parse_mode = $TGZ->parseModeDefault;
         $this->TGZ = $TGZ;
@@ -59,9 +72,23 @@ class Inline
         return $this;
     }
 
-    public function img(string $url = ''): self
+    public function fileUrl(string $url = ''): self
     {
-        $this->imgUrl = $url;
+        $this->fileUrl = $url;
+
+        return $this;
+    }
+
+    public function fileID(string $id = ''): self
+    {
+        $this->fileId = $id;
+
+        return $this;
+    }
+
+    public function mimeType(string $mime): self
+    {
+        $this->mimeType = $mime;
 
         return $this;
     }
@@ -87,17 +114,6 @@ class Inline
         return $this;
     }
 
-    public function msg(Message $msg): self
-    {
-        $this->message_text = $msg->text;
-        $this->parse_mode = $msg->parse_mode;
-        $this->params_additionally = $msg->params_additionally;
-        $this->kbd($msg->buttons);
-        $this->imgUrl = $msg->imgUrl;
-
-        return $this;
-    }
-
     public function parseMode(string $mode = ''): self
     {
         if (!in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', ''], true)) {
@@ -108,6 +124,37 @@ class Inline
         return $this;
     }
 
+    public function coordinates(float $latitude, float $longitude): self
+    {
+        $this->latitude = $latitude;
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    public function address(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    private function createParams(): array
+    {
+        return [
+            'type'  => $this->type,
+            'id'    => $this->id,
+            'title' => $this->title,
+        ];
+    }
+
+    private function addKbdInParams(&$params): void
+    {
+        if (!empty($this->kbd)) {
+            $params['reply_markup'] = $this->kbd;
+        }
+    }
+
     private function createText(): array
     {
         $message = [
@@ -115,49 +162,222 @@ class Inline
             'parse_mode'   => $this->parse_mode,
         ];
 
+        $message = $message + $this->params_additionally;
 
-        $message = array_merge($message, $this->params_additionally);
+        $params = $this->createParams();
 
-        $params = [
-            'type'                  => $this->type,
-            'id'                    => $this->id,
-            'title'                 => $this->title,
-            'description'           => $this->description,
-            'input_message_content' => $message,
-        ];
+        $params = $params + [
+                'description'           => $this->description,
+                'input_message_content' => $message,
+            ];
 
         if (!empty($this->thumbUrl)) {
-            $params = array_merge($params, ['thumb_url' => $this->thumbUrl]);
+            $params['thumb_url'] = $this->thumbUrl;
         }
 
-        if (!empty($this->kbd)) {
-            $params = array_merge($params, ['reply_markup' => $this->kbd]);
-        }
+        $this->addKbdInParams($params);
 
         return $params;
     }
 
     private function createPhoto(): array
     {
-        $params = [
-            'type'          => $this->type,
-            'id'            => $this->id,
-            'title'         => $this->title,
-            'description'   => $this->description,
-            'caption'       => $this->message_text,
-            'photo_url'     => $this->imgUrl,
-            'thumbnail_url' => empty($this->thumbUrl) ? $this->imgUrl
-                : $this->thumbUrl,
-            'parse_mode'    => $this->parse_mode,
-        ];
+        $params = $this->createParams();
 
-        if (!empty($this->kbd)) {
-            $params = array_merge($params, ['reply_markup' => $this->kbd]);
+        $params = $params + [
+                'description'   => $this->description,
+                'caption'       => $this->message_text,
+                'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
+                    : $this->thumbUrl,
+                'parse_mode'    => $this->parse_mode,
+            ];
+
+        if (!empty($this->fileUrl)) {
+            $params['photo_url'] = $this->fileUrl;
+        } else {
+            $params['photo_file_id'] = $this->fileId;
         }
 
-        return array_merge($params, $this->params_additionally);
+        $this->addKbdInParams($params);
+
+        return $params + $this->params_additionally;
     }
 
+    private function createGif(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'description'   => $this->description,
+                'caption'       => $this->message_text,
+                'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
+                    : $this->thumbUrl,
+                'parse_mode'    => $this->parse_mode,
+            ];
+
+        if (!empty($this->fileUrl)) {
+            $params['gif_url'] = $this->fileUrl;
+        } else {
+            $params['gif_file_id'] = $this->fileId;
+        }
+
+        $this->addKbdInParams($params);
+
+        return $params + $this->params_additionally;
+    }
+
+    private function createMpeg4Gif(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'description'   => $this->description,
+                'caption'       => $this->message_text,
+                'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
+                    : $this->thumbUrl,
+                'parse_mode'    => $this->parse_mode,
+            ];
+
+        if (!empty($this->fileUrl)) {
+            $params['mpeg4_url'] = $this->fileUrl;
+        } else {
+            $params['mpeg4_file_id'] = $this->fileId;
+        }
+
+        $this->addKbdInParams($params);
+
+        return $params + $this->params_additionally;
+    }
+
+    private function createVideo(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'description' => $this->description,
+                'caption'     => $this->message_text,
+                'mime_type'   => $this->mimeType == '' ? 'video/mp4'
+                    : $this->mimeType,
+                'parse_mode'  => $this->parse_mode,
+            ];
+
+        if (!empty($this->fileUrl)) {
+            $params['video_url'] = $this->fileUrl;
+        } else {
+            $params['video_file_id'] = $this->fileId;
+        }
+
+        $this->addKbdInParams($params);
+
+        if (!empty($this->thumbUrl)) {
+            $params['thumbnail_url'] = $this->thumbUrl;
+        }
+
+        return $params + $this->params_additionally;
+    }
+
+    private function createDocument(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'description'  => $this->description,
+                'caption'      => $this->message_text,
+                'mime_type'    => $this->mimeType,
+                'parse_mode'   => $this->parse_mode,
+            ];
+
+        if (!empty($this->fileUrl)) {
+            $params['document_url'] = $this->fileUrl;
+        } else {
+            $params['document_file_id'] = $this->fileId;
+        }
+
+        $this->addKbdInParams($params);
+
+        if (!empty($this->thumbUrl)) {
+            $params['thumbnail_url'] = $this->thumbUrl;
+        }
+
+        return $params + $this->params_additionally;
+    }
+
+    private function createAudio(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'caption'    => $this->message_text,
+                'parse_mode' => $this->parse_mode,
+            ];
+
+        if (!empty($this->fileUrl)) {
+            $params['audio_url'] = $this->fileUrl;
+        } else {
+            $params['audio_file_id'] = $this->fileId;
+        }
+
+        $this->addKbdInParams($params);
+
+        return $params + $this->params_additionally;
+    }
+
+    private function createVoice(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'caption'    => $this->message_text,
+                'parse_mode' => $this->parse_mode,
+            ];
+
+        if (!empty($this->fileUrl)) {
+            $params['voice_url'] = $this->fileUrl;
+        } else {
+            $params['voice_file_id'] = $this->fileId;
+        }
+
+        $this->addKbdInParams($params);
+
+        return $params + $this->params_additionally;
+    }
+
+    private function createLocation(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'latitude'  => $this->latitude,
+                'longitude' => $this->longitude,
+            ];
+
+        $this->addKbdInParams($params);
+
+        if (!empty($this->thumbUrl)) {
+            $params['thumbnail_url'] = $this->thumbUrl;
+        }
+
+        return $params + $this->params_additionally;
+    }
+
+    private function createVenue(): array
+    {
+        $params = $this->createParams();
+
+        $params = $params + [
+                'latitude'  => $this->latitude,
+                'longitude' => $this->longitude,
+                'address'   => $this->address,
+            ];
+
+        $this->addKbdInParams($params);
+
+        if (!empty($this->thumbUrl)) {
+            $params['thumbnail_url'] = $this->thumbUrl;
+        }
+
+        return $params + $this->params_additionally;
+    }
 
     public function create(): array
     {
@@ -171,10 +391,41 @@ class Inline
                 $return = $this->createPhoto();
                 break;
 
+            case 'gif':
+                $return = $this->createGif();
+                break;
+
+            case 'mpeg4_gif':
+                $return = $this->createMpeg4Gif();
+                break;
+
+            case 'audio':
+                $return = $this->createAudio();
+                break;
+
+            case 'video':
+                $return = $this->createVideo();
+                break;
+
+            case 'voice':
+                $return = $this->createVoice();
+                break;
+
+            case 'document':
+                $return = $this->createDocument();
+                break;
+
+            case 'location':
+                $return = $this->createLocation();
+                break;
+
+            case 'venue':
+                $return = $this->createVenue();
+                break;
+
         }
 
         return $return;
     }
-
 
 }
