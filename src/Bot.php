@@ -2,13 +2,13 @@
 
 namespace ZhenyaGR\TGZ;
 
-class Router
+class Bot
 {
 
     private TGZ $tg;
 
     /**
-     * @var Route[][]
+     * @var Action[][]
      */
     private array $routes
         = [
@@ -37,13 +37,13 @@ class Router
      * @param string $id   Уникальный идентификатор кнопки.
      * @param string $text Текст кнопки.
      *
-     * @return Route
+     * @return Action
      */
-    public function btn(string $id, string $text): Route
+    public function btn(string $id, string $text): Action
     {
         $this->buttons['btn'][$id] = $text;
 
-        $route = new Route($id, $text);
+        $route = new Action($id, $text);
         $this->buttons['action'][$id] = $route;
 
         return $route;
@@ -55,11 +55,11 @@ class Router
      * @param string       $id      Уникальный идентификатор маршрута.
      * @param array|string $command Текст команды бота, например '/start'.
      *
-     * @return Route
+     * @return Action
      */
-    public function onBotCommand(string $id, array|string $command): Route
+    public function onBotCommand(string $id, array|string $command): Action
     {
-        $route = new Route($id, $command);
+        $route = new Action($id, $command);
         $this->routes['bot_command'][$id] = $route;
 
         return $route;
@@ -71,11 +71,11 @@ class Router
      * @param string       $id      Уникальный идентификатор маршрута.
      * @param array|string $command Текст команды, например '!start'.
      *
-     * @return Route
+     * @return Action
      */
-    public function onCommand(string $id, array|string $command): Route
+    public function onCommand(string $id, array|string $command): Action
     {
-        $route = new Route($id, $command);
+        $route = new Action($id, $command);
         $this->routes['command'][$id] = $route;
 
         return $route;
@@ -87,11 +87,11 @@ class Router
      * @param string       $id   Уникальный идентификатор.
      * @param array|string $text Текст для совпадения.
      *
-     * @return Route
+     * @return Action
      */
-    public function onText(string $id, array|string $text): Route
+    public function onText(string $id, array|string $text): Action
     {
-        $route = new Route($id, $text);
+        $route = new Action($id, $text);
         $this->routes['text_exact'][$id] = $route;
 
         return $route;
@@ -103,11 +103,11 @@ class Router
      * @param string       $id      Уникальный идентификатор.
      * @param array|string $pattern Регулярное выражение.
      *
-     * @return Route
+     * @return Action
      */
-    public function onTextPreg(string $id, array|string $pattern): Route
+    public function onTextPreg(string $id, array|string $pattern): Action
     {
-        $route = new Route($id, $pattern);
+        $route = new Action($id, $pattern);
         $this->routes['text_preg'][$id] = $route;
 
         return $route;
@@ -119,11 +119,11 @@ class Router
      * @param string $id   Уникальный идентификатор.
      * @param string $data Данные из callback-кнопки.
      *
-     * @return Route
+     * @return Action
      */
-    public function onCallback(string $id, string $data): Route
+    public function onCallback(string $id, string $data): Action
     {
-        $route = new Route($id, $data);
+        $route = new Action($id, $data);
         $this->routes['callback_query'][$id] = $route;
 
         return $route;
@@ -132,12 +132,12 @@ class Router
     /**
      * Устанавливает обработчик по умолчанию (fallback).
      *
-     * @return Route
+     * @return Action
      */
-    public function onDefault(): Route
+    public function onDefault(): Action
     {
         // У обработчика по умолчанию нет ID и условия
-        $route = new Route('default_fallback', null);
+        $route = new Action('default_fallback', null);
         $this->routes['fallback'] = $route;
 
         return $route;

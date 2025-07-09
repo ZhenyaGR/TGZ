@@ -2,10 +2,7 @@
 
 namespace ZhenyaGR\TGZ;
 
-
-namespace ZhenyaGR\TGZ;
-
-class Route
+class Action
 {
     private string $id;
     private mixed $condition; // Условие (команда, текст, паттерн)
