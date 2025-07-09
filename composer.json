@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
         "php": ">=8.0",
-        "ext-curl": "*"
+        "ext-curl": "*",
+      "ext-mbstring": "*"
     },
     "autoload": {
         "psr-4": {

@@ -75,6 +75,13 @@ final class Message
         return $this;
     }
 
+    public function text(string $text): static
+    {
+        $this->text = $text;
+
+        return $this;
+    }
+
     public function parseMode(string $mode = ''): static
     {
         if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2'
@@ -313,11 +320,11 @@ final class Message
         return $this->sendMediaType($params);
     }
 
-    public function sendEdit(?string $messageID = null, ?int $chatID = null, ?string $messageIDInit = null): array
-    {
+    public function sendEdit(?string $messageID = null, ?int $chatID = null,
+        ?string $messageIDInit = null,
+    ): array {
         $this->TGZ->initMsgID($messageIDInit);
         if (isset($this->TGZ->update['callback_query']['message']['message_id'])) {
-
             $identifier = [
                 'chat_id'    => $chatID ?: $this->chatID,
                 'message_id' => $messageID ?: $messageIDInit,
@@ -341,7 +348,6 @@ final class Message
 
         return $this->TGZ->callAPI($method, $params);
     }
-
 
 
     /**

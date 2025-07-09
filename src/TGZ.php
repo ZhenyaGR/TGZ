@@ -89,30 +89,56 @@ class TGZ
             ->initChatID($chat_id)
             ->initText($text)
             ->initMsgID($msg_id)
-            ->initType($type);
+            ->initType($type)
+            ->initQuery($query_id)
+            ->initCallbackData($callback_data);
 
         if (isset($update['message'])) {
             $is_bot = $update['message']['from']['is_bot'];
             $is_command = (isset($update['message']['entities'][0]['type'])
                 && $update['message']['entities'][0]['type'] === 'bot_command');
-            $callback_data = false;
-            $query_id = false;
 
         } elseif (isset($update['callback_query'])) {
             $is_bot = $update['callback_query']['from']['is_bot'];
             $is_command = false;
-            $callback_data = $update['callback_query']['data'];
-            $query_id = $update['callback_query']['id'];
 
         } elseif (isset($update['inline_query'])) {
             $is_bot = $update['inline_query']['from']['is_bot'];
             $is_command = false;
-            $callback_data = false;
-            $query_id = $update['inline_query']['id'];
 
         }
 
         return $update;
+    }
+
+    public function initCallbackData(&$callback_data)
+    {
+        if (isset($this->update['message'])) {
+            $callback_data = false;
+        } elseif (isset($this->update['callback_query'])) {
+            $callback_data = $this->update['callback_query']['data'];
+        } elseif (isset($this->update['edited_message'])) {
+            $callback_data = false;
+        } elseif (isset($this->update['inline_query'])) {
+            $callback_data = false;
+        }
+
+        return $this;
+    }
+
+    public function initQuery(&$query_id)
+    {
+        if (isset($this->update['message'])) {
+            $query_id = false;
+        } elseif (isset($this->update['callback_query'])) {
+            $query_id = $this->update['callback_query']['id'];
+        } elseif (isset($this->update['edited_message'])) {
+            $query_id = false;
+        } elseif (isset($this->update['inline_query'])) {
+            $query_id = $this->update['inline_query']['id'];
+        }
+
+        return $this;
     }
 
     public function initType(&$type): static
