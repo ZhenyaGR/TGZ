@@ -148,13 +148,17 @@ class Bot
         $this->tg->initCallbackData($callback_data);
 
         if ($type === 'bot_command') {
-            $command = explode(' ', $text)[0];
+
+            $words = explode(' ', $text);
+            $command = mb_strtolower($words[0]);
+            unset($words[0]);
+            $refs = implode(' ', $words);
 
             foreach ($this->routes['bot_command'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
                     if ($condition === $command) {
-                        $this->dispatchAnswer($route, $type);
+                        $this->dispatchAnswer($route, $type, $refs);
 
                         return;
                     }
@@ -163,7 +167,7 @@ class Bot
         }
 
         if ($type === 'text') {
-            $userText = mb_convert_encoding($text, 'UTF-8');
+            $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
 
             // 1. Проверяем текстовые команды (onCommand)
             foreach ($this->routes['command'] as $route) {
@@ -172,6 +176,7 @@ class Bot
                     $commandFromRoute = mb_convert_encoding(
                         $condition, 'UTF-8',
                     );
+
                     if (str_starts_with($userText, $commandFromRoute)) {
                         $commandLength = strlen($commandFromRoute);
 
@@ -179,7 +184,11 @@ class Bot
                             || $userText[$commandLength] === ' '
                             || $userText[$commandLength] === "\n"
                         ) {
-                            $this->dispatchAnswer($route, $type);
+                            $argsString = trim(substr($userText, $commandLength));
+
+                            $args = ($argsString === '') ? [] : preg_split('/\s+/', $argsString, -1, PREG_SPLIT_NO_EMPTY);
+
+                            $this->dispatchAnswer($route, $type, $args);
 
                             return;
                         }
@@ -272,7 +281,7 @@ class Bot
 
     }
 
-    private function dispatchAnswer($route, $type, $matches = null)
+    private function dispatchAnswer($route, $type, $other_data = null)
     {
         if (!empty($route->button_redirect)) {
             $targetAction = $this->findActionById($route->button_redirect);
@@ -290,12 +299,13 @@ class Bot
                 );
             }
 
-            return $this->executeAction($targetAction, $matches);
+            return $this->executeAction($targetAction, $other_data);
         }
 
         $handler = $route->getHandler();
         if (!empty($handler)) {
-            $handler($this->tg, $matches);
+
+            $handler($this->tg, $other_data);
 
             return null;
         }
