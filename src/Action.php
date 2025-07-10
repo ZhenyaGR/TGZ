@@ -5,8 +5,8 @@ namespace ZhenyaGR\TGZ;
 class Action
 {
     private string $id;
-    private mixed $condition; // Условие (команда, текст, паттерн)
-    private $handler; // Функция-обработчик
+    private mixed $condition;
+    private $handler;
     public array $messageData = [];
     public string $queryText = '';
     public string $button_redirect = '';
@@ -17,13 +17,6 @@ class Action
         $this->condition = $condition;
     }
 
-    /**
-     * Устанавливает функцию-обработчик для этого маршрута.
-     *
-     * @param callable $handler
-     *
-     * @return self
-     */
     public function func(callable $handler): self
     {
         $this->handler = \Closure::fromCallable($handler);
