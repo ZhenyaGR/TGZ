@@ -7,9 +7,9 @@ class Action
     private string $id;
     private mixed $condition; // Условие (команда, текст, паттерн)
     private $handler; // Функция-обработчик
-
     public array $messageData = [];
-    public string $query_text = '';
+    public string $queryText = '';
+    public string $button_redirect = '';
 
     public function __construct(string $id, mixed $condition)
     {
@@ -27,6 +27,13 @@ class Action
     public function func(callable $handler): self
     {
         $this->handler = \Closure::fromCallable($handler);
+
+        return $this;
+    }
+
+    public function redirect(string $id): self
+    {
+        $this->button_redirect = $id;
 
         return $this;
     }
@@ -55,9 +62,7 @@ class Action
 
     public function query(string $query): self
     {
-        $this->query_text = $query;
-
-        return $this;
+        return $this->setQueryText($query);
     }
 
     public function kbd(array $buttons, bool $one_time = false,
@@ -90,7 +95,7 @@ class Action
 
     public function getQueryText(): string
     {
-        return $this->query_text;
+        return $this->queryText;
     }
 
     public function getMessageData(): array
@@ -111,5 +116,26 @@ class Action
     public function getHandler(): ?callable
     {
         return $this->handler;
+    }
+
+    public function setHandler(?callable $handler): self
+    {
+        $this->handler = $handler;
+
+        return $this;
+    }
+
+    public function setMessageData(array $messageData): self
+    {
+        $this->messageData = $messageData;
+
+        return $this;
+    }
+
+    public function setQueryText(?string $queryText): self
+    {
+        $this->queryText = $queryText;
+
+        return $this;
     }
 }

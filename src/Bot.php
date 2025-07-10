@@ -7,9 +7,6 @@ class Bot
 
     private TGZ $tg;
 
-    /**
-     * @var Action[][]
-     */
     private array $routes
         = [
             'bot_command'    => [],
@@ -25,6 +22,8 @@ class Bot
             'btn'    => [],
             'action' => [],
         ];
+
+    private array $pendingRedirects = [];
 
     public function __construct(TGZ $tg)
     {
@@ -136,8 +135,7 @@ class Bot
      */
     public function onDefault(): Action
     {
-        // У обработчика по умолчанию нет ID и условия
-        $route = new Action('default_fallback', null);
+        $route = new Action('fallback', null);
         $this->routes['fallback'] = $route;
 
         return $route;
@@ -209,6 +207,23 @@ class Bot
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
                     if ($condition === $text) {
+                        if (!empty($route->button_redirect)) {
+                            $targetAction = $this->findActionById(
+                                $route->button_redirect,
+                            );
+
+                            if ($targetAction === null) {
+                                throw new \LogicException(
+                                    "Button redirect target with ID '{$route->button_redirect}' not found.",
+                                );
+                            }
+
+                            $this->executeAction($targetAction);
+
+                            return;
+
+                        }
+
                         $this->dispatchAnswer($route, 'text_button');
 
                         return;
@@ -252,18 +267,40 @@ class Bot
         }
 
         // Fallback, если ни один маршрут не сработал
-//        if ($this->routes['fallback'] !== null) {
-//            $this->dispatchAnswer($this->routes['fallback'], 'fallback');
-//
-//            return;
-//        }
+        if ($this->routes['fallback'] !== null) {
+            $this->dispatchAnswer($this->routes['fallback'], 'text');
+
+            return;
+        }
+
     }
 
     private function dispatchAnswer($route, $type, $matches = null)
     {
+        if (!empty($route->button_redirect)) {
+            $targetAction = $this->findActionById($route->button_redirect);
+
+            if ($targetAction === null) {
+                throw new \LogicException(
+                    "Button redirect target with ID '{$route->button_redirect}' not found.",
+                );
+            }
+
+            $this->tg->initQuery($query_id);
+            if ($query_id && !empty($route->getQueryText())) {
+                $this->tg->answerCallbackQuery(
+                    $query_id, ['text' => $route->getQueryText()],
+                );
+            }
+
+            return $this->executeAction($targetAction, $matches);
+        }
+
         $handler = $route->getHandler();
         if (!empty($handler)) {
-            return $handler($this->tg, $matches);
+            $handler($this->tg, $matches);
+
+            return null;
         }
 
         if ($type === 'bot_command' || $type === 'text'
@@ -274,7 +311,9 @@ class Bot
                 return null;
             }
 
-            return $this->constructMessage($messageData);
+            $this->constructMessage($messageData);
+
+            return null;
         }
 
         if ($type === 'button_callback_query') {
@@ -298,7 +337,9 @@ class Bot
                 return null;
             }
 
-            return $this->constructMessage($messageData);
+            $this->constructMessage($messageData);
+
+            return null;
 
         }
 
@@ -314,7 +355,9 @@ class Bot
                 return null;
             }
 
-            return $this->constructMessage($messageData);
+            $this->constructMessage($messageData);
+
+            return null;
 
         }
 
@@ -388,16 +431,107 @@ class Bot
 
         }
 
-        // Если что-то собрали, добавляем к сообщению
         if (!empty($keyboardLayout)) {
             $msg->kbd($keyboardLayout, $inline, $oneTime, $resize);
         }
 
     }
 
-    public function run(): void
+    public function run(?string $id = null): void
     {
-        $this->dispatch();
+        if ($id === null) {
+            $this->processRedirects();
+
+            $this->dispatch();
+        } else {
+            $actionToRun = $this->findActionById($id);
+
+            if ($actionToRun === null) {
+                throw new \InvalidArgumentException(
+                    "Cannot run handler: Action with ID '$id' not found.",
+                );
+            }
+
+            $this->executeAction($actionToRun);
+        }
+
+    }
+
+    private function executeAction(Action $action, ?array $matches = null)
+    {
+        $handler = $action->getHandler();
+        if ($handler !== null) {
+            return $handler($this->tg, $matches);
+        }
+
+        $messageData = $action->getMessageData();
+        if (!empty($messageData)) {
+            return $this->constructMessage($messageData);
+        }
+
+        return null;
+    }
+
+    /**
+     * Перенаправляет один маршрут на другой.
+     * Копирует обработчик и данные ответа из маршрута $to_id в маршрут $id.
+     *
+     * @param string $id    ID исходного маршрута (откуда редирект).
+     * @param string $to_id ID целевого маршрута (куда редирект).
+     *
+     * @throws \InvalidArgumentException Если один из маршрутов не найден.
+     */
+    public function redirect(string $id, string $to_id): void
+    {
+        $this->pendingRedirects[] = ['from' => $id, 'to' => $to_id];
+    }
+
+    private function processRedirects(): void
+    {
+        foreach ($this->pendingRedirects as $redirect) {
+            $sourceAction = $this->findActionById($redirect['from']);
+            if ($sourceAction === null) {
+                throw new \LogicException(
+                    "Redirect source route with ID '{$redirect['from']}' not found.",
+                );
+            }
+
+            $targetAction = $this->findActionById($redirect['to']);
+            if ($targetAction === null) {
+                throw new \LogicException(
+                    "Redirect target route with ID '{$redirect['to']}' not found.",
+                );
+            }
+
+            $sourceAction
+                ->setHandler($targetAction->getHandler())
+                ->setMessageData($targetAction->getMessageData())
+                ->setQueryText($targetAction->getQueryText());
+        }
+
+        $this->pendingRedirects = [];
+    }
+
+    private function findActionById(string $id): ?Action
+    {
+        foreach ($this->routes as $type => $actions) {
+            if ($type === 'fallback') {
+                if ($this->routes['fallback']?->getId() === $id) {
+                    return $this->routes['fallback'];
+                }
+                continue;
+            }
+
+            if (isset($actions[$id])) {
+                return $actions[$id];
+            }
+        }
+
+        if (isset($this->buttons['action'][$id])) {
+            return $this->buttons['action'][$id];
+        }
+
+        return null;
     }
 
 }
