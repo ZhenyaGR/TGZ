@@ -141,9 +141,6 @@ class Bot
         return $route;
     }
 
-    /**
-     * Внутренний диспетчер
-     */
     private function dispatch(): void
     {
         $this->tg->initType($type);
