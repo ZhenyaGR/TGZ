@@ -305,7 +305,7 @@ class Bot
         $handler = $route->getHandler();
         if (!empty($handler)) {
 
-            $handler($this->tg, $other_data);
+            $handler($other_data);
 
             return null;
         }
@@ -468,7 +468,7 @@ class Bot
     {
         $handler = $action->getHandler();
         if ($handler !== null) {
-            return $handler($this->tg, $matches);
+            return $handler($matches);
         }
 
         $messageData = $action->getMessageData();
