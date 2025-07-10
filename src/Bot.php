@@ -172,25 +172,31 @@ class Bot
             // 1. Проверяем текстовые команды (onCommand)
             foreach ($this->routes['command'] as $route) {
                 $conditions = (array)$route->getCondition();
-                foreach ($conditions as $condition) {
-                    $commandFromRoute = mb_convert_encoding(
-                        $condition, 'UTF-8',
-                    );
-
-                    if (str_starts_with($userText, $commandFromRoute)) {
-                        $commandLength = strlen($commandFromRoute);
-
-                        if (!isset($userText[$commandLength])
-                            || $userText[$commandLength] === ' '
-                            || $userText[$commandLength] === "\n"
-                        ) {
-                            $argsString = trim(substr($userText, $commandLength));
-
-                            $args = ($argsString === '') ? [] : preg_split('/\s+/', $argsString, -1, PREG_SPLIT_NO_EMPTY);
-
+                foreach ($conditions as $commandPattern) {
+                    // Проверяем, используется ли новый формат с паттернами
+                    if (preg_match('/%[swn]/', $commandPattern)) {
+                        $regex = $this->convertCommandPatternToRegex($commandPattern);
+                        if (preg_match($regex, $userText, $matches)) {
+                            $args = array_slice($matches, 1);
                             $this->dispatchAnswer($route, $type, $args);
-
                             return;
+                        }
+                    } else {
+                        // Старая логика для обратной совместимости
+                        $commandFromRoute = mb_convert_encoding(
+                            $commandPattern, 'UTF-8',
+                        );
+                        if (str_starts_with($userText, $commandFromRoute)) {
+                            $commandLength = strlen($commandFromRoute);
+                            if (!isset($userText[$commandLength])
+                                || $userText[$commandLength] === ' '
+                                || $userText[$commandLength] === "\n"
+                            ) {
+                                $argsString = trim(substr($userText, $commandLength));
+                                $args = ($argsString === '') ? [] : preg_split('/\s+/', $argsString, -1, PREG_SPLIT_NO_EMPTY);
+                                $this->dispatchAnswer($route, $type, $args);
+                                return;
+                            }
                         }
                     }
                 }
@@ -280,6 +286,37 @@ class Bot
         }
 
     }
+
+    private function convertCommandPatternToRegex(string $pattern): string
+    {
+        // Находим все "токены": паттерны (%w и т.д.) или группы непробельных символов (\S+)
+        preg_match_all('/%[swn]|\S+/u', $pattern, $matches);
+        $tokens = $matches[0];
+
+        $regexParts = [];
+        foreach ($tokens as $token) {
+            switch ($token) {
+                case '%s': // string (до конца строки)
+                    $regexParts[] = '(.+)';
+                    break;
+                case '%w': // word (одно слово)
+                    $regexParts[] = '(\S+)';
+                    break;
+                case '%n': // number (только цифры)
+                    $regexParts[] = '(\d+)';
+                    break;
+                default: // статическая часть команды (например, "!cmd" или "+")
+                    $regexParts[] = preg_quote($token, '/');
+                    break;
+            }
+        }
+
+        // Соединяем части через \s+, что требует хотя бы одного пробельного символа между ними
+        $regex = '^' . implode('\s+', $regexParts) . '$';
+
+        return '/' . $regex . '/u';
+    }
+
 
     private function dispatchAnswer($route, $type, $other_data = null)
     {
