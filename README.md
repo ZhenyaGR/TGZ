@@ -2,7 +2,7 @@
 ### Используя composer
 1\. Установить
 ```bash
-composer require zhenyagr/tg-z:dev-main
+composer require zhenyagr/tgz:dev-main
 ```
 
 2\. Подключить `autoload.php`
