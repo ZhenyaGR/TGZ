@@ -158,7 +158,7 @@ class Bot
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
                     if ($condition === $command) {
-                        $this->dispatchAnswer($route, $type, $refs);
+                        $this->dispatchAnswer($route, $type, [$refs]);
 
                         return;
                     }
@@ -318,7 +318,7 @@ class Bot
     }
 
 
-    private function dispatchAnswer($route, $type, $other_data = null)
+    private function dispatchAnswer($route, $type, array $other_data = [])
     {
         if (!empty($route->button_redirect)) {
             $targetAction = $this->findActionById($route->button_redirect);
@@ -342,7 +342,7 @@ class Bot
         $handler = $route->getHandler();
         if (!empty($handler)) {
 
-            $handler($other_data);
+            $handler(...$other_data);
 
             return null;
         }
@@ -501,11 +501,11 @@ class Bot
 
     }
 
-    private function executeAction(Action $action, ?array $matches = null)
+    private function executeAction(Action $action, ?array $other_files = [])
     {
         $handler = $action->getHandler();
         if ($handler !== null) {
-            return $handler($matches);
+            return $handler(...$other_files);
         }
 
         $messageData = $action->getMessageData();
