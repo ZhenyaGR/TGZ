@@ -16,7 +16,7 @@ require_once '/vendor/autoload.php';
 ```php
 require_once "TGZ/autoload.php";
 ```
-
+test
 ### [Первоначальная настройка, создание бота и получение токена](TokenCreate.md)
 
 ---
