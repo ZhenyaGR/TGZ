@@ -15,7 +15,6 @@ final class Message
     public array $params_additionally = [];
     public bool $sendPhoto = false;
     public bool $sendAnimation = false;
-    public bool $sendPoll = false;
     public bool $sendDocument = false;
     public bool $sendSticker = false;
     public bool $sendVideo = false;
@@ -23,15 +22,10 @@ final class Message
     public bool $sendVoice = false;
     public bool $sendDice = false;
     public bool $sendMediaGroup = false;
-    public string $question = '';
     public array $media = [];
     public string $sticker_id = '';
     public array $files = [];
-    public array $options = [];
     public array $buttons = [];
-    public bool $is_anonymous = false;
-    public string $pollType = "regular";
-
 
     public function __construct($text, $TGZ)
     {
@@ -84,11 +78,8 @@ final class Message
 
     public function parseMode(string $mode = ''): static
     {
-        if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2'
-            && $mode !== ''
-        ) {
-            $mode = '';
-        }
+        $mode = in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', '']) ? $mode : '';
+
         $this->parse_mode = $mode;
 
         return $this;
@@ -171,9 +162,9 @@ final class Message
         return $this;
     }
 
-    public function voice(string $url): static
+    public function voice(string|array $url): static
     {
-        $url = [$url];
+        $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'voice');
         $this->sendVoice = true;
 
@@ -227,14 +218,6 @@ final class Message
         return $this;
     }
 
-    public function poll(string $text): static
-    {
-        $this->sendPoll = true;
-        $this->question = $text;
-
-        return $this;
-    }
-
     public function sticker(string $file_id): static
     {
         $this->sendSticker = true;
@@ -242,28 +225,6 @@ final class Message
 
         return $this;
     }
-
-    public function addAnswer(string $text): static
-    {
-        $this->options[] = $text;
-
-        return $this;
-    }
-
-    public function isAnonymous(?bool $anon = true): static
-    {
-        $this->is_anonymous = $anon;
-
-        return $this;
-    }
-
-    public function pollType(string $type): static
-    {
-        $this->pollType = $type;
-
-        return $this;
-    }
-
     public function action(?string $action = 'typing'): static
     {
         if (!in_array($action, [
@@ -301,7 +262,6 @@ final class Message
         if (!$this->sendPhoto && !$this->sendAudio && !$this->sendSticker
             && !$this->sendDice
             && !$this->sendVoice
-            && !$this->sendPoll
             && !$this->sendVideo
             && !$this->sendAnimation
             && !$this->sendDocument
@@ -384,16 +344,6 @@ final class Message
         return [];
     }
 
-    private function sendPoll($params): array
-    {
-        $params['question'] = $this->question;
-        $params['options'] = json_encode($this->options, JSON_THROW_ON_ERROR);
-        $params['is_anonymous'] = $this->is_anonymous;
-        $params['type'] = $this->pollType;
-
-        return $this->TGZ->callAPI('sendPoll', $params);
-    }
-
     private function sendSticker($params): array
     {
         $params['sticker'] = $this->sticker_id;
@@ -401,11 +351,6 @@ final class Message
         return $this->TGZ->callAPI('sendSticker', $params);
     }
 
-    /**
-     * @param (int|mixed)[]                       $params
-     *
-     * @psalm-param array{chat_id: int|mixed,...} $params
-     */
     private function sendMediaType(array $params): array
     {
         if ($this->sendPhoto) {
@@ -436,10 +381,6 @@ final class Message
             $params['emoji'] = $this->text;
 
             return $this->TGZ->callAPI('sendDice', $params);
-        }
-
-        if ($this->sendPoll) {
-            return $this->sendPoll($params);
         }
 
         if ($this->sendSticker) {
