@@ -242,7 +242,7 @@ class TGZ
         return $this->callAPI('sendMessage', [$message]);
     }
 
-    public function delMsg(array|int $msg_ids, int $chat_id = null): array
+    public function delMsg(array|int $msg_ids, int|string $chat_id = null): array
     {
         if ($chat_id === null) {
             $this->initChatID($chat_id);
@@ -254,6 +254,26 @@ class TGZ
 
         return $this->callAPI(
             $method, ['chat_id' => $chat_id, $param => $msg_ids],
+        );
+    }
+
+    public function copyMsg(int $msg_ids = null, int|string $chat_id = null, int|string $from_chat_id = null): array
+    {
+
+        if ($chat_id === null) {
+            $this->initChatID($chat_id);
+        }
+
+        if ($from_chat_id === null) {
+            $from_chat_id = $chat_id;
+        }
+
+        $bool = is_array($msg_ids);
+        $method = $bool ? 'copyMessages' : 'copyMessage';
+        $param = $bool ? 'messages_id' : 'message_id';
+
+        return $this->callAPI(
+            $method, ['chat_id' => $chat_id, 'from_chat_id' => $from_chat_id, $param => $msg_ids],
         );
     }
 
