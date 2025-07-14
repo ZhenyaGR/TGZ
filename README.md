@@ -20,7 +20,7 @@ require_once "TGZ/autoload.php";
 
 ---
 # Примеры использования
-
+test
 ### Инициализация переменных (WEBHOOK)
 ```php
 <?php

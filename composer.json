@@ -5,7 +5,7 @@
     "require": {
         "php": ">=8.0",
         "ext-curl": "*",
-      "ext-mbstring": "*"
+        "ext-mbstring": "*"
     },
     "autoload": {
         "psr-4": {
