@@ -227,9 +227,9 @@ class TGZ
         return new Message($text, $this);
     }
 
-    public function poll(string $type = 'regular'): PollBuilder
+    public function poll(string $type = 'regular'): Poll
     {
-        return new PollBuilder($type, $this);
+        return new Poll($type, $this);
     }
 
     public function inline(string $type = ''): Inline

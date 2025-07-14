@@ -2,7 +2,7 @@
 
 namespace ZhenyaGR\TGZ;
 
-class PollBuilder
+class Poll
 {
 
     public string $type = 'regular';
