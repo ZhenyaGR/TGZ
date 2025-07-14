@@ -237,6 +237,11 @@ class TGZ
         return new Inline($type, $this);
     }
 
+    public function reply($message): array
+    {
+        return $this->callAPI('sendMessage', [$message]);
+    }
+
     public function delMsg(array|int $msg_ids, int $chat_id = null): array
     {
         if ($chat_id === null) {
