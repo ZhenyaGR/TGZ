@@ -259,6 +259,9 @@ class TGZ
 
     public function copyMsg(int $msg_ids = null, int|string $chat_id = null, int|string $from_chat_id = null): array
     {
+        if ($msg_ids === null) {
+            $this->initMsgID($msg_ids);
+        }
 
         if ($chat_id === null) {
             $this->initChatID($chat_id);
