@@ -12,7 +12,6 @@ class Inline
 //    private const PHOTO_SIZE_LIMIT = 5242880;  // 5 MB
 
     public string $type = 'article';
-    public TGZ $TGZ;
     public string $parse_mode = '';
     public string $id = '';
     public string $title = '';
@@ -28,7 +27,7 @@ class Inline
     public float $longitude = 0;
     public string $address = '';
 
-    public function __construct(string $type, TGZ $TGZ)
+    public function __construct(string $type, string $defaultParseMode)
     {
         if (!in_array(
             $type,
@@ -40,8 +39,7 @@ class Inline
         }
 
         $this->type = $type;
-        $this->parse_mode = $TGZ->parseModeDefault;
-        $this->TGZ = $TGZ;
+        $this->parse_mode = $defaultParseMode;
     }
 
     public function id(string $id): self
@@ -346,10 +344,10 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'latitude'  => $this->latitude,
-                'longitude' => $this->longitude,
-            ];
+        $params += [
+            'latitude'  => $this->latitude,
+            'longitude' => $this->longitude,
+        ];
 
         $this->addKbdInParams($params);
 
@@ -364,11 +362,11 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'latitude'  => $this->latitude,
-                'longitude' => $this->longitude,
-                'address'   => $this->address,
-            ];
+        $params += [
+            'latitude'  => $this->latitude,
+            'longitude' => $this->longitude,
+            'address'   => $this->address,
+        ];
 
         $this->addKbdInParams($params);
 

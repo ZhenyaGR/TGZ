@@ -5,7 +5,9 @@ namespace ZhenyaGR\TGZ;
 class Bot
 {
 
-    private TGZ $tg;
+    public TGZ $tg;
+    public ApiClient $api;
+    public UpdateContext $context;
 
     private array $routes
         = [
@@ -28,6 +30,8 @@ class Bot
     public function __construct(TGZ $tg)
     {
         $this->tg = $tg;
+        $this->api = $tg->api;
+        $this->context = $tg->context;
     }
 
     /**
@@ -143,12 +147,11 @@ class Bot
 
     private function dispatch(): void
     {
-        $this->tg->initType($type);
-        $this->tg->initText($text);
-        $this->tg->initCallbackData($callback_data);
+        $type = $this->context->getType();
+        $text = $this->context->getText();
+        $callback_data = $this->context->getCallbackData();
 
         if ($type === 'bot_command') {
-
             $words = explode(' ', $text);
             $command = mb_strtolower($words[0]);
             unset($words[0]);
@@ -175,10 +178,13 @@ class Bot
                 foreach ($conditions as $commandPattern) {
                     // Проверяем, используется ли новый формат с паттернами
                     if (preg_match('/%[swn]/', $commandPattern)) {
-                        $regex = $this->convertCommandPatternToRegex($commandPattern);
+                        $regex = $this->convertCommandPatternToRegex(
+                            $commandPattern,
+                        );
                         if (preg_match($regex, $userText, $matches)) {
                             $args = array_slice($matches, 1);
                             $this->dispatchAnswer($route, $type, $args);
+
                             return;
                         }
                     } else {
@@ -192,9 +198,17 @@ class Bot
                                 || $userText[$commandLength] === ' '
                                 || $userText[$commandLength] === "\n"
                             ) {
-                                $argsString = trim(substr($userText, $commandLength));
-                                $args = ($argsString === '') ? [] : preg_split('/\s+/', $argsString, -1, PREG_SPLIT_NO_EMPTY);
+                                $argsString = trim(
+                                    substr($userText, $commandLength),
+                                );
+                                $args = ($argsString === '')
+                                    ? []
+                                    : preg_split(
+                                        '/\s+/', $argsString, -1,
+                                        PREG_SPLIT_NO_EMPTY,
+                                    );
                                 $this->dispatchAnswer($route, $type, $args);
+
                                 return;
                             }
                         }
@@ -312,9 +326,9 @@ class Bot
         }
 
         // Соединяем части через \s+, что требует хотя бы одного пробельного символа между ними
-        $regex = '^' . implode('\s+', $regexParts) . '$';
+        $regex = '^'.implode('\s+', $regexParts).'$';
 
-        return '/' . $regex . '/u';
+        return '/'.$regex.'/u';
     }
 
 
@@ -329,7 +343,8 @@ class Bot
                 );
             }
 
-            $this->tg->initQuery($query_id);
+            $query_id = $this->context->getQueryId();
+
             if ($query_id && !empty($route->getQueryText())) {
                 $this->tg->answerCallbackQuery(
                     $query_id, ['text' => $route->getQueryText()],
@@ -341,7 +356,6 @@ class Bot
 
         $handler = $route->getHandler();
         if (!empty($handler)) {
-
             $handler(...$other_data);
 
             return null;
@@ -361,7 +375,7 @@ class Bot
         }
 
         if ($type === 'button_callback_query') {
-            $this->tg->initQuery($query_id);
+            $query_id = $this->context->getQueryId();
             $this->tg->answerCallbackQuery(
                 $query_id, ['text' => $route->getQueryText()],
             );
@@ -369,7 +383,8 @@ class Bot
             $messageData = $route->getMessageData();
 
             if (empty($messageData)) {
-                $this->tg->initCallbackData($callback_data);
+                $callback_data = $this->context->getCallbackData();
+
                 foreach ($this->routes['callback_query'] as $route2) {
                     if ($route2->getCondition() === $callback_data) {
                         $this->dispatchAnswer($route2, 'callback_query');
@@ -388,7 +403,7 @@ class Bot
         }
 
         if ($type === 'callback_query') {
-            $this->tg->initQuery($query_id);
+            $query_id = $this->context->getQueryId();
             $this->tg->answerCallbackQuery(
                 $query_id, ['text' => $route->getQueryText()],
             );
@@ -410,7 +425,7 @@ class Bot
 
     private function constructMessage($messageData): array
     {
-        $msg = new Message('', $this->tg);
+        $msg = new Message('', '', $this->api, $this->context);
 
         if (isset($messageData['text'])) {
             $msg->text($messageData['text']);

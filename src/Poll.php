@@ -6,7 +6,8 @@ class Poll
 {
 
     public string $type = 'regular';
-    private TGZ $tg;
+    private ApiClient $api;
+    private UpdateContext $context;
     public ?string $question_parse_mode = null;
     public ?string $question = null;
     public array $options = [];
@@ -20,16 +21,18 @@ class Poll
     public ?int $close_date = null;
 
 
-    public static function create(string $type, TGZ $tg): self
+    public static function create(string $type, ApiClient $api, UpdateContext $context): self
     {
-        return new self($type, $tg);
+        return new self($type, $api, $context);
     }
 
-    public function __construct(string $type, TGZ $tg)
+    public function __construct(string $type, ApiClient $api, UpdateContext $context)
     {
         $type = in_array($type, ['regular', 'quiz']) ? $type : 'regular';
         $this->type = $type;
-        $this->tg = $tg;
+
+        $this->context = $context;
+        $this->api = $api;
     }
 
     public function parseMode(?string $parse_mode = ''): self
@@ -146,10 +149,8 @@ class Poll
 
     public function send(?int $chatID = null): array
     {
-        $this->tg->initChatID($initChatID);
-
         $params = [
-            'chat_id' => $chatID ?? $initChatID,
+            'chat_id' => $chatID ?? $this->context->getChatId(),
         ];
 
         $params['question'] = $this->question;
@@ -181,7 +182,7 @@ class Poll
             }
         }
 
-        return $this->tg->callAPI('sendPoll', $params);
+        return $this->api->callAPI('sendPoll', $params);
     }
 
 

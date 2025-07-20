@@ -7,8 +7,8 @@ use CURLFile;
 final class Message
 {
     public ?string $text;
-    public object $TGZ;
-    public ?int $chatID = 0;
+    public ApiClient $api;
+    public UpdateContext $context;
     public array $reply_to = [];
     public array $kbd = [];
     public string $parse_mode;
@@ -25,14 +25,14 @@ final class Message
     public array $media = [];
     public string $sticker_id = '';
     public array $files = [];
-    public array $buttons = [];
 
-    public function __construct($text, $TGZ)
-    {
+    public function __construct(?string $text, string $defaultParseMode,
+        ApiClient $api, UpdateContext $context,
+    ) {
         $this->text = $text;
-        $TGZ->initChatID($this->chatID);
-        $this->parse_mode = $TGZ->parseModeDefault;
-        $this->TGZ = $TGZ;
+        $this->parse_mode = $defaultParseMode;
+        $this->api = $api;
+        $this->context = $context;
     }
 
     public function kbd(
@@ -64,7 +64,6 @@ final class Message
         $this->kbd = [
             'reply_markup' => json_encode($kbd, JSON_THROW_ON_ERROR),
         ];
-        $this->buttons = $buttons;
 
         return $this;
     }
@@ -78,7 +77,8 @@ final class Message
 
     public function parseMode(string $mode = ''): static
     {
-        $mode = in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', '']) ? $mode : '';
+        $mode = in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', '']) ? $mode
+            : '';
 
         $this->parse_mode = $mode;
 
@@ -95,8 +95,7 @@ final class Message
     public function reply(?int $reply_to_message_id = null): static
     {
         if ($reply_to_message_id === null) {
-            $msg_id = $this->TGZ->update['message']['message_id'] ??
-                $this->TGZ->update['callback_query']['message']['message_id'];
+            $msg_id = $this->context->getMessageId();
         } else {
             $msg_id = $reply_to_message_id;
         }
@@ -225,6 +224,7 @@ final class Message
 
         return $this;
     }
+
     public function action(?string $action = 'typing'): static
     {
         if (!in_array($action, [
@@ -243,8 +243,9 @@ final class Message
         ) {
             $action = 'typing';
         }
-        $this->TGZ->callAPI(
-            'sendChatAction', ['chat_id' => $this->chatID, 'action' => $action],
+        $this->api->callAPI(
+            'sendChatAction',
+            ['chat_id' => $this->context->getChatId(), 'action' => $action],
         );
 
         return $this;
@@ -253,7 +254,7 @@ final class Message
     public function send(?int $chatID = null): array
     {
         $params = [
-            'chat_id' => $chatID ?: $this->chatID,
+            'chat_id' => $chatID ?: $this->context->getChatId(),
         ];
         $params = array_merge($params, $this->params_additionally);
         $params = array_merge($params, $this->reply_to);
@@ -270,7 +271,7 @@ final class Message
             $params['text'] = $this->text;
             $params['parse_mode'] = $this->parse_mode;
 
-            return $this->TGZ->callAPI('sendMessage', $params);
+            return $this->api->callAPI('sendMessage', $params);
         }
 
         if (count($this->media) > 1 && !$this->sendVoice) {
@@ -281,17 +282,18 @@ final class Message
     }
 
     public function sendEdit(?string $messageID = null, ?int $chatID = null,
-        ?string $messageIDInit = null,
     ): array {
-        $this->TGZ->initMsgID($messageIDInit);
-        if (isset($this->TGZ->update['callback_query']['message']['message_id'])) {
+        $updateData = $this->context->getUpdateData();
+        $inlineMessageId = $updateData['callback_query']['inline_message_id'] ?? null;
+
+        if ($inlineMessageId !== null) {
             $identifier = [
-                'chat_id'    => $chatID ?: $this->chatID,
-                'message_id' => $messageID ?: $messageIDInit,
+                'inline_message_id' => $this->context->getMessageId(),
             ];
         } else {
             $identifier = [
-                'inline_message_id' => $messageIDInit,
+                'chat_id'    => $chatID ?: $this->context->getChatId(),
+                'message_id' => $messageID ?: $this->context->getMessageId(),
             ];
         }
 
@@ -300,13 +302,13 @@ final class Message
             'parse_mode' => $this->parse_mode,
         ];
 
-        $params = array_merge($params, $identifier);
-        $params = array_merge($params, $this->kbd);
-        $params = array_merge($params, $this->params_additionally);
+        $params += $identifier;
+        $params += $this->kbd;
+        $params += $this->params_additionally;
 
         $method = 'editMessageText';
 
-        return $this->TGZ->callAPI($method, $params);
+        return $this->api->callAPI($method, $params);
     }
 
 
@@ -338,7 +340,7 @@ final class Message
                     $postFields[$fileKey] = $this->files[$fileKey];
                 }
             }
-            $this->TGZ->callAPI('sendMediaGroup', $postFields);
+            $this->api->callAPI('sendMediaGroup', $postFields);
         }
 
         return [];
@@ -348,7 +350,7 @@ final class Message
     {
         $params['sticker'] = $this->sticker_id;
 
-        return $this->TGZ->callAPI('sendSticker', $params);
+        return $this->api->callAPI('sendSticker', $params);
     }
 
     private function sendMediaType(array $params): array
@@ -380,7 +382,7 @@ final class Message
         if ($this->sendDice) {
             $params['emoji'] = $this->text;
 
-            return $this->TGZ->callAPI('sendDice', $params);
+            return $this->api->callAPI('sendDice', $params);
         }
 
         if ($this->sendSticker) {
@@ -399,7 +401,7 @@ final class Message
             'attach://',
         ) !== false ? $this->files['file1'] : $this->media[0]['media'];
 
-        return $this->TGZ->callAPI('send'.ucfirst($type), $params);
+        return $this->api->callAPI('send'.ucfirst($type), $params);
     }
 
 }

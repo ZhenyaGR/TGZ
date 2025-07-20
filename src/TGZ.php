@@ -4,71 +4,49 @@ namespace ZhenyaGR\TGZ;
 
 use CURLFile;
 use Exception;
+use ZhenyaGR\TGZ\Contracts\ApiInterface;
 
 class TGZ
 {
     use ErrorHandler;
 
-    public string $apiUrl;
-    public string $token;
-    public ?array $update;
-    public string $parseModeDefault = '';
+    public ApiInterface $api;
+    public UpdateContext $context;
+    private string $parseModeDefault = '';
 
+    public function __construct(ApiInterface $api, UpdateContext $context)
+    {
+        $this->api = $api;
+        $this->context = $context;
+    }
 
     public static function create(string $token): self
     {
-        return new self($token);
+        http_response_code(200);
+        echo 'ok';
+
+        $api = new ApiClient($token);
+        $context = UpdateContext::fromWebhook();
+
+        return new self($api, $context);
     }
 
-    public function __construct(string $token)
-    {
-        $this->sendOK();
-
-        $this->token = $token;
-        $this->apiUrl = "https://api.telegram.org/bot{$token}/";
-
-        $input = file_get_contents('php://input');
-        $update = json_decode($input, true);
-        $this->update = $update ?? null;
-    }
 
     public function callAPI(string $method, ?array $params = []): array
     {
-        $url = $this->apiUrl.$method;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        return $this->api->callAPI($method, $params);
+    }
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    public function __call(string $method, array $args): array
+    {
+        $params = $args[0] ?? [];
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        $response = json_decode($response, true);
-
-        if ($httpCode >= 200 && $httpCode < 300) {
-            return $response;
-        }
-
-        throw new Exception($this->TGAPIErrorMSG($response, $params));
-
-        return $response;
+        return $this->api->callAPI($method, $params);
     }
 
     public function getWebhookUpdate(): array
     {
-        return $this->update;
-    }
-
-    public function __call(string $method, array $args = []): array
-    {
-        $args = (empty($args)) ? $args : $args[0];
-
-        return $this->callAPI($method, $args);
+        return $this->context->getUpdateData();
     }
 
     public function initVars(
@@ -82,7 +60,7 @@ class TGZ
         &$is_bot = null,
         &$is_command = null,
     ): array {
-        $update = $this->update;
+        $update = $this->context->getUpdateData();
 
         $this
             ->initUserID($user_id)
@@ -113,93 +91,49 @@ class TGZ
 
     public function initCallbackData(&$callback_data)
     {
-        if (isset($this->update['message'])) {
-            $callback_data = false;
-        } elseif (isset($this->update['callback_query'])) {
-            $callback_data = $this->update['callback_query']['data'];
-        } elseif (isset($this->update['edited_message'])) {
-            $callback_data = false;
-        } elseif (isset($this->update['inline_query'])) {
-            $callback_data = false;
-        }
+        $callback_data = $this->context->getCallbackData();
 
         return $this;
     }
 
     public function initQuery(&$query_id)
     {
-        if (isset($this->update['message'])) {
-            $query_id = false;
-        } elseif (isset($this->update['callback_query'])) {
-            $query_id = $this->update['callback_query']['id'];
-        } elseif (isset($this->update['edited_message'])) {
-            $query_id = false;
-        } elseif (isset($this->update['inline_query'])) {
-            $query_id = $this->update['inline_query']['id'];
-        }
+        $query_id = $this->context->getQueryId();
 
         return $this;
     }
 
     public function initType(&$type): static
     {
-        if (isset($this->update['message'])) {
-            $type = (isset($this->update['message']['entities'][0]['type'])
-                && $this->update['message']['entities'][0]['type']
-                === 'bot_command') ? 'bot_command' : 'text';
-        } elseif (isset($this->update['callback_query'])) {
-            $type = 'callback_query';
-        } elseif (isset($this->update['edited_message'])) {
-            $type = 'edited_message';
-        } elseif (isset($this->update['inline_query'])) {
-            $type = 'inline_query';
-        }
+        $type = $this->context->getType();
 
         return $this;
     }
 
     public function initMsgID(&$msg_id): static
     {
-        $msg_id = $this->update['message']['message_id'] ??
-            $this->update['edited_message']['message_id'] ??
-            $this->update['callback_query']['message']['message_id'] ??
-            $this->update['callback_query']['inline_message_id'] ??
-            null;
+        $msg_id = $this->context->getMessageId();
 
         return $this;
     }
 
     public function initText(&$text): static
     {
-        $text = $this->update['message']['text'] ??
-            $this->update['message']['caption'] ??
-            $this->update['edited_message']['text'] ??
-            $this->update['edited_message']['caption'] ??
-            $this->update['callback_query']['message']['text'] ??
-            $this->update['callback_query']['message']['caption'] ??
-            $this->update['inline_query']['query'] ??
-            '';
+        $text = $this->context->getText();
 
         return $this;
     }
 
     public function initUserID(&$user_id): static
     {
-        $user_id = $this->update['message']['from']['id'] ??
-            $this->update['edited_message']['from']['id'] ??
-            $this->update['callback_query']['from']['id'] ??
-            $this->update['inline_query']['from']['id'] ??
-            null;
+        $user_id = $this->context->getUserId();
 
         return $this;
     }
 
     public function initChatID(&$chat_id): static
     {
-        $chat_id = $this->update['message']['chat']['id'] ??
-            $this->update['edited_message']['chat']['id'] ??
-            $this->update['callback_query']['message']['chat']['id'] ??
-            null;
+        $chat_id = $this->context->getChatId();
 
         return $this;
     }
@@ -224,22 +158,17 @@ class TGZ
 
     public function msg(string $text = ''): Message
     {
-        return new Message($text, $this);
+        return new Message($text, $this->parseModeDefault, $this->api, $this->context);
     }
 
     public function poll(string $type = 'regular'): Poll
     {
-        return new Poll($type, $this);
+        return new Poll($type, $this->api, $this->context);
     }
 
     public function inline(string $type = ''): Inline
     {
-        return new Inline($type, $this);
-    }
-
-    public function reply($message): array
-    {
-        return $this->callAPI('sendMessage', [$message]);
+        return new Inline($type, $this->parseModeDefault);
     }
 
     public function delMsg(array|int $msg_ids, int|string $chat_id = null): array
@@ -295,7 +224,7 @@ class TGZ
         $params['chat_id'] = $chat_id;
 
         $method = 'send'.ucfirst($type);
-        $result = $this->callAPI($method, $params);
+        $result = $this->api->callAPI($method, $params);
 
         if ($type === 'photo') {
             // Берем последний элемент массива (наибольший по размеру вариант)
@@ -313,14 +242,19 @@ class TGZ
         return $result['result']['document']['file_id'];
     }
 
-    public function sendMessage(int $chatId, string $text): array
+    public function sendMessage(int $chatId, string $text, array $params = []): array
     {
-        $params = [
+        $params_message = [
             'chat_id' => $chatId,
             'text'    => $text,
         ];
 
-        return $this->callAPI('sendMessage', $params);
+        return $this->api->callAPI('sendMessage', array_merge($params_message, $params));
+    }
+
+    public function reply($message, array $params = []): array
+    {
+        return $this->api->callAPI('sendMessage', array_merge($params, ['text' => $message]));
     }
 
     /**
