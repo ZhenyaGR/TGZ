@@ -5,9 +5,9 @@ namespace ZhenyaGR\TGZ;
 class Bot
 {
 
-    public TGZ $tg;
-    public ApiClient $api;
-    public UpdateContext $context;
+    private TGZ $tg;
+    private ApiClient $api;
+    private UpdateContext $context;
 
     private array $routes
         = [

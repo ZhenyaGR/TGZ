@@ -25,8 +25,6 @@ class ApiClient implements ApiInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         $responseJson = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -38,11 +36,9 @@ class ApiClient implements ApiInterface
             return $response;
         }
 
-        // Используем метод из трейта ErrorHandler для форматирования ошибки
         throw new Exception($this->TGAPIErrorMSG($response, $params));
     }
 
-    // Магический метод __call тоже уместен здесь, чтобы делегировать вызовы
     public function __call(string $method, array $args = []): array
     {
         $params = $args[0] ?? [];

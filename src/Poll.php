@@ -5,26 +5,20 @@ namespace ZhenyaGR\TGZ;
 class Poll
 {
 
-    public string $type = 'regular';
     private ApiClient $api;
     private UpdateContext $context;
-    public ?string $question_parse_mode = null;
-    public ?string $question = null;
-    public array $options = [];
-    public bool $is_anonymous = true;
-    public bool $allows_multiple_answers = false;
-    public ?int $correct_option_id = null;
-    public ?string $explanation_parse_mode = null;
-    public ?string $explanation = null;
-    public bool $is_closed = false;
-    public ?int $open_period = null;
-    public ?int $close_date = null;
-
-
-    public static function create(string $type, ApiClient $api, UpdateContext $context): self
-    {
-        return new self($type, $api, $context);
-    }
+    private string $type = 'regular';
+    private ?string $question_parse_mode = null;
+    private ?string $question = null;
+    private array $options = [];
+    private bool $is_anonymous = true;
+    private bool $allows_multiple_answers = false;
+    private ?int $correct_option_id = null;
+    private ?string $explanation_parse_mode = null;
+    private ?string $explanation = null;
+    private bool $is_closed = false;
+    private ?int $open_period = null;
+    private ?int $close_date = null;
 
     public function __construct(string $type, ApiClient $api, UpdateContext $context)
     {

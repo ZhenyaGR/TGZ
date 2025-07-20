@@ -6,25 +6,25 @@ use CURLFile;
 
 final class Message
 {
-    public ?string $text;
-    public ApiClient $api;
-    public UpdateContext $context;
-    public array $reply_to = [];
-    public array $kbd = [];
-    public string $parse_mode;
-    public array $params_additionally = [];
-    public bool $sendPhoto = false;
-    public bool $sendAnimation = false;
-    public bool $sendDocument = false;
-    public bool $sendSticker = false;
-    public bool $sendVideo = false;
-    public bool $sendAudio = false;
-    public bool $sendVoice = false;
-    public bool $sendDice = false;
-    public bool $sendMediaGroup = false;
-    public array $media = [];
-    public string $sticker_id = '';
-    public array $files = [];
+    private ApiClient $api;
+    private UpdateContext $context;
+    private ?string $text;
+    private array $reply_to = [];
+    private array $kbd = [];
+    private string $parse_mode;
+    private array $params_additionally = [];
+    private bool $sendPhoto = false;
+    private bool $sendAnimation = false;
+    private bool $sendDocument = false;
+    private bool $sendSticker = false;
+    private bool $sendVideo = false;
+    private bool $sendAudio = false;
+    private bool $sendVoice = false;
+    private bool $sendDice = false;
+    private bool $sendMediaGroup = false;
+    private array $media = [];
+    private string $sticker_id = '';
+    private array $files = [];
 
     public function __construct(?string $text, string $defaultParseMode,
         ApiClient $api, UpdateContext $context,

@@ -11,21 +11,21 @@ class Inline
 //    private const GIF_SIZE_LIMIT   = 20971520; // 20 MB
 //    private const PHOTO_SIZE_LIMIT = 5242880;  // 5 MB
 
-    public string $type = 'article';
-    public string $parse_mode = '';
-    public string $id = '';
-    public string $title = '';
-    public string $description = '';
-    public string $message_text = '';
-    public array $kbd = [];
-    public array $params_additionally = [];
-    public string $fileUrl = '';
-    public string $fileId = '';
-    public string $thumbUrl = '';
-    public string $mimeType = '';
-    public float $latitude = 0;
-    public float $longitude = 0;
-    public string $address = '';
+    private string $type = 'article';
+    private string $parse_mode = '';
+    private string $id = '';
+    private string $title = '';
+    private string $description = '';
+    private string $message_text = '';
+    private array $kbd = [];
+    private array $params_additionally = [];
+    private string $fileUrl = '';
+    private string $fileId = '';
+    private string $thumbUrl = '';
+    private string $mimeType = '';
+    private float $latitude = 0;
+    private float $longitude = 0;
+    private string $address = '';
 
     public function __construct(string $type, string $defaultParseMode)
     {
