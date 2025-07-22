@@ -44,10 +44,9 @@ class Bot
      */
     public function btn(string $id, string $text = null): Action
     {
-        $text = $text ?? $id;
-        $this->buttons['btn'][$id] = $text;
+        $this->buttons['btn'][$id] = $text ?? $id;
 
-        $route = new Action($id, $text);
+        $route = new Action($id, $text ?? $id);
         $this->buttons['action'][$id] = $route;
 
         return $route;
@@ -63,8 +62,7 @@ class Bot
      */
     public function onBotCommand(string $id, array|string $command = null): Action
     {
-        $command = $command ?? $id;
-        $route = new Action($id, $command);
+        $route = new Action($id, $command ?? $id);
         $this->routes['bot_command'][$id] = $route;
 
         return $route;
@@ -80,8 +78,7 @@ class Bot
      */
     public function onCommand(string $id, array|string $command = null): Action
     {
-        $command = $command ?? $id;
-        $route = new Action($id, $command);
+        $route = new Action($id, $command ?? $id);
         $this->routes['command'][$id] = $route;
 
         return $route;
@@ -97,8 +94,7 @@ class Bot
      */
     public function onText(string $id, array|string $text = null): Action
     {
-        $text = $text ?? $id;
-        $route = new Action($id, $text);
+        $route = new Action($id, $text ?? $id);
         $this->routes['text_exact'][$id] = $route;
 
         return $route;
@@ -114,8 +110,7 @@ class Bot
      */
     public function onTextPreg(string $id, array|string $pattern = null): Action
     {
-        $pattern = $pattern ?? $id;
-        $route = new Action($id, $pattern);
+        $route = new Action($id, $pattern ?? $id);
         $this->routes['text_preg'][$id] = $route;
 
         return $route;
@@ -131,8 +126,7 @@ class Bot
      */
     public function onCallback(string $id, string $data): Action
     {
-        $data = $data ?? $id;
-        $route = new Action($id, $data);
+        $route = new Action($id, $data ?? $id);
         $this->routes['callback_query'][$id] = $route;
 
         return $route;
