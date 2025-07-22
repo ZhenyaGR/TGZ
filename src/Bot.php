@@ -37,13 +37,14 @@ class Bot
     /**
      * Создает маршрут для команды.
      *
-     * @param string $id   Уникальный идентификатор кнопки.
-     * @param string $text Текст кнопки.
+     * @param string      $id   Уникальный идентификатор кнопки.
+     * @param string|null $text Текст кнопки.
      *
      * @return Action
      */
-    public function btn(string $id, string $text): Action
+    public function btn(string $id, string $text = null): Action
     {
+        $text = $text ?? $id;
         $this->buttons['btn'][$id] = $text;
 
         $route = new Action($id, $text);
@@ -55,13 +56,14 @@ class Bot
     /**
      * Создает маршрут для команды.
      *
-     * @param string       $id      Уникальный идентификатор маршрута.
-     * @param array|string $command Текст команды бота, например '/start'.
+     * @param string            $id      Уникальный идентификатор маршрута.
+     * @param array|string|null $command Текст команды бота, например '/start'.
      *
      * @return Action
      */
-    public function onBotCommand(string $id, array|string $command): Action
+    public function onBotCommand(string $id, array|string $command = null): Action
     {
+        $command = $command ?? $id;
         $route = new Action($id, $command);
         $this->routes['bot_command'][$id] = $route;
 
@@ -72,12 +74,13 @@ class Bot
      * Создает маршрут для команды.
      *
      * @param string       $id      Уникальный идентификатор маршрута.
-     * @param array|string $command Текст команды, например '!start'.
+     * @param array|string|null $command Текст команды, например '!start'.
      *
      * @return Action
      */
-    public function onCommand(string $id, array|string $command): Action
+    public function onCommand(string $id, array|string $command = null): Action
     {
+        $command = $command ?? $id;
         $route = new Action($id, $command);
         $this->routes['command'][$id] = $route;
 
@@ -88,12 +91,13 @@ class Bot
      * Создает маршрут для точного совпадения текста.
      *
      * @param string       $id   Уникальный идентификатор.
-     * @param array|string $text Текст для совпадения.
+     * @param array|string|null $text Текст для совпадения.
      *
      * @return Action
      */
-    public function onText(string $id, array|string $text): Action
+    public function onText(string $id, array|string $text = null): Action
     {
+        $text = $text ?? $id;
         $route = new Action($id, $text);
         $this->routes['text_exact'][$id] = $route;
 
@@ -104,12 +108,13 @@ class Bot
      * Создает маршрут для текста по регулярному выражению.
      *
      * @param string       $id      Уникальный идентификатор.
-     * @param array|string $pattern Регулярное выражение.
+     * @param array|string|null $pattern Регулярное выражение.
      *
      * @return Action
      */
-    public function onTextPreg(string $id, array|string $pattern): Action
+    public function onTextPreg(string $id, array|string $pattern = null): Action
     {
+        $pattern = $pattern ?? $id;
         $route = new Action($id, $pattern);
         $this->routes['text_preg'][$id] = $route;
 
@@ -120,12 +125,13 @@ class Bot
      * Создает маршрут для callback-запроса.
      *
      * @param string $id   Уникальный идентификатор.
-     * @param string $data Данные из callback-кнопки.
+     * @param string|null $data Данные из callback-кнопки.
      *
      * @return Action
      */
     public function onCallback(string $id, string $data): Action
     {
+        $data = $data ?? $id;
         $route = new Action($id, $data);
         $this->routes['callback_query'][$id] = $route;
 
