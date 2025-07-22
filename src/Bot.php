@@ -151,32 +151,33 @@ class Bot
         $text = $this->context->getText();
         $callback_data = $this->context->getCallbackData();
 
-        if ($type === 'bot_command') {
-            $words = explode(' ', $text);
-            $command = mb_strtolower($words[0]);
-            unset($words[0]);
-            $refs = implode(' ', $words);
+        if ($type === 'text' || $type === 'bot_command') {
 
-            foreach ($this->routes['bot_command'] as $route) {
-                $conditions = (array)$route->getCondition();
-                foreach ($conditions as $condition) {
-                    if ($condition === $command) {
-                        $this->dispatchAnswer($route, $type, [$refs]);
+            $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
 
-                        return;
+            // 1. Проверяем команды бота (onBotCommand)
+            if ($type === 'bot_command') {
+                $words = explode(' ', $userText);
+                $command = $words[0];
+                unset($words[0]);
+                $refs = implode(' ', $words);
+
+                foreach ($this->routes['bot_command'] as $route) {
+                    $conditions = (array)$route->getCondition();
+                    foreach ($conditions as $condition) {
+                        if ($condition === $command) {
+                            $this->dispatchAnswer($route, $type, [$refs]);
+
+                            return;
+                        }
                     }
                 }
             }
-        }
 
-        if ($type === 'text') {
-            $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
-
-            // 1. Проверяем текстовые команды (onCommand)
+            // 2. Проверяем текстовые команды (onCommand)
             foreach ($this->routes['command'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $commandPattern) {
-                    // Проверяем, используется ли новый формат с паттернами
                     if (preg_match('/%[swn]/', $commandPattern)) {
                         $regex = $this->convertCommandPatternToRegex(
                             $commandPattern,
@@ -188,7 +189,6 @@ class Bot
                             return;
                         }
                     } else {
-                        // Старая логика для обратной совместимости
                         $commandFromRoute = mb_convert_encoding(
                             $commandPattern, 'UTF-8',
                         );
@@ -216,7 +216,7 @@ class Bot
                 }
             }
 
-            // 2. Проверяем точное совпадение (onText)
+            // 3. Проверяем точное совпадение (onText)
             foreach ($this->routes['text_exact'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
@@ -228,7 +228,7 @@ class Bot
                 }
             }
 
-            // 3. Проверяем текстовые кнопки
+            // 4. Проверяем текстовые кнопки
             foreach ($this->buttons['action'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
@@ -257,7 +257,7 @@ class Bot
                 }
             }
 
-            // 4. Проверяем регулярные выражения (onTextPreg)
+            // 5. Проверяем регулярные выражения (onTextPreg)
             foreach ($this->routes['text_preg'] as $route) {
                 $patterns = (array)$route->getCondition();
                 foreach ($patterns as $pattern) {
@@ -268,10 +268,10 @@ class Bot
                     }
                 }
             }
-
         }
 
         if ($type === 'callback_query') {
+            // 6. Проверяем inline-кнопки
             foreach ($this->buttons['action'] as $route) {
                 if ($route->getId() === $callback_data) {
                     $this->dispatchAnswer($route, 'button_'.$type);
@@ -280,6 +280,7 @@ class Bot
                 }
             }
 
+            // 7. Проверяем callback_data
             foreach ($this->routes['callback_query'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
