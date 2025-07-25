@@ -124,7 +124,7 @@ class Bot
      *
      * @return Action
      */
-    public function onCallback(string $id, string $data): Action
+    public function onCallback(string $id, string $data = null): Action
     {
         $route = new Action($id, $data ?? $id);
         $this->routes['callback_query'][$id] = $route;
@@ -331,7 +331,6 @@ class Bot
 
         return '/'.$regex.'/u';
     }
-
 
     private function dispatchAnswer($route, $type, array $other_data = [])
     {
