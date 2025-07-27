@@ -171,17 +171,21 @@ class TGZ
         return new Inline($type, $this->parseModeDefault);
     }
 
-    public function delMsg(array|int $msg_ids, int|string $chat_id = null): array
+    public function delMsg(array|int $msg_ids = null, int|string $chat_id = null): array
     {
         if ($chat_id === null) {
             $this->initChatID($chat_id);
+        }
+
+        if ($msg_ids === null) {
+            $this->initMsgID($msg_ids);
         }
 
         $bool = is_array($msg_ids);
         $method = $bool ? 'deleteMessages' : 'deleteMessage';
         $param = $bool ? 'messages_id' : 'message_id';
 
-        return $this->callAPI(
+        return $this->api->callAPI(
             $method, ['chat_id' => $chat_id, $param => $msg_ids],
         );
     }
@@ -204,14 +208,12 @@ class TGZ
         $method = $bool ? 'copyMessages' : 'copyMessage';
         $param = $bool ? 'messages_id' : 'message_id';
 
-        return $this->callAPI(
+        return $this->api->callAPI(
             $method, ['chat_id' => $chat_id, 'from_chat_id' => $from_chat_id, $param => $msg_ids],
         );
     }
 
-    public function getFileID(string $url, int $chat_id,
-        string $type = 'document',
-    ): string {
+    public function getFileID(string $url, string $type = 'document', int|string $chat_id = null): string {
         if (!in_array(
             $type,
             ['document', 'audio', 'photo', 'animation', 'video', 'video_note',
