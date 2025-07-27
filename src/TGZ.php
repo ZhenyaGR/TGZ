@@ -256,6 +256,9 @@ class TGZ
 
     public function reply($message, array $params = []): array
     {
+        if (!isset($params['chat_id'])) {
+            $this->initChatID($params['chat_id']);
+        }
         return $this->api->callAPI('sendMessage', array_merge($params, ['text' => $message]));
     }
 
