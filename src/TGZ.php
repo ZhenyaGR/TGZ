@@ -156,21 +156,51 @@ class TGZ
         echo 'ok';
     }
 
+    /**
+     * Метод создает объект класса Message для конструктора сообщений
+     *
+     * @param string $text
+     *
+     * @return Message
+     */
     public function msg(string $text = ''): Message
     {
         return new Message($text, $this->parseModeDefault, $this->api, $this->context);
     }
 
+    /**
+     * Метод создает объект класса Poll для конструктора опросов
+     *
+     * @param string $type
+     *
+     * @return Poll
+     */
     public function poll(string $type = 'regular'): Poll
     {
         return new Poll($type, $this->api, $this->context);
     }
 
+    /**
+     * Метод создает объект класса Inline для конструктора Inline-запросов
+     *
+     * @param string $type
+     *
+     * @return Inline
+     */
     public function inline(string $type = ''): Inline
     {
         return new Inline($type, $this->parseModeDefault);
     }
 
+
+    /**
+     * Метод удаляет одно или несколько сообщений
+     *
+     * @param array|int|null $msg_ids
+     * @param int|string|null $chat_id
+     *
+     * @return array
+     */
     public function delMsg(array|int $msg_ids = null, int|string $chat_id = null): array
     {
         if ($chat_id === null) {
@@ -190,7 +220,16 @@ class TGZ
         );
     }
 
-    public function copyMsg(int $msg_ids = null, int|string $chat_id = null, int|string $from_chat_id = null): array
+    /**
+     * Метод копирует одно или несколько сообщений
+     *
+     * @param int|array|null $msg_ids
+     * @param int|string|null $chat_id
+     * @param int|string|null $from_chat_id
+     *
+     * @return array
+     */
+    public function copyMsg(int|array $msg_ids = null, int|string $chat_id = null, int|string $from_chat_id = null): array
     {
         if ($msg_ids === null) {
             $this->initMsgID($msg_ids);
@@ -213,6 +252,17 @@ class TGZ
         );
     }
 
+    /**
+     * Метод сначала загружает файл на сервер Telegram, а затем возвращает ID
+     * файла, для последующей быстрой отправки
+     *
+     * @param string          $url
+     * @param string          $type
+     * @param int|string|null $chat_id
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function getFileID(string $url, string $type = 'document', int|string $chat_id = null): string {
         if (!in_array(
             $type,
@@ -300,15 +350,33 @@ class TGZ
         ];
     }
 
-    public function answerCallbackQuery(string $callbackID, array $options = [],
+    /**
+     * Метод отправляет ответ Телеграму на callback-запрос
+     *
+     * @param string $callbackQueryID
+     * @param array  $options
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function answerCallbackQuery(string $callbackQueryID, array $options = [],
     ): array {
         $params = array_merge([
-            'callback_query_id' => $callbackID,
+            'callback_query_id' => $callbackQueryID,
         ], $options);
 
-        return $this->callAPI('answerCallbackQuery', $params);
+        return $this->api->callAPI('answerCallbackQuery', $params);
     }
 
+    /**
+     * Метод отправляет ответ Телеграму на inline-запрос
+     *
+     * @param string $inlineQueryID
+     * @param array  $options
+     *
+     * @return array
+     * @throws \Exception
+     */
     public function answerInlineQuery(string $inlineQueryID, array $results,
         array $extra = [],
     ): array {
@@ -317,6 +385,6 @@ class TGZ
             'results'         => json_encode($results),
         ], $extra);
 
-        return $this->callAPI('answerInlineQuery', $params);
+        return $this->api->callAPI('answerInlineQuery', $params);
     }
 }
