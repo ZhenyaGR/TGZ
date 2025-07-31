@@ -297,8 +297,11 @@ final class Message
         return $this->sendMediaType($params);
     }
 
-    public function sendEdit(?string $messageID = null, ?int $chatID = null,
+    public function sendEdit(?string $messageID = null, ?int $chatID = null, bool $caption = false
     ): array {
+        if ($caption) {
+            return $this->sendEditCaption($messageID, $chatID);
+        }
         return $this->sendEditText($messageID, $chatID);
     }
 
@@ -309,7 +312,6 @@ final class Message
      * @param int|null    $chatID
      *
      * @return array
-     * @throws \Exception
      */
     public function sendEditText(?string $messageID = null, ?int $chatID = null,
     ): array {
@@ -340,8 +342,6 @@ final class Message
      * @param int|null    $chatID
      *
      * @return array
-     *
-     * @throws \Exception
      */
     public function sendEditCaption(?string $messageID = null,
         ?int $chatID = null,
