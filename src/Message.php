@@ -206,14 +206,30 @@ final class Message
         return $this;
     }
 
-    public function urlImg(string $url): static
+    public function mediaPreview(string $url): static
     {
-        $this->text = '<a href="'.htmlspecialchars(
-                $url,
-            ).'">​</a>'.$this->text; // Использует пробел нулевой ширины
-        $this->parse_mode               // со ссылкой в начале сообщения
-            = "HTML";
-
+//        $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
+//
+//        $this->text = $invisibleCharacter . $this->text;
+//
+//        $lengthInUtf16 = strlen(mb_convert_encoding($invisibleCharacter, 'UTF-16LE', 'UTF-8')) / 2;
+//
+//        $entity = [
+//            'type'   => 'text_link',
+//            'offset' => 0,
+//            'length' => $lengthInUtf16,
+//            'url'    => $url,
+//        ];
+//
+//        if ($this->entities === null) {
+//            $this->entities = [];
+//        }
+//
+//        array_unshift($this->entities, $entity);
+//
+//        // Больше не требуется, так как мы используем entities
+//        // unset($this->parse_mode);
+//
         return $this;
     }
 
@@ -283,42 +299,102 @@ final class Message
 
     public function sendEdit(?string $messageID = null, ?int $chatID = null,
     ): array {
-        $updateData = $this->context->getUpdateData();
-        $inlineMessageId = $updateData['callback_query']['inline_message_id'] ?? null;
+        return $this->sendEditText($messageID, $chatID);
+    }
 
-        if ($inlineMessageId !== null) {
-            $identifier = [
-                'inline_message_id' => $this->context->getMessageId(),
+    /**
+     * Редактирует текст существующего сообщения
+     *
+     * @param string|null $messageID
+     * @param int|null    $chatID
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function sendEditText(?string $messageID = null, ?int $chatID = null,
+    ): array {
+        $identifier = $this->_getIdentifier($messageID, $chatID);
+
+        if (isset($this->text)) {
+            $contentParams = [
+                'text'       => $this->text,
+                'parse_mode' => $this->parse_mode,
             ];
         } else {
-            $identifier = [
-                'chat_id'    => $chatID ?: $this->context->getChatId(),
-                'message_id' => $messageID ?: $this->context->getMessageId(),
-            ];
+            throw new \Exception(
+                'Необходимо установить свойство text перед вызовом sendEditText',
+            );
         }
 
-        $params = [
-            'text'       => $this->text,
-            'parse_mode' => $this->parse_mode,
-        ];
-
-        $params += $identifier;
+        $params = $identifier + $contentParams;
         $params += $this->kbd;
         $params += $this->params_additionally;
 
-        $method = 'editMessageText';
+        return $this->api->callAPI('editMessageText', $params);
+    }
 
-        return $this->api->callAPI($method, $params);
+    /**
+     * Редактирует описание существующего сообщения
+     *
+     * @param string|null $messageID
+     * @param int|null    $chatID
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function sendEditCaption(?string $messageID = null,
+        ?int $chatID = null,
+    ): array {
+        $identifier = $this->_getIdentifier($messageID, $chatID);
+
+        if (isset($this->text)) {
+            $contentParams = [
+                'caption'    => $this->text,
+                'parse_mode' => $this->parse_mode,
+            ];
+        } else {
+            throw new \Exception(
+                'Необходимо установить свойство text перед вызовом sendEditCaption',
+            );
+        }
+
+        $params = $identifier + $contentParams;
+        $params += $this->kbd;
+        $params += $this->params_additionally;
+
+        return $this->api->callAPI('editMessageCaption', $params);
+    }
+
+    /**
+     * Вспомогательный приватный метод для получения идентификатора сообщения.
+     * Избегает дублирования кода в публичных методах.
+     *
+     * @param string|null $messageID
+     * @param int|null    $chatID
+     *
+     * @return array
+     */
+    private function _getIdentifier(?string $messageID = null,
+        ?int $chatID = null,
+    ): array {
+        $updateData = $this->context->getUpdateData();
+        $inlineMessageId = $updateData['callback_query']['inline_message_id'] ??
+            null;
+
+        if ($inlineMessageId !== null) {
+            // Для инлайн-сообщений используется только их собственный ID
+            return ['inline_message_id' => $inlineMessageId];
+        }
+
+        // Для обычных сообщений в чате
+        return [
+            'chat_id'    => $chatID ?: $this->context->getChatId(),
+            'message_id' => $messageID ?: $this->context->getMessageId(),
+        ];
     }
 
 
-    /**
-     * @param (int|mixed)[]                       $params
-     *
-     * @psalm-param array{chat_id: int|mixed,...} $params
-     *
-     * @psalm-return array<never, never>
-     */
     private function sendMediaGroup(array $params): array
     {
         $params1 = [
