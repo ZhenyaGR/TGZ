@@ -297,12 +297,14 @@ final class Message
         return $this->sendMediaType($params);
     }
 
-    public function sendEdit(?string $messageID = null, ?int $chatID = null, bool $caption = false
+    public function sendEdit(?string $messageID = null, ?int $chatID = null,
+        bool $caption = false,
     ): array {
         if ($caption) {
-            return $this->sendEditCaption($messageID, $chatID);
+            return $this->editCaption($messageID, $chatID);
         }
-        return $this->sendEditText($messageID, $chatID);
+
+        return $this->editText($messageID, $chatID);
     }
 
     /**
@@ -313,9 +315,9 @@ final class Message
      *
      * @return array
      */
-    public function sendEditText(?string $messageID = null, ?int $chatID = null,
+    public function editText(?string $messageID = null, ?int $chatID = null,
     ): array {
-        $identifier = $this->_getIdentifier($messageID, $chatID);
+        $identifier = $this->getIdentifier($messageID, $chatID);
 
         if (isset($this->text)) {
             $contentParams = [
@@ -336,17 +338,18 @@ final class Message
     }
 
     /**
-     * Редактирует описание существующего сообщения
+     * Редактирует описание существующего сообщения (обязательное наличие медиа
+     * в сообщении)
      *
      * @param string|null $messageID
      * @param int|null    $chatID
      *
      * @return array
      */
-    public function sendEditCaption(?string $messageID = null,
+    public function editCaption(?string $messageID = null,
         ?int $chatID = null,
     ): array {
-        $identifier = $this->_getIdentifier($messageID, $chatID);
+        $identifier = $this->getIdentifier($messageID, $chatID);
 
         if (isset($this->text)) {
             $contentParams = [
@@ -367,15 +370,45 @@ final class Message
     }
 
     /**
-     * Вспомогательный приватный метод для получения идентификатора сообщения.
-     * Избегает дублирования кода в публичных методах.
+     * Редактирует медиа существующего сообщения
      *
      * @param string|null $messageID
      * @param int|null    $chatID
      *
      * @return array
      */
-    private function _getIdentifier(?string $messageID = null,
+    public function editMedia(?string $messageID = null, ?int $chatID = null,
+    ): array {
+        $identifier = $this->getIdentifier($messageID, $chatID);
+
+        if (isset($this->media)) {
+
+            $postFields = [
+                'parse_mode' => $this->parse_mode,
+            ];
+
+            foreach ($this->media as $item) {
+                if (strpos($item['media'], 'attach://') === 0) {
+                    $fileKey = str_replace('attach://', '', $item['media']);
+                    $postFields[$fileKey] = $this->files[$fileKey];
+                }
+            }
+
+        } else {
+            throw new \Exception(
+                'Необходимо установить свойство text перед вызовом sendEditText',
+            );
+        }
+
+        $params = $identifier + $postFields;
+        $params += $this->kbd;
+        $params += $this->params_additionally;
+
+        return $this->api->callAPI('editMessageMedia', $params);
+    }
+
+
+    private function getIdentifier(?string $messageID = null,
         ?int $chatID = null,
     ): array {
         $updateData = $this->context->getUpdateData();
