@@ -38,10 +38,18 @@ class Action
         return $this;
     }
 
-    public function edit(string $text = ''): self
+    public function editText(string $text = ''): self
     {
         $this->messageData['text'] = $text;
-        $this->messageData['edit'] = true;
+        $this->messageData['editText'] = true;
+
+        return $this;
+    }
+
+    public function editCaption(string $text = ''): self
+    {
+        $this->messageData['text'] = $text;
+        $this->messageData['editCaption'] = true;
 
         return $this;
     }

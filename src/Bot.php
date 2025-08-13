@@ -443,8 +443,12 @@ class Bot
             $msg->kbd(remove_keyboard: true);
         }
 
-        if (isset($messageData['edit']) && $messageData['edit'] === true) {
-            return $msg->sendEdit();
+        if (isset($messageData['editText']) && $messageData['editText'] === true) {
+            return $msg->editText();
+        }
+
+        if (isset($messageData['editCaption']) && $messageData['editCaption'] === true) {
+            return $msg->editCaption();
         }
 
         return $msg->send();
