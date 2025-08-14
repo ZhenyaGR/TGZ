@@ -11,8 +11,8 @@ class Inline
 //    private const GIF_SIZE_LIMIT   = 20971520; // 20 MB
 //    private const PHOTO_SIZE_LIMIT = 5242880;  // 5 MB
 
-    private string $type = 'article';
-    private string $parse_mode = '';
+    private string $type;
+    private string $parse_mode;
     private string $id = '';
     private string $title = '';
     private string $description = '';
@@ -42,6 +42,15 @@ class Inline
         $this->parse_mode = $defaultParseMode;
     }
 
+    /**
+     * Задает уникальный идентификатор
+     *
+     * @param string $id
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/id
+     */
     public function id(string $id): self
     {
         $this->id = $id;
@@ -49,6 +58,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает заголовок
+     *
+     * @param string $title
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/title
+     */
     public function title(string $title): self
     {
         $this->title = $title;
@@ -56,6 +74,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает описание
+     *
+     * @param string $description
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/description
+     */
     public function description(string $description): self
     {
         $this->description = $description;
@@ -63,6 +90,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает текст сообщения
+     *
+     * @param string $text
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/text
+     */
     public function text(string $text): self
     {
         $this->message_text = $text;
@@ -70,6 +106,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает URL медиа-файла
+     *
+     * @param string $url
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/fileUrl
+     */
     public function fileUrl(string $url = ''): self
     {
         $this->fileUrl = $url;
@@ -77,6 +122,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает ID медиа-файла
+     *
+     * @param string $id
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/fileID
+     */
     public function fileID(string $id = ''): self
     {
         $this->fileId = $id;
@@ -84,6 +138,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает MIME-тип медиа-файла
+     *
+     * @param string $mime
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/mimeType
+     */
     public function mimeType(string $mime): self
     {
         $this->mimeType = $mime;
@@ -91,6 +154,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает URL миниатюры
+     *
+     * @param string $url
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/thumb
+     */
     public function thumb(string $url = ''): self
     {
         $this->thumbUrl = $url;
@@ -98,6 +170,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает inline-клавиатуру
+     *
+     * @param array $buttons
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/kbd
+     */
     public function kbd(array $buttons = []): self
     {
         $this->kbd = ['inline_keyboard' => $buttons];
@@ -105,6 +186,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Добавляет дополнительные параметры
+     *
+     * @param array $params
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/params
+     */
     public function params(array $params = []): self
     {
         $this->params_additionally = $params;
@@ -112,6 +202,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает режим парсинга
+     *
+     * @param string $mode
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/parseMode
+     */
     public function parseMode(string $mode = ''): self
     {
         if (!in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', ''], true)) {
@@ -122,6 +221,16 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает координаты
+     *
+     * @param float $latitude
+     * @param float $longitude
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/coordinates
+     */
     public function coordinates(float $latitude, float $longitude): self
     {
         $this->latitude = $latitude;
@@ -130,6 +239,15 @@ class Inline
         return $this;
     }
 
+    /**
+     * Задает адрес
+     *
+     * @param string $address
+     *
+     * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/address
+     */
     public function address(string $address): self
     {
         $this->address = $address;
@@ -160,14 +278,14 @@ class Inline
             'parse_mode'   => $this->parse_mode,
         ];
 
-        $message = $message + $this->params_additionally;
+        $message += $this->params_additionally;
 
         $params = $this->createParams();
 
-        $params = $params + [
-                'description'           => $this->description,
-                'input_message_content' => $message,
-            ];
+        $params += [
+            'description'           => $this->description,
+            'input_message_content' => $message,
+        ];
 
         if (!empty($this->thumbUrl)) {
             $params['thumb_url'] = $this->thumbUrl;
@@ -182,13 +300,13 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'description'   => $this->description,
-                'caption'       => $this->message_text,
-                'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
-                    : $this->thumbUrl,
-                'parse_mode'    => $this->parse_mode,
-            ];
+        $params += [
+            'description'   => $this->description,
+            'caption'       => $this->message_text,
+            'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
+                : $this->thumbUrl,
+            'parse_mode'    => $this->parse_mode,
+        ];
 
         if (!empty($this->fileUrl)) {
             $params['photo_url'] = $this->fileUrl;
@@ -205,13 +323,13 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'description'   => $this->description,
-                'caption'       => $this->message_text,
-                'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
-                    : $this->thumbUrl,
-                'parse_mode'    => $this->parse_mode,
-            ];
+        $params += [
+            'description'   => $this->description,
+            'caption'       => $this->message_text,
+            'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
+                : $this->thumbUrl,
+            'parse_mode'    => $this->parse_mode,
+        ];
 
         if (!empty($this->fileUrl)) {
             $params['gif_url'] = $this->fileUrl;
@@ -228,13 +346,13 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'description'   => $this->description,
-                'caption'       => $this->message_text,
-                'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
-                    : $this->thumbUrl,
-                'parse_mode'    => $this->parse_mode,
-            ];
+        $params += [
+            'description'   => $this->description,
+            'caption'       => $this->message_text,
+            'thumbnail_url' => empty($this->thumbUrl) ? $this->fileUrl
+                : $this->thumbUrl,
+            'parse_mode'    => $this->parse_mode,
+        ];
 
         if (!empty($this->fileUrl)) {
             $params['mpeg4_url'] = $this->fileUrl;
@@ -251,13 +369,13 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'description' => $this->description,
-                'caption'     => $this->message_text,
-                'mime_type'   => $this->mimeType == '' ? 'video/mp4'
-                    : $this->mimeType,
-                'parse_mode'  => $this->parse_mode,
-            ];
+        $params += [
+            'description' => $this->description,
+            'caption'     => $this->message_text,
+            'mime_type'   => $this->mimeType == '' ? 'video/mp4'
+                : $this->mimeType,
+            'parse_mode'  => $this->parse_mode,
+        ];
 
         if (!empty($this->fileUrl)) {
             $params['video_url'] = $this->fileUrl;
@@ -278,12 +396,12 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'description'  => $this->description,
-                'caption'      => $this->message_text,
-                'mime_type'    => $this->mimeType,
-                'parse_mode'   => $this->parse_mode,
-            ];
+        $params += [
+            'description' => $this->description,
+            'caption'     => $this->message_text,
+            'mime_type'   => $this->mimeType,
+            'parse_mode'  => $this->parse_mode,
+        ];
 
         if (!empty($this->fileUrl)) {
             $params['document_url'] = $this->fileUrl;
@@ -304,10 +422,10 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'caption'    => $this->message_text,
-                'parse_mode' => $this->parse_mode,
-            ];
+        $params += [
+            'caption'    => $this->message_text,
+            'parse_mode' => $this->parse_mode,
+        ];
 
         if (!empty($this->fileUrl)) {
             $params['audio_url'] = $this->fileUrl;
@@ -324,10 +442,10 @@ class Inline
     {
         $params = $this->createParams();
 
-        $params = $params + [
-                'caption'    => $this->message_text,
-                'parse_mode' => $this->parse_mode,
-            ];
+        $params += [
+            'caption'    => $this->message_text,
+            'parse_mode' => $this->parse_mode,
+        ];
 
         if (!empty($this->fileUrl)) {
             $params['voice_url'] = $this->fileUrl;
@@ -377,6 +495,13 @@ class Inline
         return $params + $this->params_additionally;
     }
 
+    /**
+     * Собирает все данные в один массив
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/create
+     */
     public function create(): array
     {
         $return = [];
