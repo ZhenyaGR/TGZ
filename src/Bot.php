@@ -41,7 +41,9 @@ class Bot
      * @param string|null $text Текст кнопки.
      *
      * @return Action
-     */
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/btn
+     * */
     public function btn(string $id, string $text = null): Action
     {
         $this->buttons['btn'][$id] = $text ?? $id;
@@ -59,6 +61,8 @@ class Bot
      * @param array|string|null $command Текст команды бота, например '/start'.
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onBotCommand
      */
     public function onBotCommand(string $id, array|string $command = null): Action
     {
@@ -75,6 +79,8 @@ class Bot
      * @param array|string|null $command Текст команды, например '!start'.
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCommand
      */
     public function onCommand(string $id, array|string $command = null): Action
     {
@@ -91,6 +97,8 @@ class Bot
      * @param array|string|null $text Текст для совпадения.
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onText
      */
     public function onText(string $id, array|string $text = null): Action
     {
@@ -107,6 +115,8 @@ class Bot
      * @param array|string|null $pattern Регулярное выражение.
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onTextPreg
      */
     public function onTextPreg(string $id, array|string $pattern = null): Action
     {
@@ -123,6 +133,8 @@ class Bot
      * @param string|null $data Данные из callback-кнопки.
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallback
      */
     public function onCallback(string $id, string $data = null): Action
     {
@@ -136,6 +148,8 @@ class Bot
      * Устанавливает обработчик по умолчанию (fallback).
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onDefault
      */
     public function onDefault(): Action
     {
@@ -543,6 +557,8 @@ class Bot
      * @param string $to_id ID целевого маршрута (куда редирект).
      *
      * @throws \InvalidArgumentException Если один из маршрутов не найден.
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/redirect
      */
     public function redirect(string $id, string $to_id): void
     {
