@@ -34,8 +34,6 @@ class Action
      * Копирует обработчик и данные ответа из маршрута $id в текущий маршрут.
      *
      * @param string $id    ID маршрута, куда перенаправлять
-     *
-     * @throws \InvalidArgumentException Если один из маршрутов не найден.
      */
     public function redirect(string $id): self
     {
