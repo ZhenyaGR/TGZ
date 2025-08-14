@@ -66,186 +66,7 @@ class TGZ
         return $this->api->callAPI($method, $params);
     }
 
-    /**
-     * Возвращает данные обновления
-     *
-     * @return array
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/getWebhookUpdate
-     */
-    public function getWebhookUpdate(): array
-    {
-        return $this->context->getUpdateData();
-    }
 
-    /**
-     * Инициализирует переменные из обновления
-     *
-     * @param $chat_id
-     * @param $user_id
-     * @param $text
-     * @param $type
-     * @param $callback_data
-     * @param $query_id
-     * @param $msg_id
-     * @param $is_bot
-     * @param $is_command
-     *
-     * @return array
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initVars(
-        &$chat_id = null,
-        &$user_id = null,
-        &$text = null,
-        &$type = null,
-        &$callback_data = null,
-        &$query_id = null,
-        &$msg_id = null,
-        &$is_bot = null,
-        &$is_command = null,
-    ): array {
-        $update = $this->context->getUpdateData();
-
-        $this
-            ->initUserID($user_id)
-            ->initChatID($chat_id)
-            ->initText($text)
-            ->initMsgID($msg_id)
-            ->initType($type)
-            ->initQuery($query_id)
-            ->initCallbackData($callback_data);
-
-        if (isset($update['message'])) {
-            $is_bot = $update['message']['from']['is_bot'];
-            $is_command = (isset($update['message']['entities'][0]['type'])
-                && $update['message']['entities'][0]['type'] === 'bot_command');
-
-        } elseif (isset($update['callback_query'])) {
-            $is_bot = $update['callback_query']['from']['is_bot'];
-            $is_command = false;
-
-        } elseif (isset($update['inline_query'])) {
-            $is_bot = $update['inline_query']['from']['is_bot'];
-            $is_command = false;
-
-        }
-
-        return $update;
-    }
-
-    /**
-     * Инициализирует переменную callback_data
-     *
-     * @param $callback_data
-     *
-     * @return TGZ
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initCallbackData(&$callback_data): self
-    {
-        $callback_data = $this->context->getCallbackData();
-
-        return $this;
-    }
-
-    /**
-     * Инициализирует переменную query_id
-     *
-     * @param $query_id
-     *
-     * @return TGZ
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initQuery(&$query_id): self
-    {
-        $query_id = $this->context->getQueryId();
-
-        return $this;
-    }
-
-    /**
-     * Инициализирует переменную type
-     *
-     * @param $type
-     *
-     * @return TGZ
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initType(&$type): self
-    {
-        $type = $this->context->getType();
-
-        return $this;
-    }
-
-    /**
-     * Инициализирует переменную msg_id
-     *
-     * @param $msg_id
-     *
-     * @return TGZ
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initMsgID(&$msg_id): self
-    {
-        $msg_id = $this->context->getMessageId();
-
-        return $this;
-    }
-
-    /**
-     * Инициализирует переменную text
-     *
-     * @param $text
-     *
-     * @return TGZ
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initText(&$text): self
-    {
-        $text = $this->context->getText();
-
-        return $this;
-    }
-
-    /**
-     * Инициализирует переменную user_id
-     *
-     * @param $user_id
-     *
-     * @return TGZ
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initUserID(&$user_id): self
-    {
-        $user_id = $this->context->getUserId();
-
-        return $this;
-    }
-
-    /**
-     * Инициализирует переменную chat_id
-     *
-     * @param $chat_id
-     *
-     * @return TGZ
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
-     */
-    public function initChatID(&$chat_id): self
-    {
-        $chat_id = $this->context->getChatId();
-
-        return $this;
-    }
 
     /**
      * Устанавливает режим парсинга по умолчанию для всех сообщений
@@ -578,5 +399,270 @@ class TGZ
         ], $extra);
 
         return $this->api->callAPI('answerInlineQuery', $params);
+    }
+
+    /**
+     * Возвращает данные обновления
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/getWebhookUpdate
+     */
+    public function getWebhookUpdate(): array
+    {
+        return $this->context->getUpdateData();
+    }
+
+    /**
+     * Инициализирует переменные из обновления
+     *
+     * @param $chat_id
+     * @param $user_id
+     * @param $text
+     * @param $type
+     * @param $callback_data
+     * @param $query_id
+     * @param $msg_id
+     * @param $is_bot
+     * @param $is_command
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initVars(
+        &$chat_id = null,
+        &$user_id = null,
+        &$text = null,
+        &$type = null,
+        &$callback_data = null,
+        &$query_id = null,
+        &$msg_id = null,
+        &$is_bot = null,
+        &$is_command = null,
+    ): array {
+        $update = $this->context->getUpdateData();
+
+        $this
+            ->initUserID($user_id)
+            ->initChatID($chat_id)
+            ->initText($text)
+            ->initMsgID($msg_id)
+            ->initType($type)
+            ->initQuery($query_id)
+            ->initCallbackData($callback_data);
+
+        if (isset($update['message'])) {
+            $is_bot = $update['message']['from']['is_bot'];
+            $is_command = (isset($update['message']['entities'][0]['type'])
+                && $update['message']['entities'][0]['type'] === 'bot_command');
+
+        } elseif (isset($update['callback_query'])) {
+            $is_bot = $update['callback_query']['from']['is_bot'];
+            $is_command = false;
+
+        } elseif (isset($update['inline_query'])) {
+            $is_bot = $update['inline_query']['from']['is_bot'];
+            $is_command = false;
+
+        }
+
+        return $update;
+    }
+
+    /**
+     * Инициализирует переменную callback_data
+     *
+     * @param $callback_data
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initCallbackData(&$callback_data): self
+    {
+        $callback_data = $this->context->getCallbackData();
+
+        return $this;
+    }
+
+    /**
+     * Возвращает переменную callback_data
+     *
+     * @return ?string
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getCallbackData(): ?string
+    {
+        return $this->context->getCallbackData();
+    }
+
+    /**
+     * Инициализирует переменную query_id
+     *
+     * @param $query_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initQuery(&$query_id): self
+    {
+        $query_id = $this->context->getQueryId();
+
+        return $this;
+    }
+
+    /**
+     * Возвращает переменную query_id
+     *
+     * @return ?string
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getQueryID(): ?string
+    {
+        return $this->context->getQueryId();
+    }
+
+    /**
+     * Инициализирует переменную type
+     *
+     * @param $type
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initType(&$type): self
+    {
+        $type = $this->context->getType();
+
+        return $this;
+    }
+
+    /**
+     * Возвращает переменную type
+     *
+     * @return ?string
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getType(): ?string
+    {
+        return $this->context->getType();
+    }
+
+    /**
+     * Инициализирует переменную msg_id
+     *
+     * @param $msg_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initMsgID(&$msg_id): self
+    {
+        $msg_id = $this->context->getMessageId();
+
+        return $this;
+    }
+
+    /**
+     * Возвращает переменную msg_id
+     *
+     * @return ?string
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getMsgID(): ?string
+    {
+        return $this->context->getMessageId();
+    }
+
+    /**
+     * Инициализирует переменную text
+     *
+     * @param $text
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initText(&$text): self
+    {
+        $text = $this->context->getText();
+
+        return $this;
+    }
+
+    /**
+     * Возвращает переменную text
+     *
+     * @return ?string
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getText(): ?string
+    {
+        return $this->context->getText();
+    }
+
+    /**
+     * Инициализирует переменную user_id
+     *
+     * @param $user_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initUserID(&$user_id): self
+    {
+        $user_id = $this->context->getUserId();
+
+        return $this;
+    }
+
+    /**
+     * Возвращает переменную user_id
+     *
+     * @return ?string
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getUserID(): ?string
+    {
+        return $this->context->getUserId();
+    }
+
+    /**
+     * Инициализирует переменную chat_id
+     *
+     * @param $chat_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initChatID(&$chat_id): self
+    {
+        $chat_id = $this->context->getChatId();
+
+        return $this;
+    }
+
+    /**
+     * Возвращает переменную chat_id
+     *
+     * @return ?string
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getChatID(): ?string
+    {
+        return $this->context->getChatId();
     }
 }
