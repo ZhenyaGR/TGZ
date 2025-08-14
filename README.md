@@ -12,12 +12,12 @@
 
 # Подключение
 ## Используя composer
-1\. Установить
+1. Установить
 ```bash
 composer require zhenyagr/tgz:dev-main
 ```
 
-2\. Подключить `autoload.php`
+2. Подключить `autoload.php`
 ```php
 require_once __DIR__ . 'vendor/autoload.php';
 ```
