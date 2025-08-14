@@ -31,12 +31,34 @@ class TGZ
         return new self($api, $context);
     }
 
-
+    /**
+     * Выполняет вызов к Telegram Bot API.
+     *
+     * @param string     $method
+     * @param array|null $params
+     *
+     * @return array
+     *
+     * @throws Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/callAPI
+     */
     public function callAPI(string $method, ?array $params = []): array
     {
         return $this->api->callAPI($method, $params);
     }
 
+    /**
+     * Выполняет вызов к Telegram Bot API.
+     *
+     * @param string $method
+     * @param array  $args
+     *
+     * @return array
+     *
+     * @throws \Exception
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/callAPI
+     */
     public function __call(string $method, array $args): array
     {
         $params = $args[0] ?? [];
@@ -44,11 +66,35 @@ class TGZ
         return $this->api->callAPI($method, $params);
     }
 
+    /**
+     * Возвращает данные обновления
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/getWebhookUpdate
+     */
     public function getWebhookUpdate(): array
     {
         return $this->context->getUpdateData();
     }
 
+    /**
+     * Инициализирует переменные из обновления
+     *
+     * @param $chat_id
+     * @param $user_id
+     * @param $text
+     * @param $type
+     * @param $callback_data
+     * @param $query_id
+     * @param $msg_id
+     * @param $is_bot
+     * @param $is_command
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
     public function initVars(
         &$chat_id = null,
         &$user_id = null,
@@ -89,56 +135,128 @@ class TGZ
         return $update;
     }
 
-    public function initCallbackData(&$callback_data)
+    /**
+     * Инициализирует переменную callback_data
+     *
+     * @param $callback_data
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initCallbackData(&$callback_data): self
     {
         $callback_data = $this->context->getCallbackData();
 
         return $this;
     }
 
-    public function initQuery(&$query_id)
+    /**
+     * Инициализирует переменную query_id
+     *
+     * @param $query_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initQuery(&$query_id): self
     {
         $query_id = $this->context->getQueryId();
 
         return $this;
     }
 
-    public function initType(&$type): static
+    /**
+     * Инициализирует переменную type
+     *
+     * @param $type
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initType(&$type): self
     {
         $type = $this->context->getType();
 
         return $this;
     }
 
-    public function initMsgID(&$msg_id): static
+    /**
+     * Инициализирует переменную msg_id
+     *
+     * @param $msg_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initMsgID(&$msg_id): self
     {
         $msg_id = $this->context->getMessageId();
 
         return $this;
     }
 
-    public function initText(&$text): static
+    /**
+     * Инициализирует переменную text
+     *
+     * @param $text
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initText(&$text): self
     {
         $text = $this->context->getText();
 
         return $this;
     }
 
-    public function initUserID(&$user_id): static
+    /**
+     * Инициализирует переменную user_id
+     *
+     * @param $user_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initUserID(&$user_id): self
     {
         $user_id = $this->context->getUserId();
 
         return $this;
     }
 
-    public function initChatID(&$chat_id): static
+    /**
+     * Инициализирует переменную chat_id
+     *
+     * @param $chat_id
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/init
+     */
+    public function initChatID(&$chat_id): self
     {
         $chat_id = $this->context->getChatId();
 
         return $this;
     }
 
-    public function defaultParseMode(string $mode = ''): static
+    /**
+     * Устанавливает режим парсинга по умолчанию для всех сообщений
+     *
+     * @param string $mode HTML, Markdown, MarkdownV2
+     *
+     * @return TGZ
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/defaultParseMode
+     */
+    public function defaultParseMode(string $mode = ''): self
     {
         if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2'
             && $mode !== ''
@@ -162,10 +280,14 @@ class TGZ
      * @param string $text
      *
      * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/msg
      */
     public function msg(string $text = ''): Message
     {
-        return new Message($text, $this->parseModeDefault, $this->api, $this->context);
+        return new Message(
+            $text, $this->parseModeDefault, $this->api, $this->context,
+        );
     }
 
     /**
@@ -174,6 +296,8 @@ class TGZ
      * @param string $type
      *
      * @return Poll
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/poll
      */
     public function poll(string $type = 'regular'): Poll
     {
@@ -186,23 +310,29 @@ class TGZ
      * @param string $type
      *
      * @return Inline
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/inline
      */
     public function inline(string $type = ''): Inline
     {
         return new Inline($type, $this->parseModeDefault);
     }
 
-
     /**
      * Метод удаляет одно или несколько сообщений
      *
-     * @param array|int|null $msg_ids
+     * @param array|int|null  $msg_ids
      * @param int|string|null $chat_id
      *
      * @return array
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/delMsg
      */
-    public function delMsg(array|int $msg_ids = null, int|string $chat_id = null): array
-    {
+    public function delMsg(array|int $msg_ids = null,
+        int|string $chat_id = null,
+    ): array {
         if ($chat_id === null) {
             $this->initChatID($chat_id);
         }
@@ -223,14 +353,20 @@ class TGZ
     /**
      * Метод копирует одно или несколько сообщений
      *
-     * @param int|array|null $msg_ids
+     * @param int|array|null  $msg_ids
      * @param int|string|null $chat_id
      * @param int|string|null $from_chat_id
      *
      * @return array
+     *
+     * @throws \Exception
+     *
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/copyMsg
      */
-    public function copyMsg(int|array $msg_ids = null, int|string $chat_id = null, int|string $from_chat_id = null): array
-    {
+    public function copyMsg(int|array $msg_ids = null,
+        int|string $chat_id = null, int|string $from_chat_id = null,
+    ): array {
         if ($msg_ids === null) {
             $this->initMsgID($msg_ids);
         }
@@ -248,7 +384,8 @@ class TGZ
         $param = $bool ? 'messages_id' : 'message_id';
 
         return $this->api->callAPI(
-            $method, ['chat_id' => $chat_id, 'from_chat_id' => $from_chat_id, $param => $msg_ids],
+            $method, ['chat_id' => $chat_id, 'from_chat_id' => $from_chat_id,
+                      $param    => $msg_ids],
         );
     }
 
@@ -261,9 +398,14 @@ class TGZ
      * @param int|string|null $chat_id
      *
      * @return string
+     *
      * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/getFileID
      */
-    public function getFileID(string $url, string $type = 'document', int|string $chat_id = null): string {
+    public function getFileID(string $url, string $type = 'document',
+        int|string $chat_id = null,
+    ): string {
         if (!in_array(
             $type,
             ['document', 'audio', 'photo', 'animation', 'video', 'video_note',
@@ -294,28 +436,63 @@ class TGZ
         return $result['result']['document']['file_id'];
     }
 
-    public function sendMessage(int $chatId, string $text, array $params = []): array
-    {
+    /**
+     * Метод отправляет сообщение в чат
+     *
+     * @param int    $chatID
+     * @param string $text
+     * @param array  $params
+     *
+     * @return array
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/sendMessage
+     */
+    public function sendMessage(int $chatID, string $text, array $params = [],
+    ): array {
         $params_message = [
-            'chat_id' => $chatId,
+            'chat_id' => $chatID,
             'text'    => $text,
         ];
 
-        return $this->api->callAPI('sendMessage', array_merge($params_message, $params));
+        return $this->api->callAPI(
+            'sendMessage', $params_message + $params,
+        );
     }
 
-    public function reply($message, array $params = []): array
+    /**
+     * Метод отправляет сообщение в чат
+     *
+     * @param string $message
+     * @param array  $params
+     *
+     * @return array
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/reply
+     */
+    public function reply(string $message, array $params = []): array
     {
         if (!isset($params['chat_id'])) {
             $this->initChatID($params['chat_id']);
         }
-        return $this->api->callAPI('sendMessage', array_merge($params, ['text' => $message]));
+
+        return $this->api->callAPI(
+            'sendMessage', array_merge($params, ['text' => $message]),
+        );
     }
 
     /**
-     * @return string[]
+     * Создает callback-кнопку
      *
-     * @psalm-return array{text: string, callback_data: string}
+     * @param string $buttonText Текст кнопки
+     * @param string $buttonData Данные кнопки
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons
      */
     public function buttonCallback(string $buttonText, string $buttonData,
     ): array {
@@ -326,9 +503,14 @@ class TGZ
     }
 
     /**
-     * @return string[]
+     * Создает url-кнопку
      *
-     * @psalm-return array{text: string, url: string}
+     * @param string $buttonText Текст кнопки
+     * @param string $buttonUrl  URL
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons
      */
     public function buttonUrl(string $buttonText, string $buttonUrl): array
     {
@@ -339,9 +521,13 @@ class TGZ
     }
 
     /**
-     * @return string[]
+     * Создает текстовую кнопку
      *
-     * @psalm-return array{text: string}
+     * @param string $buttonText Текст кнопки
+     *
+     * @return array
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons
      */
     public function buttonText(string $buttonText): array
     {
@@ -358,8 +544,11 @@ class TGZ
      *
      * @return array
      * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/answers
      */
-    public function answerCallbackQuery(string $callbackQueryID, array $options = [],
+    public function answerCallbackQuery(string $callbackQueryID,
+        array $options = [],
     ): array {
         $params = array_merge([
             'callback_query_id' => $callbackQueryID,
@@ -372,17 +561,20 @@ class TGZ
      * Метод отправляет ответ Телеграму на inline-запрос
      *
      * @param string $inlineQueryID
-     * @param array  $options
+     * @param array  $results
+     * @param array  $extra
      *
      * @return array
      * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/answers
      */
     public function answerInlineQuery(string $inlineQueryID, array $results,
         array $extra = [],
     ): array {
         $params = array_merge([
             'inline_query_id' => $inlineQueryID,
-            'results'         => json_encode($results),
+            'results'         => json_encode($results, JSON_THROW_ON_ERROR),
         ], $extra);
 
         return $this->api->callAPI('answerInlineQuery', $params);
