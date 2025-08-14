@@ -21,6 +21,8 @@ class Action
      * Устанавливает обработчик для маршрута.
      *
      * @param callable $handler Обработчик
+     *
+     * @return Action
      */
     public function func(callable $handler): self
     {
@@ -34,6 +36,8 @@ class Action
      * Копирует обработчик и данные ответа из маршрута $id в текущий маршрут.
      *
      * @param string $id    ID маршрута, куда перенаправлять
+     *
+     * @return Action
      */
     public function redirect(string $id): self
     {
@@ -46,6 +50,8 @@ class Action
      * Задает текст сообщения, которое будет отправлено в ответ
      *
      * @param string $text    Текст сообщения
+     *
+     * @return Action
      */
     public function text(string $text = ''): self
     {
@@ -58,6 +64,8 @@ class Action
      * Изменяет текст сообщения
      *
      * @param string $text    Новый текст
+     *
+     * @return Action
      */
     public function editText(string $text = ''): self
     {
@@ -71,6 +79,8 @@ class Action
      * Изменяет текст описания
      *
      * @param string $text    Новый текст
+     *
+     * @return Action
      */
     public function editCaption(string $text = ''): self
     {
@@ -84,6 +94,8 @@ class Action
      * Добавляет изображение к сообщению
      *
      * @param string|array $img    Ссылка или массив ссылок (ID) изображений
+     *
+     * @return Action
      */
     public function img(string|array $img): self
     {
@@ -96,6 +108,8 @@ class Action
      * Задает всплывающий текст при нажатии на кнопку
      *
      * @param string $query    Всплывающий текст
+     *
+     * @return Action
      */
     public function query(string $query): self
     {
@@ -108,6 +122,8 @@ class Action
      * @param array $buttons    Кнопки клавиатуры
      * @param bool  $one_time   Показывать клавиатуру однократно?
      * @param bool  $resize     Растягивать клавиатуру?
+     *
+     * @return Action
      */
     public function kbd(array $buttons, bool $one_time = false,
         bool $resize = true,
@@ -124,6 +140,8 @@ class Action
      * Добавляет inline-клавиатуру к сообщению
      *
      * @param array $buttons    Кнопки клавиатуры
+     *
+     * @return Action
      */
     public function inlineKbd(array $buttons): self
     {
@@ -137,6 +155,8 @@ class Action
 
     /**
      * Удаляет клавиатуру
+     *
+     * @return Action
      */
     public function removeKbd(): self
     {
