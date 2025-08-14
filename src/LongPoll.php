@@ -37,6 +37,8 @@ class LongPoll
      * @param int    $timeout Таймаут для long-polling запроса в секундах.
      *
      * @return self
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/longpoll
      */
     public static function create(string $token, int $timeout = 20): self
     {
@@ -54,6 +56,8 @@ class LongPoll
      *                         каждого нового обновления. Она должна принимать
      *                         один аргумент: готовый к работе объект TGZ.
      *                         Пример: function(TGZ $tg) {ваш код}
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/longpoll
      */
     public function listen(Closure $handler): void
     {
