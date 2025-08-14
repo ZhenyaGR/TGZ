@@ -23,6 +23,8 @@ class Action
      * @param callable $handler Обработчик
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/func
      */
     public function func(callable $handler): self
     {
@@ -35,9 +37,11 @@ class Action
      * Перенаправляет один маршрут на другой.
      * Копирует обработчик и данные ответа из маршрута $id в текущий маршрут.
      *
-     * @param string $id    ID маршрута, куда перенаправлять
+     * @param string $id ID маршрута, куда перенаправлять
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/redirect
      */
     public function redirect(string $id): self
     {
@@ -49,9 +53,11 @@ class Action
     /**
      * Задает текст сообщения, которое будет отправлено в ответ
      *
-     * @param string $text    Текст сообщения
+     * @param string $text Текст сообщения
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/text
      */
     public function text(string $text = ''): self
     {
@@ -63,9 +69,11 @@ class Action
     /**
      * Изменяет текст сообщения
      *
-     * @param string $text    Новый текст
+     * @param string $text Новый текст
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/editText
      */
     public function editText(string $text = ''): self
     {
@@ -78,9 +86,11 @@ class Action
     /**
      * Изменяет текст описания
      *
-     * @param string $text    Новый текст
+     * @param string $text Новый текст
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/editCaption
      */
     public function editCaption(string $text = ''): self
     {
@@ -93,9 +103,11 @@ class Action
     /**
      * Добавляет изображение к сообщению
      *
-     * @param string|array $img    Ссылка или массив ссылок (ID) изображений
+     * @param string|array $img Ссылка или массив ссылок (ID) изображений
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/img
      */
     public function img(string|array $img): self
     {
@@ -107,9 +119,11 @@ class Action
     /**
      * Задает всплывающий текст при нажатии на кнопку
      *
-     * @param string $query    Всплывающий текст
+     * @param string $query Всплывающий текст
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/query
      */
     public function query(string $query): self
     {
@@ -119,11 +133,13 @@ class Action
     /**
      * Добавляет клавиатуру к сообщению
      *
-     * @param array $buttons    Кнопки клавиатуры
-     * @param bool  $one_time   Показывать клавиатуру однократно?
-     * @param bool  $resize     Растягивать клавиатуру?
+     * @param array $buttons  Кнопки клавиатуры
+     * @param bool  $one_time Показывать клавиатуру однократно?
+     * @param bool  $resize   Растягивать клавиатуру?
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/kbd
      */
     public function kbd(array $buttons, bool $one_time = false,
         bool $resize = true,
@@ -139,9 +155,11 @@ class Action
     /**
      * Добавляет inline-клавиатуру к сообщению
      *
-     * @param array $buttons    Кнопки клавиатуры
+     * @param array $buttons Кнопки клавиатуры
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/inlineKbd
      */
     public function inlineKbd(array $buttons): self
     {
@@ -157,6 +175,8 @@ class Action
      * Удаляет клавиатуру
      *
      * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/removeKbd
      */
     public function removeKbd(): self
     {
