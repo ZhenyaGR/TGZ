@@ -372,7 +372,7 @@ class Inline
         $params += [
             'description' => $this->description,
             'caption'     => $this->message_text,
-            'mime_type'   => $this->mimeType == '' ? 'video/mp4'
+            'mime_type'   => $this->mimeType === '' ? 'video/mp4'
                 : $this->mimeType,
             'parse_mode'  => $this->parse_mode,
         ];
