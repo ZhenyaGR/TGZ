@@ -1,5 +1,7 @@
 # Что такое TGZ?
-**TGZ** — это библиотека для создания ботов в Telegram. Библиотека написана на **PHP**. Позволяет создавать ботов любой сложности
+**TGZ** — это современная PHP-библиотека для создания ботов в Telegram.
+Позволяет быстро и удобно работать с Bot API, поддерживает Webhook и LongPoll, а также все типы сообщений и клавиатур.
+Идеально подходит как для новичков, так и для опытных разработчиков.
 
 ## Поддерживаемые возможности
 * `Webhook API`
@@ -9,7 +11,7 @@
 * Работа с голосовыми сообщениями, документами и другими медиа-файлами
 
 # Подключение
-### Используя composer
+## Используя composer
 1\. Установить
 ```bash
 composer require zhenyagr/tgz:dev-main
@@ -19,19 +21,20 @@ composer require zhenyagr/tgz:dev-main
 ```php
 require_once __DIR__ . 'vendor/autoload.php';
 ```
-### Вручную
+## Вручную
 1. Скачать последний релиз c [github](https://github.com/ZhenyaGR/TGZ)
 2. Подключить `autoload.php`.  
 > Вот так будет происходить подключение, если ваш бот находится в той же папке, что и папка `TGZ`
 ```php
 require_once "TGZ/autoload.php";
 ```
-### [Первоначальная настройка, создание бота и получение токена](TokenCreate.md)
+
+## [Первоначальная настройка, создание бота и получение токена](TokenCreate.md)
 
 ---
 # Примеры использования
 
-### Инициализация переменных (WEBHOOK)
+## Инициализация переменных (WEBHOOK)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
@@ -50,7 +53,7 @@ $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_
 // Все переменные сразу одним методом
 ```
 
-### Инициализация переменных (LONGPOLL)
+## Инициализация переменных (LONGPOLL)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
@@ -74,7 +77,7 @@ $polling->listen(function(TGZ $tg) {
 });
 ```
 
-### Вызов любых методов BOT API. Например copyMessage (WEBHOOK)
+## Вызов любых методов BOT API. Например copyMessage (WEBHOOK)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
@@ -95,7 +98,7 @@ if ($type == 'text' || $type == 'bot_command') {
 }
 ```
 
-### Эхо-бот с конструктором сообщений (WEBHOOK)
+## Эхо-бот с конструктором сообщений (WEBHOOK)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
@@ -109,7 +112,8 @@ if ($type == 'text' || $type == 'bot_command') {
     // Отправляем сообщение с таким-же текстом
 }
 ```
-### Вызов любых методов BOT API. Например copyMessage (LONGPOLL)
+
+## Вызов любых методов BOT API. Например copyMessage (LONGPOLL)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
@@ -135,7 +139,8 @@ $polling->listen(function(TGZ $tg) {
     }
 });
 ```
-### Эхо-бот с конструктором сообщений (LONGPOLL)
+
+## Эхо-бот с конструктором сообщений (LONGPOLL)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
