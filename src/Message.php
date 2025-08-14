@@ -35,6 +35,20 @@ final class Message
         $this->context = $context;
     }
 
+    /**
+     * Добавляет клавиатуру или inline-клавиатуру и удаляет клавиатуру
+     *
+     * @param array $buttons
+     * @param bool  $inline
+     * @param bool  $one_time_keyboard
+     * @param bool  $resize_keyboard
+     * @param bool  $remove_keyboard
+     *
+     * @return Message
+     *
+     * @throws \JsonException
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/kbd
+     */
     public function kbd(
         array $buttons = [],
         bool $inline = false,
@@ -68,6 +82,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Задает текст сообщения
+     *
+     * @param string $text
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/text
+     */
     public function text(string $text): static
     {
         $this->text = $text;
@@ -75,6 +98,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Задает режим парсинга
+     *
+     * @param string $mode 'HTML', 'Markdown', 'MarkdownV2'
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/parseMode
+     */
     public function parseMode(string $mode = ''): static
     {
         $mode = in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', '']) ? $mode
@@ -85,6 +117,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Добавляет дополнительные параметры
+     *
+     * @param array $params
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/params
+     */
     public function params(array $params = []): static
     {
         $this->params_additionally = $params;
@@ -92,6 +133,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Отвечает на сообщение
+     *
+     * @param int|null $reply_to_message_id
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/reply
+     */
     public function reply(?int $reply_to_message_id = null): static
     {
         if ($reply_to_message_id === null) {
@@ -144,6 +194,15 @@ final class Message
         return false;
     }
 
+    /**
+     * Отправляет анимированные эмодзи
+     *
+     * @param string $dice '🎲', '🎯', '🏀', '⚽', '🎳', '🎰'
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/dice
+     */
     public function dice(string $dice): static
     {
         $this->sendDice = true;
@@ -152,6 +211,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Добавляет gif-файл к сообщению
+     *
+     * @param string|array $url Ссылка или массив ссылок (ID)
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/gif
+     */
     public function gif(string|array $url): static
     {
         $url = is_array($url) ? $url : [$url];
@@ -161,7 +229,16 @@ final class Message
         return $this;
     }
 
-    public function voice(string|array $url): static
+    /**
+     * Отправляет голосовое сообщение
+     *
+     * @param string|array $url Ссылка или массив ссылок (ID)
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/voice
+     */
+    public function voice(string $url): static
     {
         $url = is_array($url) ? $url : [$url];
         $this->processMediaGroup($url, 'voice');
@@ -170,6 +247,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Добавляет аудио-файл к сообщению
+     *
+     * @param string|array $url Ссылка или массив ссылок (ID)
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/audio
+     */
     public function audio(string|array $url): static
     {
         $url = is_array($url) ? $url : [$url];
@@ -179,6 +265,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Добавляет видео-файл к сообщению
+     *
+     * @param string|array $url Ссылка или массив ссылок (ID)
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/video
+     */
     public function video(string|array $url): static
     {
         $url = is_array($url) ? $url : [$url];
@@ -188,6 +283,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Добавляет документ к сообщению
+     *
+     * @param string|array $url Ссылка или массив ссылок (ID)
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/doc
+     */
     public function doc(string|array $url): static
     {
         $url = is_array($url) ? $url : [$url];
@@ -197,6 +301,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Добавляет изображение к сообщению
+     *
+     * @param string|array $url Ссылка или массив ссылок (ID)
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/img
+     */
     public function img(string|array $url): static
     {
         $url = is_array($url) ? $url : [$url];
@@ -206,6 +319,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Добавляет превью к сообщению с помощью ссылки
+     *
+     * @param string $url
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/mediaPreview
+     */
     public function mediaPreview(string $url): static
     {
 //        $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
@@ -233,6 +355,15 @@ final class Message
         return $this;
     }
 
+    /**
+     * Отправляет стикер
+     *
+     * @param string $file_id
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/sticker
+     */
     public function sticker(string $file_id): static
     {
         $this->sendSticker = true;
@@ -241,6 +372,17 @@ final class Message
         return $this;
     }
 
+    /**
+     * Отправляет действие
+     *
+     * @param string|null $action
+     *
+     * @return Message
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/action
+     */
     public function action(?string $action = 'typing'): static
     {
         if (!in_array($action, [
@@ -267,6 +409,17 @@ final class Message
         return $this;
     }
 
+    /**
+     * Отправляет сообщение
+     *
+     * @param int|null $chatID
+     *
+     * @return array
+     *
+     * @throws \JsonException
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/send
+     */
     public function send(?int $chatID = null): array
     {
         $params = [
@@ -297,6 +450,17 @@ final class Message
         return $this->sendMediaType($params);
     }
 
+    /**
+     * Редактирует существующее сообщение
+     *
+     * @param string|null $messageID
+     * @param int|null    $chatID
+     * @param bool        $caption
+     *
+     * @return array
+     *
+     * @throws \JsonException|\Exception
+     */
     public function sendEdit(?string $messageID = null, ?int $chatID = null,
         bool $caption = false,
     ): array {
@@ -314,6 +478,10 @@ final class Message
      * @param int|null    $chatID
      *
      * @return array
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editText
      */
     public function editText(?string $messageID = null, ?int $chatID = null,
     ): array {
@@ -345,6 +513,10 @@ final class Message
      * @param int|null    $chatID
      *
      * @return array
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editCaption
      */
     public function editCaption(?string $messageID = null,
         ?int $chatID = null,
@@ -376,13 +548,16 @@ final class Message
      * @param int|null    $chatID
      *
      * @return array
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editCaption
      */
     public function editMedia(?string $messageID = null, ?int $chatID = null,
     ): array {
         $identifier = $this->getIdentifier($messageID, $chatID);
 
         if (isset($this->media)) {
-
             $postFields = [
                 'parse_mode' => $this->parse_mode,
             ];
@@ -505,10 +680,8 @@ final class Message
     {
         $params['caption'] = $this->text;
         $params['parse_mode'] = $this->parse_mode;
-        $params[$type] = strpos(
-            $this->media[0]['media'],
-            'attach://',
-        ) !== false ? $this->files['file1'] : $this->media[0]['media'];
+        $params[$type] = str_contains($this->media[0]['media'], 'attach://')
+            ? $this->files['file1'] : $this->media[0]['media'];
 
         return $this->api->callAPI('send'.ucfirst($type), $params);
     }
