@@ -5,14 +5,33 @@ namespace ZhenyaGR\TGZ;
 class File
 {
     private ApiClient $api;
-    public string $file_id = '';
-    public string $file_path = '';
-    public int $file_size = 0;
+    private string $file_id;
+    private string $file_path;
+    private int $file_size;
 
     public function __construct(string $file_id, ApiClient $api)
     {
         $this->file_id = $file_id;
         $this->api = $api;
+
+        $file_data = $this->api->callAPI(
+            'getFile', ['file_id' => $this->file_id],
+        );
+
+        $this->file_path = $this->api->getApiFileUrl()
+            .$file_data['result']['file_path'];
+        $this->file_size = $file_data['result']['file_size'];
+
+    }
+
+    /**
+     * Возвращает размер файла в байтах
+     *
+     * @return int Размер в битах
+     */
+    public function getFileSize(): int
+    {
+        return $this->file_size;
     }
 
     /**
@@ -28,17 +47,6 @@ class File
      */
     public function save(string $path): string
     {
-        // 1. Получаем метаданные файла от Telegram API
-        $file_data = $this->api->callAPI(
-            'getFile', ['file_id' => $this->file_id],
-        );
-
-        // Предполагается, что у вас есть метод для получения полного URL файла
-        $this->file_path = $this->api->getApiFileUrl()
-            . $file_data['result']['file_path'];
-        $this->file_size = $file_data['result']['file_size'];
-
-        // 2. Проверяем размер файла (лимит Telegram Bot API - 20 МБ)
         if ($this->file_size >= 20971520) {
             throw new \RuntimeException('Размер файла превышает 20 МБ');
         }
@@ -53,7 +61,7 @@ class File
 
         if (is_dir($path)) {
             // Если передан путь к директории, добавляем к нему имя файла
-            $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            $path = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
             $path .= basename($this->file_path);
         }
 
@@ -66,7 +74,8 @@ class File
             if (!mkdir($directory, 0775, true)) {
                 // Если создать не удалось - выбрасываем исключение
                 throw new \RuntimeException(
-                    'Не удалось создать директорию для сохранения файла: ' . $directory
+                    'Не удалось создать директорию для сохранения файла: '
+                    .$directory,
                 );
             }
         }
@@ -75,8 +84,8 @@ class File
             $error = error_get_last();
             $errorMessage = $error['message'] ?? 'неизвестная ошибка';
             throw new \RuntimeException(
-                'Не удалось скачать или сохранить файл. Причина: ' . $errorMessage
-                . '. Путь: ' . $destinationPath
+                'Не удалось скачать или сохранить файл. Причина: '.$errorMessage
+                .'. Путь: '.$destinationPath,
             );
         }
 
