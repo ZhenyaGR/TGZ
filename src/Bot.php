@@ -11,12 +11,13 @@ class Bot
 
     private array $routes
         = [
-            'bot_command'    => [],
-            'command'        => [],
-            'text_exact'     => [],
-            'text_preg'      => [],
-            'callback_query' => [],
-            'fallback'       => null,
+            'bot_command'      => [],
+            'command'          => [],
+            'text_exact'       => [],
+            'text_preg'        => [],
+            'callback_query'   => [],
+            'sticker_fallback' => null,
+            'fallback'         => null,
         ];
 
     public array $buttons
@@ -64,8 +65,8 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onBotCommand
      */
-    public function onBotCommand(string $id, array|string $command = null): Action
-    {
+    public function onBotCommand(string $id, array|string $command = null,
+    ): Action {
         $route = new Action($id, $command ?? $id);
         $this->routes['bot_command'][$id] = $route;
 
@@ -75,7 +76,7 @@ class Bot
     /**
      * Создает маршрут для команды.
      *
-     * @param string       $id      Уникальный идентификатор маршрута.
+     * @param string            $id      Уникальный идентификатор маршрута.
      * @param array|string|null $command Текст команды, например '!start'.
      *
      * @return Action
@@ -93,7 +94,7 @@ class Bot
     /**
      * Создает маршрут для точного совпадения текста.
      *
-     * @param string       $id   Уникальный идентификатор.
+     * @param string            $id   Уникальный идентификатор.
      * @param array|string|null $text Текст для совпадения.
      *
      * @return Action
@@ -111,7 +112,7 @@ class Bot
     /**
      * Создает маршрут для текста по регулярному выражению.
      *
-     * @param string       $id      Уникальный идентификатор.
+     * @param string            $id      Уникальный идентификатор.
      * @param array|string|null $pattern Регулярное выражение.
      *
      * @return Action
@@ -129,7 +130,7 @@ class Bot
     /**
      * Создает маршрут для callback-запроса.
      *
-     * @param string $id   Уникальный идентификатор.
+     * @param string      $id   Уникальный идентификатор.
      * @param string|null $data Данные из callback-кнопки.
      *
      * @return Action
@@ -143,6 +144,22 @@ class Bot
 
         return $route;
     }
+
+    /**
+     * Создает маршрут для всех стикеров.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onSticker
+     */
+    public function onSticker()
+    {
+        $route = new Action('sticker_fallback', null);
+        $this->routes['sticker_fallback'] = $route;
+
+        return $route;
+    }
+
 
     /**
      * Устанавливает обработчик по умолчанию (fallback).
@@ -166,7 +183,6 @@ class Bot
         $callback_data = $this->context->getCallbackData();
 
         if ($type === 'text' || $type === 'bot_command') {
-
             $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
 
             // 1. Проверяем команды бота (onBotCommand)
@@ -282,10 +298,26 @@ class Bot
                     }
                 }
             }
+
+            // 6. Проверяем стикер
+            if (!empty($this->context->getUpdateData()['message']['sticker'])) {
+                $this->dispatchAnswer(
+                    $this->routes['sticker_fallback'], 'text',
+                );
+
+                return;
+            }
+
+            // Fallback, если ни один маршрут не сработал
+            if ($this->routes['fallback'] !== null) {
+                $this->dispatchAnswer($this->routes['fallback'], 'text');
+
+                return;
+            }
         }
 
         if ($type === 'callback_query') {
-            // 6. Проверяем inline-кнопки
+            // 7. Проверяем inline-кнопки
             foreach ($this->buttons['action'] as $route) {
                 if ($route->getId() === $callback_data) {
                     $this->dispatchAnswer($route, 'button_'.$type);
@@ -294,7 +326,7 @@ class Bot
                 }
             }
 
-            // 7. Проверяем callback_data
+            // 8. Проверяем callback_data
             foreach ($this->routes['callback_query'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
@@ -306,14 +338,6 @@ class Bot
                 }
             }
         }
-
-        // Fallback, если ни один маршрут не сработал
-        if ($this->routes['fallback'] !== null) {
-            $this->dispatchAnswer($this->routes['fallback'], 'text');
-
-            return;
-        }
-
     }
 
     private function convertCommandPatternToRegex(string $pattern): string
@@ -457,11 +481,15 @@ class Bot
             $msg->kbd(remove_keyboard: true);
         }
 
-        if (isset($messageData['editText']) && $messageData['editText'] === true) {
+        if (isset($messageData['editText'])
+            && $messageData['editText'] === true
+        ) {
             return $msg->editText();
         }
 
-        if (isset($messageData['editCaption']) && $messageData['editCaption'] === true) {
+        if (isset($messageData['editCaption'])
+            && $messageData['editCaption'] === true
+        ) {
             return $msg->editCaption();
         }
 
