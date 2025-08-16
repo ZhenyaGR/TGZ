@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZhenyaGR\TGZ;
 
-use Exception;
 use ZhenyaGR\TGZ\Contracts\ApiInterface;
 
 class ApiClient implements ApiInterface
@@ -36,7 +35,7 @@ class ApiClient implements ApiInterface
             return $response;
         }
 
-        throw new Exception($this->TGAPIErrorMSG($response, $params));
+        throw new \RuntimeException($this->TGAPIErrorMSG($response, $params));
     }
 
     public function __call(string $method, array $args = []): array

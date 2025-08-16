@@ -140,6 +140,20 @@ class TGZ
     }
 
     /**
+     * Метод создает объект класса File для скачивания
+     *
+     * @param string $file_id
+     *
+     * @return \ZhenyaGR\TGZ\File
+     *
+//     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/inline
+     */
+    public function getFile(string $file_id): File
+    {
+        return new File($file_id, $this->api);
+    }
+
+    /**
      * Метод удаляет одно или несколько сообщений
      *
      * @param array|int|null  $msg_ids
