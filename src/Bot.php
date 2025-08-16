@@ -8,6 +8,7 @@ class Bot
     private TGZ $tg;
     private ApiClient $api;
     private UpdateContext $context;
+    private array $ctx = [];
 
     private array $routes
         = [
@@ -403,26 +404,27 @@ class Bot
 
     private function dispatchAnswer($route, $type, array $other_data = [])
     {
-        $this->tg->addCtxBot([
+        $this->ctx = [
             'route' => $route,
             'type' => $type,
             'other_data' => $other_data
-        ]);
+        ];
 
-        $next = function($ctx): void {
-            [$route, $type, $other_data] = $ctx->getData();
-            $this->processAnswer($route, $type, $other_data);
+        $next = function(): void {
+            $this->processAnswer();
         };
 
         if (is_callable($route->middleware_handler)) {
             ($route->middleware_handler)($this->tg, $next);
         } else {
-            $next($this->tg);
+            $next();
         }
     }
 
-    private function processAnswer($route, $type, $other_data)
+    private function processAnswer()
     {
+        [$route, $type, $other_data] = $this->ctx;
+
         if (!empty($route->button_redirect)) {
             $targetAction = $this->findActionById($route->button_redirect);
 
