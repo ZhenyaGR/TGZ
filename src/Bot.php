@@ -405,9 +405,9 @@ class Bot
     private function dispatchAnswer($route, $type, array $other_data = [])
     {
         $this->ctx = [
-            'route' => $route,
-            'type' => $type,
-            'other_data' => $other_data
+            $route,
+            $type,
+            $other_data
         ];
 
         $next = function(): void {
