@@ -10,7 +10,7 @@ class Action
     public array $messageData = [];
     public string $queryText = '';
     public string $button_redirect = '';
-    private \Closure|null $middleware_handler = null;
+    public \Closure|null $middleware_handler = null;
 
     public function __construct(string $id, mixed $condition)
     {
