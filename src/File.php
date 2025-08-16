@@ -28,6 +28,8 @@ class File
      * Возвращает размер файла в байтах
      *
      * @return int Размер в битах
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/file
      */
     public function getFileSize(): int
     {
@@ -44,6 +46,8 @@ class File
      *
      * @throws \RuntimeException Если файл слишком большой, или не удалось
      *                           создать директорию/скачать файл.
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/file
      */
     public function save(string $path): string
     {
