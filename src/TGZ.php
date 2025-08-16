@@ -13,6 +13,7 @@ class TGZ
     public ApiInterface $api;
     public UpdateContext $context;
     private string $parseModeDefault = '';
+    public array $ctx_bot = [];
 
     public function __construct(ApiInterface $api, UpdateContext $context)
     {
@@ -29,6 +30,16 @@ class TGZ
         $context = UpdateContext::fromWebhook();
 
         return new self($api, $context);
+    }
+
+    public function addCtxBot(array $ctx_bot): void
+    {
+        $this->ctx_bot = $ctx_bot;
+    }
+
+    public function getCtxBot(): array
+    {
+        return $this->ctx_bot;
     }
 
     /**

@@ -83,8 +83,7 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onBotCommand
      */
-    public function onBotCommand(string $id, array|string $command = null,
-    ): Action {
+    public function onBotCommand(string $id, array|string $command = null): Action {
         $route = new Action($id, $command ?? $id);
         $this->routes['bot_command'][$id] = $route;
 
@@ -178,7 +177,6 @@ class Bot
         return $route;
     }
 
-
     /**
      * Устанавливает обработчик по умолчанию (fallback).
      *
@@ -201,7 +199,7 @@ class Bot
         };
 
         if (is_callable($this->middleware_handler)) {
-            ($this->middleware_handler)($next);
+            ($this->middleware_handler)($this->tg, $next);
         } else {
             $next();
         }
@@ -405,14 +403,21 @@ class Bot
 
     private function dispatchAnswer($route, $type, array $other_data = [])
     {
-        $next = function() use ($route, $type, $other_data): void {
+        $this->tg->addCtxBot([
+            'route' => $route,
+            'type' => $type,
+            'other_data' => $other_data
+        ]);
+
+        $next = function($ctx): void {
+            [$route, $type, $other_data] = $ctx->getData();
             $this->processAnswer($route, $type, $other_data);
         };
 
         if (is_callable($route->middleware_handler)) {
-            ($route->middleware_handler)($next);
+            ($route->middleware_handler)($this->tg, $next);
         } else {
-            $next();
+            $next($this->tg);
         }
     }
 
@@ -440,7 +445,7 @@ class Bot
 
         $handler = $route->getHandler();
         if (!empty($handler)) {
-            $handler(...$other_data);
+            $handler($this->tg, ...$other_data);
 
             return null;
         }
