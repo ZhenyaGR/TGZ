@@ -38,7 +38,7 @@ class Bot
     }
 
     /**
-     * Устанавливает обработчик для маршрута.
+     * Устанавливает middleware
      *
      * @param callable $handler Обработчик
      *
@@ -404,6 +404,19 @@ class Bot
     }
 
     private function dispatchAnswer($route, $type, array $other_data = [])
+    {
+        $next = function() use ($route, $type, $other_data): void {
+            $this->processAnswer($route, $type, $other_data);
+        };
+
+        if (is_callable($route->middleware_handler)) {
+            ($route->middleware_handler)($next);
+        } else {
+            $next();
+        }
+    }
+
+    private function processAnswer($route, $type, $other_data)
     {
         if (!empty($route->button_redirect)) {
             $targetAction = $this->findActionById($route->button_redirect);

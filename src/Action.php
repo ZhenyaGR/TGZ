@@ -10,12 +10,30 @@ class Action
     public array $messageData = [];
     public string $queryText = '';
     public string $button_redirect = '';
+    private \Closure|null $middleware_handler = null;
 
     public function __construct(string $id, mixed $condition)
     {
         $this->id = $id;
         $this->condition = $condition;
     }
+
+    /**
+     * Устанавливает middleware для маршрута.
+     *
+     * @param callable $handler Обработчик
+     *
+     * @return Bot
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/middleware
+     */
+    public function middleware(callable $handler): self
+    {
+        $this->middleware_handler = \Closure::fromCallable($handler);
+
+        return $this;
+    }
+
 
     /**
      * Устанавливает обработчик для маршрута.
