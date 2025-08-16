@@ -146,9 +146,9 @@ class TGZ
      *
      * @return \ZhenyaGR\TGZ\File
      *
-//     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/inline
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/file
      */
-    public function getFile(string $file_id): File
+    public function file(string $file_id): File
     {
         return new File($file_id, $this->api);
     }
