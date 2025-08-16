@@ -144,7 +144,7 @@ class TGZ
      *
      * @param string $file_id
      *
-     * @return \ZhenyaGR\TGZ\File
+     * @return File
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/file
      */
