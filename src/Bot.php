@@ -302,7 +302,7 @@ class Bot
                 }
             }
 
-            // 6. Проверяем стикер
+            // 6. Проверяем стикеры
             if (!empty($this->context->getUpdateData()['message']['sticker'])) {
                 $this->dispatchAnswer(
                     $this->routes['sticker_fallback'], 'text',
