@@ -28,6 +28,8 @@ class Bot
 
     private array $pendingRedirects = [];
 
+    private \Closure|null $middleware_handler = null;
+
     public function __construct(TGZ $tg)
     {
         $this->tg = $tg;
@@ -36,7 +38,23 @@ class Bot
     }
 
     /**
-     * Создает маршрут для команды.
+     * Устанавливает обработчик для маршрута.
+     *
+     * @param callable $handler Обработчик
+     *
+     * @return Bot
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/middleware
+     */
+    public function middleware(callable $handler): self
+    {
+        $this->middleware_handler = \Closure::fromCallable($handler);
+
+        return $this;
+    }
+
+    /**
+     * Создает маршрут для кнопки.
      *
      * @param string      $id   Уникальный идентификатор кнопки.
      * @param string|null $text Текст кнопки.
@@ -44,7 +62,7 @@ class Bot
      * @return Action
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/btn
-     * */
+     */
     public function btn(string $id, string $text = null): Action
     {
         $this->buttons['btn'][$id] = $text ?? $id;
@@ -178,13 +196,25 @@ class Bot
 
     private function dispatch(): void
     {
+        $next = function(): void {
+            $this->processRoutes();
+        };
+
+        if (is_callable($this->middleware_handler)) {
+            ($this->middleware_handler)($next);
+        } else {
+            $next();
+        }
+    }
+
+    private function processRoutes()
+    {
         $type = $this->context->getType();
         $text = $this->context->getText();
         $callback_data = $this->context->getCallbackData();
 
         if ($type === 'text' || $type === 'bot_command') {
             if (!empty($text)) {
-
                 $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
 
                 // 1. Проверяем команды бота (onBotCommand)
