@@ -51,33 +51,38 @@ class File
         $downloadUrl = $this->file_path;
 
         if (is_dir($path)) {
+            // Убираем слэш в конце, если он есть, и добавляем один правильный
             $path = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
             $path .= basename($this->file_path);
         }
 
         $destinationPath = $path;
-
         $directory = dirname($destinationPath);
-        if (!mkdir($directory, 0775, true) && !is_dir($directory)) {
-            // Если после попытки создания директория все еще не существует
-            if (!is_dir($directory)) {
-                throw new \RuntimeException(
-                    'Не удалось создать директорию: '.$directory,
-                );
-            }
+
+        if (!mkdir($directory, 0775, true)
+            && !is_dir(
+                $directory
+            )
+        ) {
+            // Если mkdir вернул false, значит создать не удалось
+            throw new \RuntimeException(
+                'Не удалось создать директорию для сохранения файла: '
+                .$directory,
+            );
         }
 
-        if (!@copy($downloadUrl, $destinationPath)) {
+        if (!copy($downloadUrl, $destinationPath)) {
+            $error = error_get_last();
+            $errorMessage = $error['message'] ?? 'неизвестная ошибка';
             throw new \RuntimeException(
-                'Не удалось скачать или сохранить файл по пути: '
-                .$destinationPath,
+                'Не удалось скачать или сохранить файл. Причина: '.$errorMessage
+                .'. Путь: '.$destinationPath,
             );
         }
 
         return $destinationPath;
     }
 }
-
 // ПРИМЕЧАНИЕ: Для работы этого кода класс ApiClient должен иметь метод getFileDownloadUrl
 /*
 class ApiClient {
