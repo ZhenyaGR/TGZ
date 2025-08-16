@@ -8,12 +8,14 @@ use ZhenyaGR\TGZ\Contracts\ApiInterface;
 
 class ApiClient implements ApiInterface
 {
-    private const API_BASE_URL = 'https://api.telegram.org/bot';
+    private const API_BASE_URL = 'https://api.telegram.org';
     private string $apiUrl;
+    private string $apiFileUrl;
 
     public function __construct(string $token)
     {
-        $this->apiUrl = self::API_BASE_URL . $token . '/';
+        $this->apiUrl = self::API_BASE_URL  . '/bot' . $token . '/';
+        $this->apiFileUrl = self::API_BASE_URL  . '/file/bot' . $token . '/';
     }
 
     public function callAPI(string $method, ?array $params = []): array
@@ -47,5 +49,10 @@ class ApiClient implements ApiInterface
     public function getApiUrl(): string
     {
         return $this->apiUrl;
+    }
+
+    public function getApiFileUrl(): string
+    {
+        return $this->apiFileUrl;
     }
 }

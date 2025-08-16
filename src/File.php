@@ -33,7 +33,7 @@ class File
             'getFile', ['file_id' => $this->file_id],
         );
 
-        $this->file_path = $this->api->getApiUrl()
+        $this->file_path = $this->api->getApiFileUrl()
             .$file_data['result']['file_path'];
         $this->file_size = $file_data['result']['file_size'];
 
