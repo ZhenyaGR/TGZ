@@ -183,118 +183,121 @@ class Bot
         $callback_data = $this->context->getCallbackData();
 
         if ($type === 'text' || $type === 'bot_command') {
-            $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
+            if (!empty($text)) {
 
-            // 1. Проверяем команды бота (onBotCommand)
-            if ($type === 'bot_command') {
-                $words = explode(' ', $userText);
-                $command = $words[0];
-                unset($words[0]);
-                $refs = implode(' ', $words);
+                $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
 
-                foreach ($this->routes['bot_command'] as $route) {
-                    $conditions = (array)$route->getCondition();
-                    foreach ($conditions as $condition) {
-                        if ($condition === $command) {
-                            $this->dispatchAnswer($route, $type, [$refs]);
+                // 1. Проверяем команды бота (onBotCommand)
+                if ($type === 'bot_command') {
+                    $words = explode(' ', $userText);
+                    $command = $words[0];
+                    unset($words[0]);
+                    $refs = implode(' ', $words);
 
-                            return;
-                        }
-                    }
-                }
-            }
-
-            // 2. Проверяем текстовые команды (onCommand)
-            foreach ($this->routes['command'] as $route) {
-                $conditions = (array)$route->getCondition();
-                foreach ($conditions as $commandPattern) {
-                    if (preg_match('/%[swn]/', $commandPattern)) {
-                        $regex = $this->convertCommandPatternToRegex(
-                            $commandPattern,
-                        );
-                        if (preg_match($regex, $userText, $matches)) {
-                            $args = array_slice($matches, 1);
-                            $this->dispatchAnswer($route, $type, $args);
-
-                            return;
-                        }
-                    } else {
-                        $commandFromRoute = mb_convert_encoding(
-                            $commandPattern, 'UTF-8',
-                        );
-                        if (str_starts_with($userText, $commandFromRoute)) {
-                            $commandLength = strlen($commandFromRoute);
-                            if (!isset($userText[$commandLength])
-                                || $userText[$commandLength] === ' '
-                                || $userText[$commandLength] === "\n"
-                            ) {
-                                $argsString = trim(
-                                    substr($userText, $commandLength),
-                                );
-                                $args = ($argsString === '')
-                                    ? []
-                                    : preg_split(
-                                        '/\s+/', $argsString, -1,
-                                        PREG_SPLIT_NO_EMPTY,
-                                    );
-                                $this->dispatchAnswer($route, $type, $args);
+                    foreach ($this->routes['bot_command'] as $route) {
+                        $conditions = (array)$route->getCondition();
+                        foreach ($conditions as $condition) {
+                            if ($condition === $command) {
+                                $this->dispatchAnswer($route, $type, [$refs]);
 
                                 return;
                             }
                         }
                     }
                 }
-            }
 
-            // 3. Проверяем точное совпадение (onText)
-            foreach ($this->routes['text_exact'] as $route) {
-                $conditions = (array)$route->getCondition();
-                foreach ($conditions as $condition) {
-                    if ($condition === $text) {
-                        $this->dispatchAnswer($route, $type);
+                // 2. Проверяем текстовые команды (onCommand)
+                foreach ($this->routes['command'] as $route) {
+                    $conditions = (array)$route->getCondition();
+                    foreach ($conditions as $commandPattern) {
+                        if (preg_match('/%[swn]/', $commandPattern)) {
+                            $regex = $this->convertCommandPatternToRegex(
+                                $commandPattern,
+                            );
+                            if (preg_match($regex, $userText, $matches)) {
+                                $args = array_slice($matches, 1);
+                                $this->dispatchAnswer($route, $type, $args);
 
-                        return;
+                                return;
+                            }
+                        } else {
+                            $commandFromRoute = mb_convert_encoding(
+                                $commandPattern, 'UTF-8',
+                            );
+                            if (str_starts_with($userText, $commandFromRoute)) {
+                                $commandLength = strlen($commandFromRoute);
+                                if (!isset($userText[$commandLength])
+                                    || $userText[$commandLength] === ' '
+                                    || $userText[$commandLength] === "\n"
+                                ) {
+                                    $argsString = trim(
+                                        substr($userText, $commandLength),
+                                    );
+                                    $args = ($argsString === '')
+                                        ? []
+                                        : preg_split(
+                                            '/\s+/', $argsString, -1,
+                                            PREG_SPLIT_NO_EMPTY,
+                                        );
+                                    $this->dispatchAnswer($route, $type, $args);
+
+                                    return;
+                                }
+                            }
+                        }
                     }
                 }
-            }
 
-            // 4. Проверяем текстовые кнопки
-            foreach ($this->buttons['action'] as $route) {
-                $conditions = (array)$route->getCondition();
-                foreach ($conditions as $condition) {
-                    if ($condition === $text) {
-                        if (!empty($route->button_redirect)) {
-                            $targetAction = $this->findActionById(
-                                $route->button_redirect,
-                            );
-
-                            if ($targetAction === null) {
-                                throw new \LogicException(
-                                    "Button redirect target with ID '{$route->button_redirect}' not found.",
-                                );
-                            }
-
-                            $this->executeAction($targetAction);
+                // 3. Проверяем точное совпадение (onText)
+                foreach ($this->routes['text_exact'] as $route) {
+                    $conditions = (array)$route->getCondition();
+                    foreach ($conditions as $condition) {
+                        if ($condition === $text) {
+                            $this->dispatchAnswer($route, $type);
 
                             return;
-
                         }
-
-                        $this->dispatchAnswer($route, 'text_button');
-
-                        return;
                     }
                 }
-            }
 
-            // 5. Проверяем регулярные выражения (onTextPreg)
-            foreach ($this->routes['text_preg'] as $route) {
-                $patterns = (array)$route->getCondition();
-                foreach ($patterns as $pattern) {
-                    if (preg_match($pattern, $text, $matches)) {
-                        $this->dispatchAnswer($route, $type, $matches);
+                // 4. Проверяем текстовые кнопки
+                foreach ($this->buttons['action'] as $route) {
+                    $conditions = (array)$route->getCondition();
+                    foreach ($conditions as $condition) {
+                        if ($condition === $text) {
+                            if (!empty($route->button_redirect)) {
+                                $targetAction = $this->findActionById(
+                                    $route->button_redirect,
+                                );
 
-                        return;
+                                if ($targetAction === null) {
+                                    throw new \LogicException(
+                                        "Button redirect target with ID '{$route->button_redirect}' not found.",
+                                    );
+                                }
+
+                                $this->executeAction($targetAction);
+
+                                return;
+
+                            }
+
+                            $this->dispatchAnswer($route, 'text_button');
+
+                            return;
+                        }
+                    }
+                }
+
+                // 5. Проверяем регулярные выражения (onTextPreg)
+                foreach ($this->routes['text_preg'] as $route) {
+                    $patterns = (array)$route->getCondition();
+                    foreach ($patterns as $pattern) {
+                        if (preg_match($pattern, $text, $matches)) {
+                            $this->dispatchAnswer($route, $type, $matches);
+
+                            return;
+                        }
                     }
                 }
             }
