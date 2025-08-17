@@ -31,7 +31,7 @@ class ApiClient implements ApiInterface
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        $response = json_decode($responseJson, true);
+        $response = json_decode($responseJson, true, 512, JSON_THROW_ON_ERROR);
 
         if ($httpCode >= 200 && $httpCode < 300 && $response['ok']) {
             return $response;

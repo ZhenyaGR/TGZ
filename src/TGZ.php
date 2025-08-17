@@ -12,8 +12,7 @@ class TGZ
 
     public ApiInterface $api;
     public UpdateContext $context;
-    private string $parseModeDefault = '';
-    public array $ctx_bot = [];
+    public string $parseModeDefault = '';
 
     public function __construct(ApiInterface $api, UpdateContext $context)
     {
@@ -30,16 +29,6 @@ class TGZ
         $context = UpdateContext::fromWebhook();
 
         return new self($api, $context);
-    }
-
-    public function addCtxBot(array $ctx_bot): void
-    {
-        $this->ctx_bot = $ctx_bot;
-    }
-
-    public function getCtxBot(): array
-    {
-        return $this->ctx_bot;
     }
 
     /**
@@ -76,8 +65,6 @@ class TGZ
 
         return $this->api->callAPI($method, $params);
     }
-
-
 
     /**
      * Устанавливает режим парсинга по умолчанию для всех сообщений
@@ -118,7 +105,7 @@ class TGZ
     public function msg(string $text = ''): Message
     {
         return new Message(
-            $text, $this->parseModeDefault, $this->api, $this->context,
+            $text, $this
         );
     }
 
@@ -280,6 +267,44 @@ class TGZ
         }
 
         return $result['result']['document']['file_id'];
+    }
+
+
+    /**
+     * Устанавливает действие бота
+     *
+     * @param string|null $action
+     *
+     * @return TGZ
+     *
+     * @throws \Exception
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/sendAction
+     */
+    public function sendAction(?string $action = 'typing'): static
+    {
+        if (!in_array($action, [
+            'typing',
+            'upload_photo',
+            'upload_video',
+            'record_video',
+            'record_voice',
+            'upload_voice',
+            'upload_document',
+            'choose_sticker',
+            'find_location',
+            'record_video_note',
+            'upload_video_note',
+        ])
+        ) {
+            $action = 'typing';
+        }
+        $this->api->callAPI(
+            'sendChatAction',
+            ['chat_id' => $this->context->getChatId(), 'action' => $action],
+        );
+
+        return $this;
     }
 
     /**

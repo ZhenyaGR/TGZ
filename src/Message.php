@@ -8,6 +8,7 @@ final class Message
 {
     private ApiClient $api;
     private UpdateContext $context;
+    private TGZ $TGZ;
     private ?string $text;
     private array $reply_to = [];
     private array $kbd = [];
@@ -26,13 +27,13 @@ final class Message
     private string $sticker_id = '';
     private array $files = [];
 
-    public function __construct(?string $text, string $defaultParseMode,
-        ApiClient $api, UpdateContext $context,
+    public function __construct(?string $text, TGZ $TGZ
     ) {
         $this->text = $text;
-        $this->parse_mode = $defaultParseMode;
-        $this->api = $api;
-        $this->context = $context;
+        $this->parse_mode = $TGZ->parseModeDefault;
+        $this->api = $TGZ->api;
+        $this->context = $TGZ->context;
+        $this->TGZ = $TGZ;
     }
 
     /**
@@ -383,28 +384,9 @@ final class Message
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/action
      */
-    public function action(?string $action = 'typing'): static
+    public function action(?string $action = 'typing'): self
     {
-        if (!in_array($action, [
-            'typing',
-            'upload_photo',
-            'upload_video',
-            'record_video',
-            'record_voice',
-            'upload_voice',
-            'upload_document',
-            'choose_sticker',
-            'find_location',
-            'record_video_note',
-            'upload_video_note',
-        ])
-        ) {
-            $action = 'typing';
-        }
-        $this->api->callAPI(
-            'sendChatAction',
-            ['chat_id' => $this->context->getChatId(), 'action' => $action],
-        );
+        $this->TGZ->sendAction($action);
 
         return $this;
     }
