@@ -6,7 +6,6 @@ class Bot
 {
 
     private TGZ $tg;
-    private ApiClient $api;
     private UpdateContext $context;
     private array $ctx = [];
 
@@ -34,7 +33,6 @@ class Bot
     public function __construct(TGZ $tg)
     {
         $this->tg = $tg;
-        $this->api = $tg->api;
         $this->context = $tg->context;
     }
 
