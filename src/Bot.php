@@ -425,6 +425,28 @@ class Bot
     {
         [$route, $type, $other_data] = $this->ctx;
 
+        $user_id = $this->context->getUserId();
+
+        if ($user_id) {
+            $accessIds = $route->getAccessIds();
+            if (!empty($accessIds) && !in_array($user_id, $accessIds)) {
+                $accessHandler = $route->getAccessHandler();
+                if (is_callable($accessHandler)) {
+                    $accessHandler($this->tg);
+                }
+                return null;
+            }
+
+            $noAccessIds = $route->getNoAccessIds();
+            if (!empty($noAccessIds) && in_array($user_id, $noAccessIds)) {
+                $noAccessHandler = $route->getNoAccessHandler();
+                if (is_callable($noAccessHandler)) {
+                    $noAccessHandler($this->tg);
+                }
+                return null;
+            }
+        }
+
         if (!empty($route->button_redirect)) {
             $targetAction = $this->findActionById($route->button_redirect);
 
@@ -516,7 +538,7 @@ class Bot
 
     private function constructMessage($messageData): array
     {
-        $msg = new Message('', '', $this->api, $this->context);
+        $msg = new Message('', $this->tg);
 
         if (isset($messageData['text'])) {
             $msg->text($messageData['text']);
