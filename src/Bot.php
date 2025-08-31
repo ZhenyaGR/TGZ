@@ -511,8 +511,8 @@ class Bot
                 $this->dispatchAnswer(
                     $this->routes['new_chat_members'],
                     'text',
-                    [$this->context->getUpdateData(
-                    )['message']['new_chat_members']],
+                    $this->context->getUpdateData(
+                    )['message']['new_chat_members'],
                 );
             }
 
