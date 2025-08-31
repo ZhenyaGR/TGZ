@@ -20,6 +20,7 @@ class Bot
             'message_fallback'    => null,
             'photo_fallback'      => null,
             'video_fallback'      => null,
+            'audio_fallback'      => null,
             'voice_fallback'      => null,
             'document_fallback'   => null,
             'video_note_fallback' => null,
