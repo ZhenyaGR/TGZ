@@ -541,8 +541,8 @@ class Bot
                 $this->dispatchAnswer(
                     $this->routes['left_chat_member'],
                     'text',
-                    $this->context->getUpdateData(
-                    )['message']['left_chat_member'],
+                    [$this->context->getUpdateData(
+                    )['message']['left_chat_member']],
                 );
             }
 
