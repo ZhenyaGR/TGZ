@@ -25,6 +25,7 @@ class Bot
             'document_fallback'   => null,
             'video_note_fallback' => null,
             'new_chat_members'    => null,
+            'left_chat_member'    => null,
             'fallback'            => null,
         ];
 
@@ -305,6 +306,22 @@ class Bot
         return $route;
     }
 
+
+    /**
+     * Создает маршрут вышедшего участника чата
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onLeftChatMember
+     */
+    public function onLeftChatMember(): Action
+    {
+        $route = new Action('left_chat_member', null);
+        $this->routes['left_chat_member'] = $route;
+
+        return $route;
+    }
+
     /**
      * Устанавливает обработчик по умолчанию (fallback).
      *
@@ -513,6 +530,19 @@ class Bot
                     'text',
                     $this->context->getUpdateData(
                     )['message']['new_chat_members'],
+                );
+            }
+
+            if (!empty(
+                $this->context->getUpdateData()['message']['left_chat_member']
+                )
+                && $this->routes['left_chat_member'] !== null
+            ) {
+                $this->dispatchAnswer(
+                    $this->routes['left_chat_member'],
+                    'text',
+                    $this->context->getUpdateData(
+                    )['message']['left_chat_member'],
                 );
             }
 
