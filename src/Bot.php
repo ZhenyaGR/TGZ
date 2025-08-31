@@ -24,6 +24,7 @@ class Bot
             'voice_fallback'      => null,
             'document_fallback'   => null,
             'video_note_fallback' => null,
+            'new_chat_members'    => null,
             'fallback'            => null,
         ];
 
@@ -290,6 +291,21 @@ class Bot
     }
 
     /**
+     * Создает маршрут для нового(ых) участника(ов) чата
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onNewChatMember
+     */
+    public function onNewChatMember(): Action
+    {
+        $route = new Action('new_chat_members', null);
+        $this->routes['new_chat_members'] = $route;
+
+        return $route;
+    }
+
+    /**
      * Устанавливает обработчик по умолчанию (fallback).
      *
      * @return Action
@@ -485,6 +501,19 @@ class Bot
             // 12. Проверяем видео-сообщения
             if ($this->tryProcessFallbackMedia('video_note')) {
                 return;
+            }
+
+            if (!empty(
+                $this->context->getUpdateData()['message']['new_chat_members']
+                )
+                && $this->routes['new_chat_members'] !== null
+            ) {
+                $this->dispatchAnswer(
+                    $this->routes['new_chat_members'],
+                    'text',
+                    $this->context->getUpdateData(
+                    )['message']['new_chat_members'],
+                );
             }
 
             // Fallback, если ни один маршрут не сработал
@@ -886,3 +915,10 @@ class Bot
 
 }
 
+
+//onNewChatMember() или onUserJoined()
+//Срабатывает, когда в чат/канал добавляется новый участник.
+//onLeftChatMember() или onUserLeft()
+//Срабатывает, когда участник покидает чат/канал.
+//onEditedMessage()
+//Срабатывает при редактировании пользователем своего сообщения (текста или медиа).
