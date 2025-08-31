@@ -11,13 +11,19 @@ class Bot
 
     private array $routes
         = [
-            'bot_command'      => [],
-            'command'          => [],
-            'text_exact'       => [],
-            'text_preg'        => [],
-            'callback_query'   => [],
-            'sticker_fallback' => null,
-            'fallback'         => null,
+            'bot_command'         => [],
+            'command'             => [],
+            'text_exact'          => [],
+            'text_preg'           => [],
+            'callback_query'      => [],
+            'sticker_fallback'    => null,
+            'message_fallback'    => null,
+            'photo_fallback'      => null,
+            'video_fallback'      => null,
+            'voice_fallback'      => null,
+            'document_fallback'   => null,
+            'video_note_fallback' => null,
+            'fallback'            => null,
         ];
 
     public array $buttons
@@ -82,7 +88,8 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onBotCommand
      */
-    public function onBotCommand(string $id, array|string $command = null): Action {
+    public function onBotCommand(string $id, array|string $command = null,
+    ): Action {
         $route = new Action($id, $command ?? $id);
         $this->routes['bot_command'][$id] = $route;
 
@@ -168,10 +175,115 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onSticker
      */
-    public function onSticker()
+    public function onSticker(): Action
     {
         $route = new Action('sticker_fallback', null);
         $this->routes['sticker_fallback'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для всех текстовых сообщений.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onMessage
+     */
+    public function onMessage(): Action
+    {
+        $route = new Action('message_fallback', null);
+        $this->routes['message_fallback'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для всех сообщений с фото.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onPhoto
+     */
+    public function onPhoto(): Action
+    {
+        $route = new Action('photo_fallback', null);
+        $this->routes['photo_fallback'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для всех сообщений с видео.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVideo
+     */
+    public function onVideo(): Action
+    {
+        $route = new Action('video_fallback', null);
+        $this->routes['video_fallback'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для всех сообщений с аудио.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onAudio
+     */
+    public function onAudio(): Action
+    {
+        $route = new Action('audio_fallback', null);
+        $this->routes['audio_fallback'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для всех голосовых сообщений
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVoice
+     */
+    public function onVoice(): Action
+    {
+        $route = new Action('voice_fallback', null);
+        $this->routes['voice_fallback'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для всех документов
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onDocument
+     */
+    public function onDocument(): Action
+    {
+        $route = new Action('document_fallback', null);
+        $this->routes['document_fallback'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для всех видео-сообщений
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVideoNote
+     */
+    public function onVideoNote(): Action
+    {
+        $route = new Action('video_note_fallback', null);
+        $this->routes['video_note_fallback'] = $route;
 
         return $route;
     }
@@ -327,14 +439,50 @@ class Bot
                         }
                     }
                 }
+
+                // 6. Проверяем обычное сообщение
+                if ($this->routes['message_fallback'] !== null) {
+                    $this->dispatchAnswer(
+                        $this->routes['message_fallback'], 'text',
+                    );
+
+                    return;
+                }
+
             }
 
-            // 6. Проверяем стикеры
-            if (!empty($this->context->getUpdateData()['message']['sticker'])) {
-                $this->dispatchAnswer(
-                    $this->routes['sticker_fallback'], 'text',
-                );
+            // 7. Проверяем сообщение с фото
+            if ($this->tryProcessFallbackMedia('photo')) {
+                return;
+            }
 
+            // 8. Проверяем сообщение с аудио
+            if ($this->tryProcessFallbackMedia('audio')) {
+                return;
+            }
+
+            // 9. Проверяем видео
+            if ($this->tryProcessFallbackMedia('video')) {
+                return;
+            }
+
+            // 10. Проверяем стикеры
+            if ($this->tryProcessFallbackMedia('sticker')) {
+                return;
+            }
+
+            // 11. Проверяем голосовые
+            if ($this->tryProcessFallbackMedia('voice')) {
+                return;
+            }
+
+            // 11. Проверяем документы
+            if ($this->tryProcessFallbackMedia('document')) {
+                return;
+            }
+
+            // 12. Проверяем видео-сообщения
+            if ($this->tryProcessFallbackMedia('video_note')) {
                 return;
             }
 
@@ -347,7 +495,7 @@ class Bot
         }
 
         if ($type === 'callback_query') {
-            // 7. Проверяем inline-кнопки
+            // 13. Проверяем inline-кнопки
             foreach ($this->buttons['action'] as $route) {
                 if ($route->getId() === $callback_data) {
                     $this->dispatchAnswer($route, 'button_'.$type);
@@ -356,7 +504,7 @@ class Bot
                 }
             }
 
-            // 8. Проверяем callback_data
+            // 14. Проверяем callback_data
             foreach ($this->routes['callback_query'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
@@ -368,6 +516,25 @@ class Bot
                 }
             }
         }
+    }
+
+    private function tryProcessFallbackMedia(string $route_type): bool
+    {
+        $fallback_key = $route_type.'_fallback';
+
+        // Проверяем, есть ли в сообщении медиа этого типа И существует ли для него fallback
+        if (!empty($this->context->getUpdateData()['message'][$route_type])
+            && $this->routes[$fallback_key] !== null
+        ) {
+            $this->dispatchAnswer(
+                $this->routes[$fallback_key],
+                'text',
+            );
+
+            return true;
+        }
+
+        return false;
     }
 
     private function convertCommandPatternToRegex(string $pattern): string
@@ -405,7 +572,7 @@ class Bot
         $this->ctx = [
             $route,
             $type,
-            $other_data
+            $other_data,
         ];
 
         $next = function(): void {
@@ -432,6 +599,7 @@ class Bot
                 if (is_callable($accessHandler)) {
                     $accessHandler($this->tg);
                 }
+
                 return null;
             }
 
@@ -441,6 +609,7 @@ class Bot
                 if (is_callable($noAccessHandler)) {
                     $noAccessHandler($this->tg);
                 }
+
                 return null;
             }
         }
