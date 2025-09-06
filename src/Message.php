@@ -26,8 +26,9 @@ final class Message
     private array $media = [];
     private string $sticker_id = '';
     private array $files = [];
+    private ?array $entities = null;
 
-    public function __construct(?string $text, TGZ $TGZ
+    public function __construct(?string $text, TGZ $TGZ,
     ) {
         $this->text = $text;
         $this->parse_mode = $TGZ->parseModeDefault;
@@ -303,6 +304,22 @@ final class Message
     }
 
     /**
+     * Добавляет "сущность" с форматированием к сообщению
+     *
+     * @param array $entity Массив с форматированием
+     *
+     * @return Message
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/entity
+     */
+    public function entity(array $entity): self
+    {
+        $this->entities = $entity;
+
+        return $this;
+    }
+
+    /**
      * Добавляет изображение к сообщению
      *
      * @param string|array $url Ссылка или массив ссылок (ID)
@@ -331,28 +348,39 @@ final class Message
      */
     public function mediaPreview(string $url): static
     {
-//        $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
-//
-//        $this->text = $invisibleCharacter . $this->text;
-//
-//        $lengthInUtf16 = strlen(mb_convert_encoding($invisibleCharacter, 'UTF-16LE', 'UTF-8')) / 2;
-//
-//        $entity = [
-//            'type'   => 'text_link',
-//            'offset' => 0,
-//            'length' => $lengthInUtf16,
-//            'url'    => $url,
-//        ];
-//
-//        if ($this->entities === null) {
-//            $this->entities = [];
-//        }
-//
-//        array_unshift($this->entities, $entity);
-//
-//        // Больше не требуется, так как мы используем entities
-//        // unset($this->parse_mode);
-//
+        $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
+
+        if ($this->parse_mode === 'MarkdownV2' || $this->parse_mode === 'Markdown') {
+            $this->text = "[](".$invisibleCharacter.")".$this->text;
+
+            return $this;
+        }
+
+        if ($this->parse_mode === 'HTML') {
+            $this->text = "<a href=\"".$url."\">".$invisibleCharacter."</a>".$this->text;
+
+            return $this;
+        }
+
+        $this->text = $invisibleCharacter.$this->text;
+
+        $lengthInUtf16 = strlen(
+                mb_convert_encoding($invisibleCharacter, 'UTF-16LE', 'UTF-8'),
+            ) / 2;
+
+        $entity = [
+            'type'   => 'text_link',
+            'offset' => 0,
+            'length' => $lengthInUtf16,
+            'url'    => $url,
+        ];
+
+        if ($this->entities === null) {
+            $this->entities = [];
+        }
+
+        array_unshift($this->entities, $entity);
+
         return $this;
     }
 
