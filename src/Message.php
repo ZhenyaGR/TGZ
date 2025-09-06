@@ -351,7 +351,7 @@ final class Message
         $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
 
         if ($this->parse_mode === 'MarkdownV2' || $this->parse_mode === 'Markdown') {
-            $this->text = "[](".$invisibleCharacter.")".$this->text;
+            $this->text = "[$invisibleCharacter](".$url.")".$this->text;
 
             return $this;
         }
