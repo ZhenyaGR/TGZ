@@ -12,7 +12,7 @@ final class Message
     private ?string $text;
     private array $reply_to = [];
     private array $kbd = [];
-    private string $parse_mode;
+    private ?string $parse_mode;
     private array $params_additionally = [];
     private bool $sendPhoto = false;
     private bool $sendAnimation = false;
