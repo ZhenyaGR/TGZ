@@ -12,7 +12,7 @@ class TGZ
 
     public ApiInterface $api;
     public UpdateContext $context;
-    public string $parseModeDefault = '';
+    public ?string $parseModeDefault = null;
 
     public function __construct(ApiInterface $api, UpdateContext $context)
     {
@@ -69,18 +69,18 @@ class TGZ
     /**
      * Устанавливает режим парсинга по умолчанию для всех сообщений
      *
-     * @param string $mode HTML, Markdown, MarkdownV2
+     * @param ?string $mode HTML, Markdown, MarkdownV2
      *
      * @return TGZ
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/defaultParseMode
      */
-    public function defaultParseMode(string $mode = ''): self
+    public function defaultParseMode(?string $mode = null): self
     {
         if ($mode !== 'HTML' && $mode !== 'Markdown' && $mode !== 'MarkdownV2'
-            && $mode !== ''
+            && $mode !== null
         ) {
-            $mode = '';
+            $mode = null;
         }
         $this->parseModeDefault = $mode;
 

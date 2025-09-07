@@ -103,16 +103,16 @@ final class Message
     /**
      * Задает режим парсинга
      *
-     * @param string $mode 'HTML', 'Markdown', 'MarkdownV2'
+     * @param ?string $mode 'HTML', 'Markdown', 'MarkdownV2'
      *
      * @return Message
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/parseMode
      */
-    public function parseMode(string $mode = ''): static
+    public function parseMode(?string $mode = null): Message
     {
         $mode = in_array($mode, ['HTML', 'Markdown', 'MarkdownV2', '']) ? $mode
-            : '';
+            : null;
 
         $this->parse_mode = $mode;
 
