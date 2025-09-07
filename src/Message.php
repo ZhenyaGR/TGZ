@@ -306,15 +306,15 @@ final class Message
     /**
      * Добавляет "сущность" с форматированием к сообщению
      *
-     * @param array $entity Массив с форматированием
+     * @param array $entities Массив с форматированием
      *
      * @return Message
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/entity
      */
-    public function entity(array $entity): self
+    public function entities(array $entities): self
     {
-        $this->entities = $entity;
+        $this->entities = $entities;
 
         return $this;
     }
@@ -350,14 +350,17 @@ final class Message
     {
         $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
 
-        if ($this->parse_mode === 'MarkdownV2' || $this->parse_mode === 'Markdown') {
+        if ($this->parse_mode === 'MarkdownV2'
+            || $this->parse_mode === 'Markdown'
+        ) {
             $this->text = "[$invisibleCharacter](".$url.")".$this->text;
 
             return $this;
         }
 
         if ($this->parse_mode === 'HTML') {
-            $this->text = "<a href=\"".$url."\">".$invisibleCharacter."</a>".$this->text;
+            $this->text = "<a href=\"".$url."\">".$invisibleCharacter."</a>"
+                .$this->text;
 
             return $this;
         }
@@ -448,7 +451,14 @@ final class Message
             && !$this->sendMediaGroup
         ) {
             $params['text'] = $this->text;
-            $params['parse_mode'] = $this->parse_mode;
+
+            if ($this->parse_mode !== null) {
+                $params['parse_mode'] = $this->parse_mode;
+            }
+
+            if ($this->entities !== null) {
+                $params['entities'] = $this->entities;
+            }
 
             return $this->api->callAPI('sendMessage', $params);
         }
@@ -499,9 +509,16 @@ final class Message
 
         if (isset($this->text)) {
             $contentParams = [
-                'text'       => $this->text,
-                'parse_mode' => $this->parse_mode,
+                'text' => $this->text,
             ];
+            if ($this->parse_mode !== null) {
+                $contentParams['parse_mode'] = $this->parse_mode;
+            }
+
+            if ($this->entities !== null) {
+                $contentParams['entities'] = $this->entities;
+            }
+
         } else {
             throw new \Exception(
                 'Необходимо установить свойство text перед вызовом sendEditText',
@@ -535,9 +552,16 @@ final class Message
 
         if (isset($this->text)) {
             $contentParams = [
-                'caption'    => $this->text,
-                'parse_mode' => $this->parse_mode,
+                'caption' => $this->text,
             ];
+
+            if ($this->parse_mode !== null) {
+                $contentParams['parse_mode'] = $this->parse_mode;
+            }
+
+            if ($this->entities !== null) {
+                $contentParams['caption_entities'] = $this->entities;
+            }
         } else {
             throw new \Exception(
                 'Необходимо установить свойство text перед вызовом sendEditCaption',
@@ -568,9 +592,18 @@ final class Message
         $identifier = $this->getIdentifier($messageID, $chatID);
 
         if (isset($this->media)) {
-            $postFields = [
-                'parse_mode' => $this->parse_mode,
-            ];
+
+            if ($this->parse_mode !== null) {
+                $postFields = [
+                    'parse_mode' => $this->parse_mode,
+                ];
+            }
+
+            if ($this->entities !== null) {
+                $postFields = [
+                    'entities' => $this->entities,
+                ];
+            }
 
             foreach ($this->media as $item) {
                 if (strpos($item['media'], 'attach://') === 0) {
@@ -617,8 +650,15 @@ final class Message
     {
         $params1 = [
             'caption'    => $this->text,
-            'parse_mode' => $this->parse_mode,
         ];
+
+        if($this->parse_mode !== null) {
+            $params1['parse_mode'] = $this->parse_mode;
+        }
+
+        if ($this->entities !== null) {
+            $params1['caption_entities'] = $this->entities;
+        }
 
         $this->media[0] = array_merge($this->media[0], $params1);
         $mediaChunks = array_chunk($this->media, 10);
@@ -689,7 +729,14 @@ final class Message
     private function mediaSend(string $type, $params)
     {
         $params['caption'] = $this->text;
-        $params['parse_mode'] = $this->parse_mode;
+        if($this->parse_mode !== null) {
+            $params['parse_mode'] = $this->parse_mode;
+        }
+
+        if ($this->entities !== null) {
+            $params['caption_entities'] = $this->entities;
+        }
+
         $params[$type] = str_contains($this->media[0]['media'], 'attach://')
             ? $this->files['file1'] : $this->media[0]['media'];
 
