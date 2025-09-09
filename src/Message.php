@@ -28,6 +28,11 @@ final class Message
     private array $files = [];
     private ?array $entities = null;
 
+    /**
+     * @var string|null URL для медиа-превью.
+     */
+    private ?string $media_preview_url = null;
+
     public function __construct(?string $text, TGZ $TGZ,
     ) {
         $this->text = $text;
@@ -338,7 +343,8 @@ final class Message
     }
 
     /**
-     * Добавляет превью к сообщению с помощью ссылки
+     * Добавляет превью к сообщению с помощью ссылки.
+     * Теперь этот метод только сохраняет URL, а вся логика применяется в момент отправки.
      *
      * @param string $url
      *
@@ -348,42 +354,7 @@ final class Message
      */
     public function mediaPreview(string $url): static
     {
-        $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
-
-        if ($this->parse_mode === 'MarkdownV2'
-            || $this->parse_mode === 'Markdown'
-        ) {
-            $this->text = "[$invisibleCharacter](".$url.")".$this->text;
-
-            return $this;
-        }
-
-        if ($this->parse_mode === 'HTML') {
-            $this->text = "<a href=\"".$url."\">".$invisibleCharacter."</a>"
-                .$this->text;
-
-            return $this;
-        }
-
-        $this->text = $invisibleCharacter.$this->text;
-
-        $lengthInUtf16 = strlen(
-                mb_convert_encoding($invisibleCharacter, 'UTF-16LE', 'UTF-8'),
-            ) / 2;
-
-        $entity = [
-            'type'   => 'text_link',
-            'offset' => 0,
-            'length' => $lengthInUtf16,
-            'url'    => $url,
-        ];
-
-        if ($this->entities === null) {
-            $this->entities = [];
-        }
-
-        array_unshift($this->entities, $entity);
-
+        $this->media_preview_url = $url;
         return $this;
     }
 
@@ -422,6 +393,46 @@ final class Message
         return $this;
     }
 
+    private function applyMediaPreview(): void
+    {
+        // Если URL для превью не был установлен, ничего не делаем.
+        if ($this->media_preview_url === null) {
+            return;
+        }
+
+        $url = $this->media_preview_url;
+        $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
+
+        if ($this->parse_mode === 'MarkdownV2' || $this->parse_mode === 'Markdown') {
+            $this->text = "[$invisibleCharacter](".$url.")".$this->text;
+        } elseif ($this->parse_mode === 'HTML') {
+            $this->text = "<a href=\"".$url."\">".$invisibleCharacter."</a>".$this->text;
+        } else {
+            // Если parse_mode не задан, используем entities
+            $this->text = $invisibleCharacter.$this->text;
+
+            $lengthInUtf16 = strlen(
+                    mb_convert_encoding($invisibleCharacter, 'UTF-16LE', 'UTF-8'),
+                ) / 2;
+
+            $entity = [
+                'type'   => 'text_link',
+                'offset' => 0,
+                'length' => $lengthInUtf16,
+                'url'    => $url,
+            ];
+
+            if ($this->entities === null) {
+                $this->entities = [];
+            }
+
+            array_unshift($this->entities, $entity);
+        }
+
+        $this->media_preview_url = null;
+    }
+
+
     /**
      * Отправляет сообщение
      *
@@ -435,6 +446,9 @@ final class Message
      */
     public function send(?int $chatID = null): array
     {
+        // Применяем логику превью перед формированием параметров
+        $this->applyMediaPreview();
+
         $params = [
             'chat_id' => $chatID ?: $this->context->getChatId(),
         ];
@@ -505,6 +519,9 @@ final class Message
      */
     public function editText(?string $messageID = null, ?int $chatID = null,
     ): array {
+        // Применяем логику превью
+        $this->applyMediaPreview();
+
         $identifier = $this->getIdentifier($messageID, $chatID);
 
         if (isset($this->text)) {
@@ -548,6 +565,9 @@ final class Message
     public function editCaption(?string $messageID = null,
         ?int $chatID = null,
     ): array {
+        // Применяем логику превью
+        $this->applyMediaPreview();
+
         $identifier = $this->getIdentifier($messageID, $chatID);
 
         if (isset($this->text)) {
@@ -739,5 +759,4 @@ final class Message
 
         return $this->api->callAPI('send'.ucfirst($type), $params);
     }
-
 }
