@@ -775,6 +775,46 @@ class Bot
             $msg->img($messageData['img']);
         }
 
+        if (isset($messageData['gif'])) {
+            $msg->gif($messageData['gif']);
+        }
+
+        if (isset($messageData['video'])) {
+            $msg->video($messageData['video']);
+        }
+
+        if (isset($messageData['voice'])) {
+            $msg->voice($messageData['voice']);
+        }
+
+        if (isset($messageData['audio'])) {
+            $msg->audio($messageData['audio']);
+        }
+
+        if (isset($messageData['doc'])) {
+            $msg->doc($messageData['doc']);
+        }
+
+        if (isset($messageData['sticker'])) {
+            $msg->sticker($messageData['sticker']);
+        }
+
+        if (isset($messageData['dice'])) {
+            $msg->dice($messageData['dice']);
+        }
+
+        if (isset($messageData['params'])) {
+            $msg->params($messageData['params']);
+        }
+
+        if (isset($messageData['reply'])) {
+            if ($messageData['reply'] === true) {
+                $msg->reply();
+            } else {
+                $msg->reply($messageData['reply']);
+            }
+        }
+
         if (isset($messageData['kbd'])) {
             $this->constructKbd(
                 $msg, $messageData['kbd'], $messageData['inline'],
