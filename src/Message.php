@@ -457,7 +457,7 @@ final class Message
             }
 
             if ($this->entities !== null) {
-                $params['entities'] = $this->entities;
+                $params['entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
             }
 
             return $this->api->callAPI('sendMessage', $params);
@@ -516,7 +516,7 @@ final class Message
             }
 
             if ($this->entities !== null) {
-                $contentParams['entities'] = $this->entities;
+                $contentParams['entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
             }
 
         } else {
@@ -560,7 +560,7 @@ final class Message
             }
 
             if ($this->entities !== null) {
-                $contentParams['caption_entities'] = $this->entities;
+                $contentParams['caption_entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
             }
         } else {
             throw new \Exception(
@@ -590,19 +590,16 @@ final class Message
     public function editMedia(?string $messageID = null, ?int $chatID = null,
     ): array {
         $identifier = $this->getIdentifier($messageID, $chatID);
+        $postFields = []; // Инициализация
 
         if (isset($this->media)) {
 
             if ($this->parse_mode !== null) {
-                $postFields = [
-                    'parse_mode' => $this->parse_mode,
-                ];
+                $postFields['parse_mode'] = $this->parse_mode;
             }
 
             if ($this->entities !== null) {
-                $postFields = [
-                    'entities' => $this->entities,
-                ];
+                $postFields['entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
             }
 
             foreach ($this->media as $item) {
@@ -657,7 +654,7 @@ final class Message
         }
 
         if ($this->entities !== null) {
-            $params1['caption_entities'] = $this->entities;
+            $params1['caption_entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
         }
 
         $this->media[0] = array_merge($this->media[0], $params1);
@@ -734,7 +731,7 @@ final class Message
         }
 
         if ($this->entities !== null) {
-            $params['caption_entities'] = $this->entities;
+            $params['caption_entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
         }
 
         $params[$type] = str_contains($this->media[0]['media'], 'attach://')
@@ -744,5 +741,3 @@ final class Message
     }
 
 }
-
-
