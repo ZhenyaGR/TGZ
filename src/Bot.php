@@ -769,15 +769,16 @@ class Bot
         $msg = new Message($text, $this->tg);
 
         $methodMap = [
-            'img'     => 'img',
-            'gif'     => 'gif',
-            'video'   => 'video',
-            'voice'   => 'voice',
-            'audio'   => 'audio',
-            'doc'     => 'doc',
-            'sticker' => 'sticker',
-            'dice'    => 'dice',
-            'params'  => 'params',
+            'parseMode' => 'parseMode',
+            'img'       => 'img',
+            'gif'       => 'gif',
+            'video'     => 'video',
+            'voice'     => 'voice',
+            'audio'     => 'audio',
+            'doc'       => 'doc',
+            'sticker'   => 'sticker',
+            'dice'      => 'dice',
+            'params'    => 'params',
         ];
 
         foreach ($methodMap as $dataKey => $methodName) {

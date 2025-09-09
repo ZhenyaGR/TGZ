@@ -172,6 +172,22 @@ class Action
     }
 
     /**
+     * Устанавливает режим парсинга сообщения
+     *
+     * @param string $parseMode Режим Парсинга: HTML, Markdown, MarkdownV2
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/params
+     */
+    public function parseMode(string $parseMode): self
+    {
+        $this->messageData['parseMode'] = $parseMode;
+
+        return $this;
+    }
+
+    /**
      * Устанавливает режим ответа на сообщение.
      *
      * @param int|null $message_id ID сообщения для ответа. Если null, отвечает на текущее сообщение из контекста.
