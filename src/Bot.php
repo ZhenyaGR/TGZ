@@ -765,46 +765,25 @@ class Bot
 
     private function constructMessage($messageData): array
     {
-        $msg = new Message('', $this->tg);
+        $text = $messageData['text'] ?? '';
+        $msg = new Message($text, $this->tg);
 
-        if (isset($messageData['text'])) {
-            $msg->text($messageData['text']);
-        }
+        $methodMap = [
+            'img'     => 'img',
+            'gif'     => 'gif',
+            'video'   => 'video',
+            'voice'   => 'voice',
+            'audio'   => 'audio',
+            'doc'     => 'doc',
+            'sticker' => 'sticker',
+            'dice'    => 'dice',
+            'params'  => 'params',
+        ];
 
-        if (isset($messageData['img'])) {
-            $msg->img($messageData['img']);
-        }
-
-        if (isset($messageData['gif'])) {
-            $msg->gif($messageData['gif']);
-        }
-
-        if (isset($messageData['video'])) {
-            $msg->video($messageData['video']);
-        }
-
-        if (isset($messageData['voice'])) {
-            $msg->voice($messageData['voice']);
-        }
-
-        if (isset($messageData['audio'])) {
-            $msg->audio($messageData['audio']);
-        }
-
-        if (isset($messageData['doc'])) {
-            $msg->doc($messageData['doc']);
-        }
-
-        if (isset($messageData['sticker'])) {
-            $msg->sticker($messageData['sticker']);
-        }
-
-        if (isset($messageData['dice'])) {
-            $msg->dice($messageData['dice']);
-        }
-
-        if (isset($messageData['params'])) {
-            $msg->params($messageData['params']);
+        foreach ($methodMap as $dataKey => $methodName) {
+            if (isset($messageData[$dataKey])) {
+                $msg->{$methodName}($messageData[$dataKey]);
+            }
         }
 
         if (isset($messageData['reply'])) {
