@@ -139,6 +139,152 @@ class Action
     }
 
     /**
+     * Добавляет gif к сообщению
+     *
+     * @param string|array $gif Ссылка или массив ссылок (ID) gif-файлов
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/gif
+     */
+    public function gif(string|array $gif): self
+    {
+        $this->messageData['gif'] = $gif;
+
+        return $this;
+    }
+
+    /**
+     * Добавляет дополнительные параметры к сообщению.
+     *
+     * @param array $params Массив с дополнительными параметрами
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/params
+     */
+    public function params(array $params): self
+    {
+        // Используем array_merge для добавления, а не перезаписи
+        $this->messageData['params'] = array_merge($this->messageData['params'] ?? [], $params);
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает режим ответа на сообщение.
+     *
+     * @param int|null $message_id ID сообщения для ответа. Если null, отвечает на текущее сообщение из контекста.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/reply
+     */
+    public function reply(?int $message_id = null): self
+    {
+        // Сохраняем ID или true как флаг для ответа на текущее сообщение
+        $this->messageData['reply'] = $message_id ?? true;
+
+        return $this;
+    }
+
+    /**
+     * Отправляет анимированный эмодзи (кубик).
+     *
+     * @param string $emoji Эмодзи для отправки: '🎲', '🎯', '🏀', '⚽', '🎳', '🎰'
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/dice
+     */
+    public function dice(string $emoji): self
+    {
+        $this->messageData['dice'] = $emoji;
+
+        return $this;
+    }
+
+    /**
+     * Добавляет голосовое сообщение.
+     *
+     * @param string $voice Ссылка или ID голосового сообщения
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/voice
+     */
+    public function voice(string $voice): self
+    {
+        $this->messageData['voice'] = $voice;
+
+        return $this;
+    }
+
+    /**
+     * Добавляет аудио-файл к сообщению.
+     *
+     * @param string|array $audio Ссылка или массив ссылок (ID) аудио-файлов
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/audio
+     */
+    public function audio(string|array $audio): self
+    {
+        $this->messageData['audio'] = $audio;
+
+        return $this;
+    }
+
+    /**
+     * Добавляет документ к сообщению.
+     *
+     * @param string|array $doc Ссылка или массив ссылок (ID) документов
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/doc
+     */
+    public function doc(string|array $doc): self
+    {
+        $this->messageData['doc'] = $doc;
+
+        return $this;
+    }
+
+    /**
+     * Отправляет стикер.
+     *
+     * @param string $file_id ID стикера для отправки
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/sticker
+     */
+    public function sticker(string $file_id): self
+    {
+        $this->messageData['sticker'] = $file_id;
+
+        return $this;
+    }
+
+    /**
+     * Добавляет видео к сообщению
+     *
+     * @param string|array $video Ссылка или массив ссылок (ID) видео-файлов
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/video
+     */
+    public function video(string|array $video): self
+    {
+        $this->messageData['video'] = $video;
+
+        return $this;
+    }
+
+    /**
      * Задает всплывающий текст при нажатии на кнопку
      *
      * @param string $query Всплывающий текст
@@ -210,7 +356,7 @@ class Action
     /**
      * Устанавливает список ID пользователей, которым доступен маршрут
      *
-     * @param int|array     $ids Идентификаторы пользователей
+     * @param int|array     $ids     Идентификаторы пользователей
      * @param callable|null $handler Обработчик, если доступ к маршруту запрещен
      *
      * @return Action
@@ -219,8 +365,10 @@ class Action
      */
     public function access(int|array $ids, ?callable $handler = null): self
     {
-        $this->access_ids =  is_numeric($ids) ? [$ids] : $ids;
-        $this->access_handler = ($handler !== null) ? \Closure::fromCallable($handler) : null;
+        $this->access_ids = is_numeric($ids) ? [$ids] : $ids;
+        $this->access_handler = ($handler !== null) ? \Closure::fromCallable(
+            $handler,
+        ) : null;
 
         return $this;
     }
@@ -228,7 +376,7 @@ class Action
     /**
      * Устанавливает список ID пользователей, которым не доступен маршрут
      *
-     * @param int|array     $ids Идентификаторы пользователей
+     * @param int|array     $ids     Идентификаторы пользователей
      * @param callable|null $handler Обработчик, если доступ к маршруту запрещен
      *
      * @return Action
@@ -239,7 +387,9 @@ class Action
     {
         $this->no_access_ids = is_numeric($ids) ? [$ids] : $ids;
 
-        $this->no_access_handler = ($handler !== null) ? \Closure::fromCallable($handler) : null;
+        $this->no_access_handler = ($handler !== null) ? \Closure::fromCallable(
+            $handler,
+        ) : null;
 
         return $this;
     }

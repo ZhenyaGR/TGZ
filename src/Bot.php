@@ -770,15 +770,18 @@ class Bot
         if (isset($messageData['text'])) {
             $msg->text($messageData['text']);
         }
+
         if (isset($messageData['img'])) {
             $msg->img($messageData['img']);
         }
+
         if (isset($messageData['kbd'])) {
             $this->constructKbd(
                 $msg, $messageData['kbd'], $messageData['inline'],
                 $messageData['oneTime'], $messageData['resize'],
             );
         }
+
         if (isset($messageData['remove_keyboard'])) {
             $msg->kbd(remove_keyboard: true);
         }
