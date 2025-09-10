@@ -605,7 +605,7 @@ final class Message
      *
      * @throws \Exception
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editCaption
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editMedia
      */
     public function editMedia(?string $messageID = null, ?int $chatID = null,
     ): array {
@@ -631,7 +631,7 @@ final class Message
 
         } else {
             throw new \Exception(
-                'Необходимо установить свойство text перед вызовом sendEditText',
+                'Необходимо добавить медиа перед вызовом editMedia',
             );
         }
 
