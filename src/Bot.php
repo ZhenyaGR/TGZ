@@ -50,15 +50,13 @@ class Bot
      *
      * @param callable $handler Обработчик
      *
-     * @return Bot
+     * @return void
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/middleware
      */
-    public function middleware(callable $handler): self
+    public function middleware(callable $handler): void
     {
         $this->middleware_handler = \Closure::fromCallable($handler);
-
-        return $this;
     }
 
     /**
