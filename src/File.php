@@ -4,16 +4,11 @@ namespace ZhenyaGR\TGZ;
 
 class File
 {
-    private ApiClient $api;
-    private string $file_id;
     private string $file_path;
     private int $file_size;
 
-    public function __construct(string $file_id, ApiClient $api)
+    public function __construct(private string $file_id, private ApiClient $api)
     {
-        $this->file_id = $file_id;
-        $this->api = $api;
-
         $file_data = $this->api->callAPI(
             'getFile', ['file_id' => $this->file_id],
         );
