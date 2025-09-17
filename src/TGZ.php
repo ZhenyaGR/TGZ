@@ -329,7 +329,7 @@ class TGZ
     public function reply(string $message, array $params = []): array
     {
         if (!isset($params['chat_id'])) {
-            $this->initChatID($params['chat_id']);
+            $params['chat_id'] = $this->context->getChatId();
         }
 
         return $this->api->callAPI(
