@@ -18,8 +18,10 @@ class UserDto
     }
 
     /**
-     * Статический метод-фабрика для создания DTO из массива от Telegram.
+     * Статический метод-фабрика для создания DTO из массива от Telegram.'
+     *
      * @param array $data
+     *
      * @return static
      */
     public static function fromArray(array $data): static
