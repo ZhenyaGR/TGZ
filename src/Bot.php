@@ -20,6 +20,7 @@ class Bot
             'callback_query'      => [],
             'start_command'       => null,
             'referral_command'    => null,
+            'edit_message'        => null,
             'sticker_fallback'    => null,
             'message_fallback'    => null,
             'photo_fallback'      => null,
@@ -108,7 +109,8 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onStart
      */
-    public function onStart(): Action {
+    public function onStart(): Action
+    {
         $route = new Action('start_command', null);
         $this->routes['start_command'] = $route;
 
@@ -122,9 +124,25 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onReferral
      */
-    public function onReferral(): Action {
+    public function onReferral(): Action
+    {
         $route = new Action('referral_command', null);
         $this->routes['referral_command'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для реферальной ссылки.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onReferral
+     */
+    public function onEditedMessage(): Action
+    {
+        $route = new Action('edit_message', null);
+        $this->routes['edit_message'] = $route;
 
         return $route;
     }
@@ -392,17 +410,22 @@ class Bot
 
 
                 if ($type === 'bot_command') {
-
                     // Проверяeм реферал (onReferral)
-                    if (str_starts_with($userText, '/start ') && $this->routes['referral_command'] !== null) {
+                    if (str_starts_with($userText, '/start ')
+                        && $this->routes['referral_command'] !== null
+                    ) {
                         $route = $this->routes['referral_command'];
-                        $this->dispatchAnswer($route, $type, [trim(mb_substr($text, 6))]);
+                        $this->dispatchAnswer(
+                            $route, $type, [trim(mb_substr($text, 6))],
+                        );
 
                         return;
                     }
 
                     // Проверяeм /start (onStart)
-                    if ($userText === '/start' && $this->routes['start_command'] !== null) {
+                    if ($userText === '/start'
+                        && $this->routes['start_command'] !== null
+                    ) {
                         $route = $this->routes['start_command'];
                         $this->dispatchAnswer($route, $type);
 
@@ -573,11 +596,11 @@ class Bot
                 )
                 && $this->routes['new_chat_members'] !== null
             ) {
-
-                $newMembersData = $this->context->getUpdateData()['message']['new_chat_members'];
+                $newMembersData = $this->context->getUpdateData(
+                )['message']['new_chat_members'];
                 $newMembersDtos = array_map(
                     fn(array $memberData) => UserDto::fromArray($memberData),
-                    $newMembersData
+                    $newMembersData,
                 );
 
                 $this->dispatchAnswer(
@@ -592,8 +615,10 @@ class Bot
                 )
                 && $this->routes['left_chat_member'] !== null
             ) {
-
-                $leftMember = UserDto::fromArray($this->context->getUpdateData()['message']['left_chat_member']);
+                $leftMember = UserDto::fromArray(
+                    $this->context->getUpdateData(
+                    )['message']['left_chat_member'],
+                );
 
                 $this->dispatchAnswer(
                     $this->routes['left_chat_member'],
@@ -630,6 +655,14 @@ class Bot
                         return;
                     }
                 }
+            }
+        }
+
+        if ($type === 'edited_message') {
+            if ($this->routes['edited_message'] !== null) {
+                $this->dispatchAnswer($this->routes['edited_message'], 'text');
+
+                return;
             }
         }
     }
