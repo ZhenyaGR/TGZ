@@ -659,8 +659,8 @@ class Bot
         }
 
         if ($type === 'edited_message') {
-            if ($this->routes['edited_message'] !== null) {
-                $this->dispatchAnswer($this->routes['edited_message'], 'text');
+            if ($this->routes['edit_message'] !== null) {
+                $this->dispatchAnswer($this->routes['edit_message'], 'text');
 
                 return;
             }
