@@ -133,11 +133,11 @@ class Bot
     }
 
     /**
-     * Создает маршрут для реферальной ссылки.
+     * Создает маршрут для редактирования сообщения.
      *
      * @return Action
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onReferral
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onEditedMessage
      */
     public function onEditedMessage(): Action
     {
