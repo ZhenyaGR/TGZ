@@ -18,6 +18,8 @@ class Bot
             'text_exact'          => [],
             'text_preg'           => [],
             'callback_query'      => [],
+            'start_command'       => null,
+            'referral_command'    => null,
             'sticker_fallback'    => null,
             'message_fallback'    => null,
             'photo_fallback'      => null,
@@ -95,6 +97,34 @@ class Bot
     ): Action {
         $route = new Action($id, $command ?? $id);
         $this->routes['bot_command'][$id] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для команды /start.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onStart
+     */
+    public function onStart(): Action {
+        $route = new Action('start_command', null);
+        $this->routes['start_command'] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для реферальной ссылки.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onReferral
+     */
+    public function onReferral(): Action {
+        $route = new Action('referral_command', null);
+        $this->routes['referral_command'] = $route;
 
         return $route;
     }
@@ -360,8 +390,26 @@ class Bot
             if (!empty($text)) {
                 $userText = strtolower(mb_convert_encoding($text, 'UTF-8'));
 
-                // 1. Проверяем команды бота (onBotCommand)
+
                 if ($type === 'bot_command') {
+
+                    // Проверяeм реферал (onReferral)
+                    if (str_starts_with($userText, '/start ') && $this->routes['referral_command'] !== null) {
+                        $route = $this->routes['referral_command'];
+                        $this->dispatchAnswer($route, $type, [mb_substr($userText, 0, 7)]);
+
+                        return;
+                    }
+
+                    // Проверяeм /start (onStart)
+                    if ($userText === '/start' && $this->routes['start_command'] !== null) {
+                        $route = $this->routes['start_command'];
+                        $this->dispatchAnswer($route, $type);
+
+                        return;
+                    }
+
+                    // Проверяем команды бота (onBotCommand)
                     $words = explode(' ', $userText);
                     $command = $words[0];
                     unset($words[0]);
@@ -379,7 +427,7 @@ class Bot
                     }
                 }
 
-                // 2. Проверяем текстовые команды (onCommand)
+                // Проверяем текстовые команды (onCommand)
                 foreach ($this->routes['command'] as $route) {
                     $conditions = (array)$route->getCondition();
                     foreach ($conditions as $commandPattern) {
@@ -421,7 +469,7 @@ class Bot
                     }
                 }
 
-                // 3. Проверяем точное совпадение (onText)
+                // Проверяем точное совпадение (onText)
                 foreach ($this->routes['text_exact'] as $route) {
                     $conditions = (array)$route->getCondition();
                     foreach ($conditions as $condition) {
@@ -433,7 +481,7 @@ class Bot
                     }
                 }
 
-                // 4. Проверяем текстовые кнопки
+                // Проверяем текстовые кнопки
                 foreach ($this->buttons['action'] as $route) {
                     $conditions = (array)$route->getCondition();
                     foreach ($conditions as $condition) {
@@ -462,7 +510,7 @@ class Bot
                     }
                 }
 
-                // 5. Проверяем регулярные выражения (onTextPreg)
+                // Проверяем регулярные выражения (onTextPreg)
                 foreach ($this->routes['text_preg'] as $route) {
                     $patterns = (array)$route->getCondition();
                     foreach ($patterns as $pattern) {
@@ -474,7 +522,7 @@ class Bot
                     }
                 }
 
-                // 6. Проверяем обычное сообщение
+                // Проверяем обычное сообщение
                 if ($this->routes['message_fallback'] !== null) {
                     $this->dispatchAnswer(
                         $this->routes['message_fallback'], 'text',
@@ -485,37 +533,37 @@ class Bot
 
             }
 
-            // 7. Проверяем сообщение с фото
+            // Проверяем сообщение с фото
             if ($this->tryProcessFallbackMedia('photo')) {
                 return;
             }
 
-            // 8. Проверяем сообщение с аудио
+            // Проверяем сообщение с аудио
             if ($this->tryProcessFallbackMedia('audio')) {
                 return;
             }
 
-            // 9. Проверяем видео
+            // Проверяем видео
             if ($this->tryProcessFallbackMedia('video')) {
                 return;
             }
 
-            // 10. Проверяем стикеры
+            // Проверяем стикеры
             if ($this->tryProcessFallbackMedia('sticker')) {
                 return;
             }
 
-            // 11. Проверяем голосовые
+            // Проверяем голосовые
             if ($this->tryProcessFallbackMedia('voice')) {
                 return;
             }
 
-            // 11. Проверяем документы
+            // Проверяем документы
             if ($this->tryProcessFallbackMedia('document')) {
                 return;
             }
 
-            // 12. Проверяем видео-сообщения
+            // Проверяем видео-сообщения
             if ($this->tryProcessFallbackMedia('video_note')) {
                 return;
             }
@@ -563,7 +611,7 @@ class Bot
         }
 
         if ($type === 'callback_query') {
-            // 13. Проверяем inline-кнопки
+            // Проверяем inline-кнопки
             foreach ($this->buttons['action'] as $route) {
                 if ($route->getId() === $callback_data) {
                     $this->dispatchAnswer($route, 'button_'.$type);
@@ -572,7 +620,7 @@ class Bot
                 }
             }
 
-            // 14. Проверяем callback_data
+            // Проверяем callback_data
             foreach ($this->routes['callback_query'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
