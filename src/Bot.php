@@ -436,13 +436,13 @@ class Bot
                     $words = explode(' ', $userText);
                     $command = $words[0];
                     unset($words[0]);
-                    $refs = implode(' ', $words);
+                    $final_text = implode(' ', $words);
 
                     foreach ($this->routes['bot_command'] as $route) {
                         $conditions = (array)$route->getCondition();
                         foreach ($conditions as $condition) {
                             if ($condition === $command) {
-                                $this->dispatchAnswer($route, $type, [$refs]);
+                                $this->dispatchAnswer($route, $type, [$final_text]);
 
                                 return;
                             }
