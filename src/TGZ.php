@@ -4,7 +4,10 @@ namespace ZhenyaGR\TGZ;
 
 use CURLFile;
 use Exception;
+use LogicException;
 use ZhenyaGR\TGZ\Contracts\ApiInterface;
+use ZhenyaGR\TGZ\Dto\UserDto;
+use ZhenyaGR\TGZ\Dto\ChatDto;
 
 class TGZ
 {
@@ -587,4 +590,101 @@ class TGZ
     {
         return $this->context->getChatId();
     }
+
+    /**
+     * Извлекает данные пользователя из любого подходящего поля в текущем событии.
+     *
+     * Этот метод универсален и ищет данные пользователя ('from') в таких событиях,
+     * как message, callback_query, inline_query, my_chat_member и других.
+     *
+     * @return UserDto Объект пользователя.
+     * @throws LogicException Если данные пользователя не найдены в событии.
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getUserDto(): UserDto
+    {
+        $update = $this->context->getUpdateData();
+        $user = null;
+
+        $keys = [
+            'message',
+            'edited_message',
+            'callback_query',
+            'inline_query',
+            'my_chat_member',
+            'chat_member',
+            'chat_join_request',
+        ];
+
+        foreach ($keys as $key) {
+            if (isset($update[$key]['from'])) {
+                $user = $update[$key]['from'];
+                break;
+            }
+        }
+
+        if ($user === null) {
+            throw new LogicException("Не удалось найти данные пользователя ('from') в текущем событии.");
+        }
+
+        return UserDto::fromArray($user);
+    }
+
+    /**
+     * Извлекает данные чата из любого подходящего поля в текущем событии.
+     *
+     * Этот метод универсален и ищет данные чата ('chat') в таких событиях,
+     * как message, callback_query, channel_post, my_chat_member и других,
+     * корректно обрабатывая вложенные структуры.
+     *
+     * @return ChatDto Объект чата.
+     * @throws LogicException Если данные чата не найдены в событии.
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     */
+    public function getChatDto(): ChatDto
+    {
+        $update = $this->context->getUpdateData();
+        $chatData = null;
+
+        // Определяем возможные пути к объекту 'chat'
+        $paths = [
+            ['message', 'chat'],
+            ['edited_message', 'chat'],
+            ['channel_post', 'chat'],
+            ['edited_channel_post', 'chat'],
+            ['my_chat_member', 'chat'],
+            ['chat_member', 'chat'],
+            ['chat_join_request', 'chat'],
+            ['callback_query', 'message', 'chat'], // Вложенный путь
+        ];
+
+        foreach ($paths as $path) {
+            $temp = $update;
+            $found = true;
+
+            // Проходим по каждому ключу в пути
+            foreach ($path as $key) {
+                if (!isset($temp[$key])) {
+                    $found = false;
+                    break; // Если ключ не найден, этот путь не подходит
+                }
+                $temp = $temp[$key]; // Спускаемся на уровень глубже
+            }
+
+            if ($found) {
+                $chatData = $temp;
+                break; // Нашли данные, выходим из основного цикла
+            }
+        }
+
+        if ($chatData === null) {
+            throw new LogicException("Не удалось найти данные чата ('chat') в текущем событии.");
+        }
+
+        return ChatDto::fromArray($chatData);
+    }
+
+
 }
