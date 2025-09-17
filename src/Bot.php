@@ -2,6 +2,8 @@
 
 namespace ZhenyaGR\TGZ;
 
+use ZhenyaGR\TGZ\Dto\UserDto;
+
 class Bot
 {
 
@@ -523,11 +525,17 @@ class Bot
                 )
                 && $this->routes['new_chat_members'] !== null
             ) {
+
+                $newMembersData = $this->context->getUpdateData()['message']['new_chat_members'];
+                $newMembersDtos = array_map(
+                    fn(array $memberData) => UserDto::fromArray($memberData),
+                    $newMembersData
+                );
+
                 $this->dispatchAnswer(
                     $this->routes['new_chat_members'],
                     'text',
-                    $this->context->getUpdateData(
-                    )['message']['new_chat_members'],
+                    $newMembersDtos,
                 );
             }
 
@@ -536,11 +544,13 @@ class Bot
                 )
                 && $this->routes['left_chat_member'] !== null
             ) {
+
+                $leftMember = UserDto::fromArray($this->context->getUpdateData()['message']['left_chat_member']);
+
                 $this->dispatchAnswer(
                     $this->routes['left_chat_member'],
                     'text',
-                    [$this->context->getUpdateData(
-                    )['message']['left_chat_member']],
+                    [$leftMember],
                 );
             }
 
@@ -967,9 +977,6 @@ class Bot
 }
 
 
-//onNewChatMember() или onUserJoined()
-//Срабатывает, когда в чат/канал добавляется новый участник.
-//onLeftChatMember() или onUserLeft()
-//Срабатывает, когда участник покидает чат/канал.
 //onEditedMessage()
-//Срабатывает при редактировании пользователем своего сообщения (текста или медиа).
+//onStart()
+//onReferal()
