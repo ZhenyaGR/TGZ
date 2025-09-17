@@ -396,7 +396,7 @@ class Bot
                     // Проверяeм реферал (onReferral)
                     if (str_starts_with($userText, '/start ') && $this->routes['referral_command'] !== null) {
                         $route = $this->routes['referral_command'];
-                        $this->dispatchAnswer($route, $type, [mb_substr($userText, 0, 7)]);
+                        $this->dispatchAnswer($route, $type, [trim(mb_substr($text, 6))]);
 
                         return;
                     }
