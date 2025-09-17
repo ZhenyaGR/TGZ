@@ -3,7 +3,7 @@
     "description": "Библиотека для разработки ботов в Telegram",
     "type": "library",
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.1",
         "ext-curl": "*",
         "ext-mbstring": "*"
     },

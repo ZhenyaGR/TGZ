@@ -8,17 +8,17 @@ namespace ZhenyaGR\TGZ\Dto;
 class UserDto
 {
     public function __construct(
-        public int $id,
-        public bool $isBot,
-        public string $firstName,
-        public ?string $lastName,
-        public ?string $username,
-        public ?string $languageCode
+        public readonly int $id,
+        public readonly bool $isBot,
+        public readonly string $firstName,
+        public readonly ?string $lastName,
+        public readonly ?string $username,
+        public readonly ?string $languageCode
     ) {
     }
 
     /**
-     * Статический метод-фабрика для создания DTO из массива от Telegram.'
+     * Статический метод-фабрика для создания DTO из массива от Telegram.
      *
      * @param array $data
      *

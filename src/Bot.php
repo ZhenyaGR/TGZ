@@ -1056,8 +1056,3 @@ class Bot
     }
 
 }
-
-
-//onEditedMessage()
-//onStart()
-//onReferal()
