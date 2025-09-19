@@ -151,13 +151,14 @@ class TGZ
     public function delMsg(array|int $msg_ids = null,
         int|string $chat_id = null,
     ): array {
-        if ($chat_id === null) {
-            $this->initChatID($chat_id);
+        if ($msg_ids === null) {
+            $msg_ids = $this->getMsgId();
         }
 
-        if ($msg_ids === null) {
-            $this->initMsgID($msg_ids);
+        if ($chat_id === null) {
+            $chat_id = $this->getChatId();
         }
+
 
         $bool = is_array($msg_ids);
         $method = $bool ? 'deleteMessages' : 'deleteMessage';
@@ -186,11 +187,11 @@ class TGZ
         int|string $chat_id = null, int|string $from_chat_id = null,
     ): array {
         if ($msg_ids === null) {
-            $this->initMsgID($msg_ids);
+            $msg_ids = $this->getMsgId();
         }
 
         if ($chat_id === null) {
-            $this->initChatID($chat_id);
+            $chat_id = $this->getChatId();
         }
 
         if ($from_chat_id === null) {
