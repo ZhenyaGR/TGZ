@@ -684,6 +684,20 @@ class Bot
                 return;
             }
         }
+
+        if ($type === 'inline_query') {
+            // Проверяем inline
+            foreach ($this->routes['inline_query'] as $route) {
+                $conditions = (array)$route->getCondition();
+                foreach ($conditions as $condition) {
+                    if ($condition === $text) {
+                        $this->dispatchAnswer($route, $type);
+
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     private function tryProcessFallbackMedia(string $route_type): bool
@@ -866,6 +880,13 @@ class Bot
 
             return null;
 
+        }
+
+        if ($type === 'inline_query') {
+            $query_id = $this->context->getQueryId();
+            $this->tg->answerInlineQuery(
+                $query_id, $route->getQueryData(),
+            );
         }
 
         return null;
