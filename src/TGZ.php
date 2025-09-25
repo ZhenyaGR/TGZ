@@ -15,7 +15,7 @@ class TGZ
 
     public ApiInterface $api;
     public UpdateContext $context;
-    public ?string $parseModeDefault = null;
+    public string $parseModeDefault = '';
 
     public function __construct(ApiInterface $api, UpdateContext $context)
     {

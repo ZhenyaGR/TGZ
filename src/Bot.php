@@ -866,6 +866,7 @@ class Bot
 
         if ($type === 'callback_query') {
             $query_id = $this->context->getQueryId();
+
             $this->tg->answerCallbackQuery(
                 $query_id, ['text' => $route->getQueryText()],
             );
@@ -884,9 +885,12 @@ class Bot
 
         if ($type === 'inline_query') {
             $query_id = $this->context->getQueryId();
+
             $this->tg->answerInlineQuery(
                 $query_id, $route->getQueryData(),
             );
+
+            return null;
         }
 
         return null;
