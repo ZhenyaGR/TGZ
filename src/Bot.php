@@ -18,6 +18,7 @@ class Bot
             'text_exact'          => [],
             'text_preg'           => [],
             'callback_query'      => [],
+            'inline_query'        => [],
             'start_command'       => null,
             'referral_command'    => null,
             'edit_message'        => null,
@@ -205,16 +206,34 @@ class Bot
      * Создает маршрут для callback-запроса.
      *
      * @param string      $id   Уникальный идентификатор.
-     * @param string|null $data Данные из callback-кнопки.
+     * @param array|string|null $data Данные из callback-кнопки.
      *
      * @return Action
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallback
      */
-    public function onCallback(string $id, string $data = null): Action
+    public function onCallback(string $id, array|string $data = null): Action
     {
         $route = new Action($id, $data ?? $id);
         $this->routes['callback_query'][$id] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для inline-запроса.
+     *
+     * @param string      $id   Уникальный идентификатор.
+     * @param array|string|null $data Данные из callback-кнопки.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onInline
+     */
+    public function onInline(string $id, array|string $data = null): Action
+    {
+        $route = new Action($id, $data ?? $id);
+        $this->routes['inline_query'][$id] = $route;
 
         return $route;
     }
