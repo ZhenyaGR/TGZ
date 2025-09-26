@@ -18,7 +18,7 @@ class Bot
             'text_exact'          => [],
             'text_preg'           => [],
             'callback_query'      => [],
-            'inline_query'        => [],
+            'inline_fallback'     => null,
             'start_command'       => null,
             'referral_command'    => null,
             'edit_message'        => null,
@@ -205,7 +205,7 @@ class Bot
     /**
      * Создает маршрут для callback-запроса.
      *
-     * @param string      $id   Уникальный идентификатор.
+     * @param string            $id   Уникальный идентификатор.
      * @param array|string|null $data Данные из callback-кнопки.
      *
      * @return Action
@@ -223,17 +223,14 @@ class Bot
     /**
      * Создает маршрут для inline-запроса.
      *
-     * @param string      $id   Уникальный идентификатор.
-     * @param array|string|null $data Данные из callback-кнопки.
-     *
      * @return Action
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onInline
      */
-    public function onInline(string $id, array|string $data = null): Action
+    public function onInline(): Action
     {
-        $route = new Action($id, $data ?? $id);
-        $this->routes['inline_query'][$id] = $route;
+        $route = new Action('inline_fallback', null);
+        $this->routes['inline_fallback'] = $route;
 
         return $route;
     }
@@ -461,7 +458,9 @@ class Bot
                         $conditions = (array)$route->getCondition();
                         foreach ($conditions as $condition) {
                             if ($condition === $command) {
-                                $this->dispatchAnswer($route, $type, [$final_text]);
+                                $this->dispatchAnswer(
+                                    $route, $type, [$final_text],
+                                );
 
                                 return;
                             }
@@ -687,15 +686,10 @@ class Bot
 
         if ($type === 'inline_query') {
             // Проверяем inline
-            foreach ($this->routes['inline_query'] as $route) {
-                $conditions = (array)$route->getCondition();
-                foreach ($conditions as $condition) {
-                    if ($condition === $text) {
-                        $this->dispatchAnswer($route, $type);
+            if ($this->routes['inline_fallback'] !== null) {
+                $this->dispatchAnswer($this->routes['inline_fallback'], $type);
 
-                        return;
-                    }
-                }
+                return;
             }
         }
     }
@@ -881,16 +875,6 @@ class Bot
 
             return null;
 
-        }
-
-        if ($type === 'inline_query') {
-            $query_id = $this->context->getQueryId();
-
-            $this->tg->answerInlineQuery(
-                $query_id, $route->getQueryData(),
-            );
-
-            return null;
         }
 
         return null;
