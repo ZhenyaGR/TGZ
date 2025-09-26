@@ -687,7 +687,7 @@ class Bot
         if ($type === 'inline_query') {
             // Проверяем inline
             if ($this->routes['inline_fallback'] !== null) {
-                $this->dispatchAnswer($this->routes['inline_fallback'], $type, [$text]);
+                $this->dispatchAnswer($this->routes['inline_fallback'], $type);
 
                 return;
             }
