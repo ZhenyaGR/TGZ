@@ -11,7 +11,6 @@ class Action
     private $handler;
     public array $messageData = [];
     public string $queryText = '';
-    public array $queryData = [];
     public string $button_redirect = '';
     public \Closure|null $middleware_handler = null;
     private array $access_ids = [];
@@ -319,19 +318,6 @@ class Action
         return $this->setQueryText($query);
     }
 
-    /**
-     * Задает inline-ответ
-     *
-     * @param array $query Ответ на inline-запрос
-     *
-     * @return Action
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/query
-     */
-    public function inlineQuery(array $query): self
-    {
-        return $this->setQueryData($query);
-    }
 
     /**
      * Добавляет клавиатуру к сообщению
@@ -434,10 +420,6 @@ class Action
         return $this->queryText;
     }
 
-    public function getQueryData(): array
-    {
-        return $this->queryData;
-    }
 
     public function getMessageData(): array
     {
@@ -496,13 +478,6 @@ class Action
     public function setQueryText(?string $queryText): self
     {
         $this->queryText = $queryText;
-
-        return $this;
-    }
-
-    public function setQueryData(?array $queryText): self
-    {
-        $this->queryData = $queryText;
 
         return $this;
     }
