@@ -678,7 +678,7 @@ class Bot
 
         if ($type === 'edited_message') {
             if ($this->routes['edit_message'] !== null) {
-                $this->dispatchAnswer($this->routes['edit_message'], 'text', [$text]);
+                $this->dispatchAnswer($this->routes['edit_message'], 'text');
 
                 return;
             }
@@ -687,7 +687,7 @@ class Bot
         if ($type === 'inline_query') {
             // Проверяем inline
             if ($this->routes['inline_fallback'] !== null) {
-                $this->dispatchAnswer($this->routes['inline_fallback'], $type);
+                $this->dispatchAnswer($this->routes['inline_fallback'], $type, [$text]);
 
                 return;
             }
