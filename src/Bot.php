@@ -7,8 +7,8 @@ use ZhenyaGR\TGZ\Dto\UserDto;
 class Bot
 {
 
-    private TGZ $tg;
-    private UpdateContext $context;
+    private TGZ|null $tg;
+    private UpdateContext|null $context;
     private array $ctx = [];
 
     private array $routes
@@ -45,10 +45,10 @@ class Bot
 
     private \Closure|null $middleware_handler = null;
 
-    public function __construct(TGZ $tg)
+    public function __construct(TGZ $tg = null)
     {
         $this->tg = $tg;
-        $this->context = $tg->context;
+        $this->context = $tg?->context;
     }
 
     /**
@@ -982,6 +982,14 @@ class Bot
             $msg->kbd($keyboardLayout, $inline, $oneTime, $resize);
         }
 
+    }
+
+    public function tgz(TGZ $TGZ):self
+    {
+        $this->tg = $TGZ;
+        $this->context = $TGZ->context;
+
+        return $this;
     }
 
     public function run(?string $id = null): void
