@@ -8,7 +8,13 @@ class File
     private ApiClient $api;
     private string $file_id;
 
-    private const MAX_DOWNLOAD_SIZE_BYTES = 20 * 1024 * 1024;
+    private const MAX_DOWNLOAD_SIZE_BYTES = 167772160;  // 8 * 20 * 1024 * 1024
+    private const DIVISION_SIZE_B = 8;                  // 8
+    private const DIVISION_SIZE_KB = 8192;              // 1024 * 8
+    private const DIVISION_SIZE_MB = 8388608;           // 1024 * 1024 * 8
+    private const DIVISION_SIZE_b = 1;                  // 1
+    private const DIVISION_SIZE_Kb =  1024;             // 1024
+    private const DIVISION_SIZE_Mb =  1048576;          // 1024 * 1024
 
     public function __construct(string $file_id, ApiClient $api,
     ) {
@@ -28,15 +34,31 @@ class File
     }
 
     /**
-     * Возвращает размер файла в байтах
+     * Возвращает размер файла в заданной единице измерения
      *
-     * @return int Размер в битах
+     * @param string $units Единица измерения: b, Kb, Mb, B KB, MB
+     *                      По умолчанию: b
+     *
+     *                      b - биты, Kb - килобиты, Mb - мегабиты
+     *                      B - байты, KB - килобайты, MB - мегабайты
+     *
+     * @return int|float Размер файла
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/file
      */
-    public function getFileSize(): int
+    public function getFileSize(string $units = 'b'): int|float
     {
-        return $this->getFileInfo()['file_size'];
+
+        $division = match ($units) {
+            'MB' => $this::DIVISION_SIZE_MB,    // мегабайты
+            'KB' => $this::DIVISION_SIZE_KB,    // килобайты
+            'B' => $this::DIVISION_SIZE_B,      // байты
+            'Mb' => $this::DIVISION_SIZE_Mb,    // мегабиты
+            'Kb' => $this::DIVISION_SIZE_Kb,    // килобиты
+            default => $this::DIVISION_SIZE_b,  // биты
+        };
+
+        return round($this->getFileInfo()['file_size'] / $division, 5);
     }
 
     public function getFilePath(): string
