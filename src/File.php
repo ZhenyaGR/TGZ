@@ -36,13 +36,12 @@ class File
      */
     public function getFileSize(): int
     {
-        return $this->getFileInfo()['result']['file_size'];
+        return $this->getFileInfo()['file_size'];
     }
 
     public function getFilePath(): string
     {
-        return $this->api->getApiFileUrl().$this->getFileInfo(
-            )['result']['file_path'];
+        return $this->api->getApiFileUrl().$this->getFileInfo()['file_path'];
     }
 
     /**
@@ -103,8 +102,8 @@ class File
         return $destinationPath;
     }
 
-    public static function getFileId(array $context, ?string $type = null): ?string
-    {
+    public static function getFileId(array $context, ?string $type = null,
+    ): ?string {
         $message = $context['result'] ?? $context['message'] ?? [];
         if (empty($message)) {
             return null;
