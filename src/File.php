@@ -8,13 +8,13 @@ class File
     private ApiClient $api;
     private string $file_id;
 
-    private const MAX_DOWNLOAD_SIZE_BYTES = 167772160;  // 8 * 20 * 1024 * 1024
-    private const DIVISION_SIZE_B = 8;                  // 8
-    private const DIVISION_SIZE_KB = 8192;              // 1024 * 8
-    private const DIVISION_SIZE_MB = 8388608;           // 1024 * 1024 * 8
-    private const DIVISION_SIZE_b = 1;                  // 1
-    private const DIVISION_SIZE_Kb =  1024;             // 1024
-    private const DIVISION_SIZE_Mb =  1048576;          // 1024 * 1024
+    private const MAX_DOWNLOAD_SIZE_BYTES = 20971520; // 20 * 1024 * 1024
+    private const DIVISION_SIZE_B = 1;                 // 1
+    private const DIVISION_SIZE_KB = 1024;             // 1024
+    private const DIVISION_SIZE_MB = 1048576;          // 1024 * 1024
+    private const DIVISION_SIZE_b = 0.125;             // 1/8
+    private const DIVISION_SIZE_Kb =  128;             // 1/8 * 1024
+    private const DIVISION_SIZE_Mb =  131072;          // 1/8 * 1024 * 1024
 
     public function __construct(string $file_id, ApiClient $api,
     ) {
