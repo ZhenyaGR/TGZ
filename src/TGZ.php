@@ -216,7 +216,7 @@ class TGZ
      * @param string          $type
      * @param int|string|null $chat_id
      *
-     * @return string
+     * @return null|string
      *
      * @throws \Exception
      *
@@ -224,7 +224,7 @@ class TGZ
      */
     public function getFileID(string $url, string $type = 'document',
         int|string $chat_id = null,
-    ): string {
+    ): ?string {
         if (!in_array(
             $type,
             ['document', 'audio', 'photo', 'animation', 'video', 'video_note',
@@ -239,20 +239,7 @@ class TGZ
         $method = 'send'.ucfirst($type);
         $result = $this->api->callAPI($method, $params);
 
-        if ($type === 'photo') {
-            // Берем последний элемент массива (наибольший по размеру вариант)
-            return end($result['result']['photo'])['file_id'];
-        }
-
-        if ($type === 'audio') {
-            return $result['result']['audio']['file_id'];
-        }
-
-        if ($type === 'video') {
-            return $result['result']['video']['file_id'];
-        }
-
-        return $result['result']['document']['file_id'];
+        return \File::getFileId($result, $type);
     }
 
 

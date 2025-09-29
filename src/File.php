@@ -5,9 +5,12 @@ namespace ZhenyaGR\TGZ;
 class File
 {
     private array $file_info = [];
+    private ApiClient $api;
+    private string $file_id;
+
     private const MAX_DOWNLOAD_SIZE_BYTES = 20 * 1024 * 1024;
 
-    public function __construct(private string $file_id, private ApiClient $api,
+    public function __construct(string $file_id, ApiClient $api,
     ) {
         $this->api = $api;
         $this->file_id = $file_id;
@@ -38,7 +41,8 @@ class File
 
     public function getFilePath(): string
     {
-        return $this->api->getApiFileUrl() . $this->getFileInfo()['result']['file_path'];
+        return $this->api->getApiFileUrl().$this->getFileInfo(
+            )['result']['file_path'];
     }
 
     /**
@@ -97,5 +101,42 @@ class File
         }
 
         return $destinationPath;
+    }
+
+    public function getFileId(array $context, ?string $type = null): ?string
+    {
+        $message = $context['result'] ?? $context['message'] ?? [];
+        if (empty($message)) {
+            return null;
+        }
+
+        if ($type !== null) {
+            return match ($type) {
+                'photo' => end($message['photo'])['file_id'],
+                'audio' => $message['audio']['file_id'],
+                'video' => $message['video']['file_id'],
+                'document' => $message['document']['file_id'],
+                'voice' => $message['voice']['file_id'],
+                'sticker' => $message['sticker']['file_id'],
+                default => null,
+            };
+        }
+
+        $fileTypes = [
+            'photo', 'document', 'video', 'audio',
+            'voice', 'sticker', 'video_note', 'animation',
+        ];
+
+        foreach ($fileTypes as $fileType) {
+            if (isset($message[$fileType])) {
+                if ($fileType === 'photo') {
+                    return end($message['photo'])['file_id'];
+                }
+
+                return $message[$fileType]['file_id'];
+            }
+        }
+
+        return null;
     }
 }
