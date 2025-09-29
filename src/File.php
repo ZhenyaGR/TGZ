@@ -37,7 +37,7 @@ class File
      * Возвращает размер файла в заданной единице измерения
      *
      * @param string $units Единица измерения: b, Kb, Mb, B KB, MB
-     *                      По умолчанию: b
+     *                      По умолчанию: B (байты)
      *
      *                      b - биты, Kb - килобиты, Mb - мегабиты
      *                      B - байты, KB - килобайты, MB - мегабайты
@@ -47,7 +47,7 @@ class File
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/file
      */
-    public function getFileSize(string $units = 'b', int $precision = 5): int|float
+    public function getFileSize(string $units = 'B', int $precision = 5): int|float
     {
 
         $division = match ($units) {
