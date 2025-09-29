@@ -703,7 +703,7 @@ class Bot
             && $this->routes[$fallback_key] !== null
         ) {
 
-            $file_id = \File::getFileId($this->context->getUpdateData(), $route_type);
+            $file_id = File::getFileId($this->context->getUpdateData(), $route_type);
             $file = new File($file_id, $this->tg->api);
 
             $this->dispatchAnswer(

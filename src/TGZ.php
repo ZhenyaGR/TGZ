@@ -239,7 +239,7 @@ class TGZ
         $method = 'send'.ucfirst($type);
         $result = $this->api->callAPI($method, $params);
 
-        return \File::getFileId($result, $type);
+        return File::getFileId($result, $type);
     }
 
 

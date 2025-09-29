@@ -103,7 +103,7 @@ class File
         return $destinationPath;
     }
 
-    public function getFileId(array $context, ?string $type = null): ?string
+    public static function getFileId(array $context, ?string $type = null): ?string
     {
         $message = $context['result'] ?? $context['message'] ?? [];
         if (empty($message)) {
