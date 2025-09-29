@@ -11,7 +11,7 @@
 
 ## [Полная документация](https://zhenyagr.github.io/TGZ-Doc/)
 
-# Подключение
+# Подключение Библиотеки
 ## Используя composer
 1. Установить
 ```bash
@@ -30,12 +30,12 @@ require_once __DIR__ . 'vendor/autoload.php';
 require_once "TGZ/autoload.php";
 ```
 
-## [Первоначальная настройка, создание бота и получение токена](TokenCreate.md)
+## Первоначальная настройка, создание бота и получение токена
+Более подробно описано в [файле](TokenCreate.md)
 
----
 # Примеры использования
 
-## Инициализация переменных (WEBHOOK)
+## Получение переменных (WEBHOOK)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
@@ -43,35 +43,35 @@ use ZhenyaGR\TGZ\TGZ;  // Используем основной класс
 
 $tg = TGZ::create(BOT_TOKEN); // Создаем объект бота
 
-$tg->initUserID($user_id)
-    ->initChatID($chat_id)
-    ->initText($text)
-    ->initMsgID($msg_id)
-    ->initType($type);
-// Некоторые переменные можно инициализировать по отдельности
+$user_id = $tg->getUserId();
+$chat_id = $tg->getChatId();
+$text = $tg->getText();
+$msg_id = $tg->getMsgId();
+$type = $tg->getType();
+// Некоторые переменные можно получить по отдельности
 
 $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_id, $is_bot, $is_command);
 // Все переменные сразу одним методом
 ```
 
-## Инициализация переменных (LONGPOLL)
+## Получение переменных (LONGPOLL)
 ```php
 <?php
 require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библиотеку
 use ZhenyaGR\TGZ\LongPoll;   // Используем класс LongPoll
 use ZhenyaGR\TGZ\TGZ;
 
-$polling = LongPoll::create(BOT_TOKEN); 
+$lp = LongPoll::create(BOT_TOKEN); 
 // Создаем объект бота 
 
-$polling->listen(function(TGZ $tg) {
+$lp->listen(function(TGZ $tg) {
         
-    $tg->initUserID($user_id)
-        ->initChatID($chat_id)
-        ->initText($text)
-        ->initMsgID($msg_id)
-        ->initType($type);
-    // Некоторые переменные можно инициализировать по отдельности
+    $user_id = $tg->getUserId();
+    $chat_id = $tg->getChatId();
+    $text = $tg->getText();
+    $msg_id = $tg->getMsgId();
+    $type = $tg->getType();
+    // Некоторые переменные можно получить по отдельности
     
     $tg->initVars($chat_id, $user_id, $text, $type, $callback_data, $query_id, $msg_id, $is_bot, $is_command);
     // Все переменные сразу одним методом
@@ -106,7 +106,7 @@ require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библ�
 use ZhenyaGR\TGZ\TGZ; 
 
 $tg = TGZ::create(BOT_TOKEN);
-$tg->initVars($chat_id, $user_id, $text, $type);
+$tg->initVars(text: $text, type: $type);
 
 if ($type == 'text' || $type == 'bot_command') {
     $tg->msg($text)->send(); 
@@ -121,9 +121,9 @@ require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библ�
 use ZhenyaGR\TGZ\LongPoll;  // Меняем класс
 use ZhenyaGR\TGZ\TGZ; 
 
-$polling = LongPoll::create(BOT_TOKEN); 
+$lp = LongPoll::create(BOT_TOKEN); 
 
-$polling->listen(function(TGZ $tg) {
+$lp->listen(function(TGZ $tg) {
     // Ждём новый update
     
     $tg->initVars($chat_id, $user_id, $text, $type, msg_id: $msg_id); 
@@ -148,11 +148,11 @@ require_once __DIR__ . 'vendor/autoload.php';  // Подключаем библ�
 use ZhenyaGR\TGZ\LongPoll; 
 use ZhenyaGR\TGZ\TGZ; 
 
-$polling = LongPoll::create(BOT_TOKEN);
+$lp = LongPoll::create(BOT_TOKEN);
 
-$polling->listen(function(TGZ $tg) {
+$lp->listen(function(TGZ $tg) {
 
-    $tg->initVars($chat_id, $user_id, $text, $type);
+    $tg->initVars(text: $text, type: $type);
     
     if ($type == 'text' || $type == 'bot_command') {
         $tg->msg($text)->send(); // Отправляем сообщение с таким-же текстом
