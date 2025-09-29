@@ -41,12 +41,13 @@ class File
      *
      *                      b - биты, Kb - килобиты, Mb - мегабиты
      *                      B - байты, KB - килобайты, MB - мегабайты
+     * @param int $precision Количество знаков после запятой
      *
      * @return int|float Размер файла
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/file
      */
-    public function getFileSize(string $units = 'b'): int|float
+    public function getFileSize(string $units = 'b', int $precision = 5): int|float
     {
 
         $division = match ($units) {
@@ -58,7 +59,7 @@ class File
             default => $this::DIVISION_SIZE_b,  // биты
         };
 
-        return round($this->getFileInfo()['file_size'] / $division, 5);
+        return round($this->getFileInfo()['file_size'] / $division, $precision);
     }
 
     public function getFilePath(): string
