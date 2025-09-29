@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZhenyaGR\TGZ;
 
 use ZhenyaGR\TGZ\Contracts\ApiInterface;
+use ZhenyaGR\TGZ;
 
 class ApiClient implements ApiInterface
 {
@@ -29,6 +30,8 @@ class ApiClient implements ApiInterface
 
         $responseJson = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+
         curl_close($ch);
 
         $response = json_decode($responseJson, true, 512, JSON_THROW_ON_ERROR);
@@ -37,14 +40,9 @@ class ApiClient implements ApiInterface
             return $response;
         }
 
-        throw new \RuntimeException($this->TGAPIErrorMSG($response, $params));
+        throw new \RuntimeException(\TGZ::TGAPIErrorMSG($response, $params));
     }
 
-    public function __call(string $method, array $args = []): array
-    {
-        $params = $args[0] ?? [];
-        return $this->callAPI($method, $params);
-    }
 
     public function getApiUrl(): string
     {

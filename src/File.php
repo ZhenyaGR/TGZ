@@ -4,19 +4,24 @@ namespace ZhenyaGR\TGZ;
 
 class File
 {
-    private string $file_path;
-    private int $file_size;
+    private array $file_info = [];
+    private const MAX_DOWNLOAD_SIZE_BYTES = 20 * 1024 * 1024;
 
-    public function __construct(private string $file_id, private ApiClient $api)
+    public function __construct(private string $file_id, private ApiClient $api,
+    ) {
+        $this->api = $api;
+        $this->file_id = $file_id;
+    }
+
+    public function getFileInfo(): array
     {
-        $file_data = $this->api->callAPI(
-            'getFile', ['file_id' => $this->file_id],
-        );
+        if (empty($this->file_info)) {
+            $this->file_info = $this->api->callAPI(
+                'getFile', ['file_id' => $this->file_id],
+            );
+        }
 
-        $this->file_path = $this->api->getApiFileUrl()
-            .$file_data['result']['file_path'];
-        $this->file_size = $file_data['result']['file_size'];
-
+        return $this->file_info['result'];
     }
 
     /**
@@ -28,7 +33,12 @@ class File
      */
     public function getFileSize(): int
     {
-        return $this->file_size;
+        return $this->getFileInfo()['result']['file_size'];
+    }
+
+    public function getFilePath(): string
+    {
+        return $this->api->getApiFileUrl() . $this->getFileInfo()['result']['file_path'];
     }
 
     /**
@@ -46,7 +56,7 @@ class File
      */
     public function save(string $path): string
     {
-        if ($this->file_size >= 20971520) {
+        if ($this->getFileSize() >= $this::MAX_DOWNLOAD_SIZE_BYTES) {
             throw new \RuntimeException('Размер файла превышает 20 МБ');
         }
 
@@ -56,27 +66,25 @@ class File
 
     private function downloadFile(string $path): string
     {
-        $downloadUrl = $this->file_path;
+        $downloadUrl = $this->getFilePath();
 
         if (is_dir($path)) {
             // Если передан путь к директории, добавляем к нему имя файла
             $path = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
-            $path .= basename($this->file_path);
+            $path .= basename($downloadUrl);
         }
 
         $destinationPath = $path;
         $directory = dirname($destinationPath);
 
-        // Исправленная логика: сначала проверяем, потом создаем
-        if (!is_dir($directory)) {
-            // Если директории нет, пытаемся её создать рекурсивно
-            if (!mkdir($directory, 0775, true)) {
-                // Если создать не удалось - выбрасываем исключение
-                throw new \RuntimeException(
-                    'Не удалось создать директорию для сохранения файла: '
-                    .$directory,
-                );
-            }
+        // Cначала проверяем, потом создаем
+        // Если директории нет, пытаемся её создать рекурсивно
+        if (!mkdir($directory, 0775, true) && !is_dir($directory)) {
+            // Если создать не удалось - выбрасываем исключение
+            throw new \RuntimeException(
+                'Не удалось создать директорию для сохранения файла: '
+                .$directory,
+            );
         }
 
         if (!@copy($downloadUrl, $destinationPath)) {
