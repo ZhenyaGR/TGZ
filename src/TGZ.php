@@ -12,6 +12,7 @@ use ZhenyaGR\TGZ\Dto\ChatDto;
 class TGZ
 {
     use ErrorHandler;
+
     public ApiInterface $api;
     public UpdateContext $context;
     public string $parseModeDefault = '';
@@ -674,7 +675,7 @@ class TGZ
         return ChatDto::fromArray($chatData);
     }
 
-    protected function TGAPIErrorMSG($response, $params): string
+    public function TGAPIErrorMSG($response, $params): string
     {
         $function_params['error_code'] = $response['error_code'];
         $function_params['description'] = $response['description'];
