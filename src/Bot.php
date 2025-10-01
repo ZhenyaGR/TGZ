@@ -1084,8 +1084,8 @@ class Bot
                 continue;
             }
 
-            if (isset($actions[$id])) {
-                return $actions[$id];
+            if (isset($actions->$id)) {
+                return $actions->$id;
             }
         }
 
