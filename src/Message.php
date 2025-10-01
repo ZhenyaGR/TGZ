@@ -610,23 +610,33 @@ final class Message
     public function editMedia(?string $messageID = null, ?int $chatID = null,
     ): array {
         $identifier = $this->getIdentifier($messageID, $chatID);
-        $postFields = []; // Инициализация
+        $postFields = [];
 
-        if (isset($this->media)) {
+        // Проверяем, что массив media не пуст
+        if (!empty($this->media)) {
+            // 1. Берем первый элемент, так как editMedia работает только с одним медиа
+            $mediaObject = $this->media[0];
 
-            $postFields['media'] = json_encode($this->media, JSON_THROW_ON_ERROR);
-
+            // 2. Добавляем подпись и параметры форматирования ВНУТРЬ этого объекта
+            if ($this->text !== null) {
+                $mediaObject['caption'] = $this->text;
+            }
             if ($this->parse_mode !== null) {
-                $postFields['parse_mode'] = $this->parse_mode;
+                $mediaObject['parse_mode'] = $this->parse_mode;
             }
-
             if ($this->entities !== null) {
-                $postFields['entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
+                // Для InputMedia поле называется 'caption_entities'
+                $mediaObject['caption_entities'] = $this->entities;
             }
 
-            foreach ($this->media as $item) {
-                if (isset($item['media']) && strpos($item['media'], 'attach://') === 0) {
-                    $fileKey = str_replace('attach://', '', $item['media']);
+            // 3. Кодируем в JSON именно этот ОДИН объект
+            $postFields['media'] = json_encode($mediaObject, JSON_THROW_ON_ERROR);
+
+            // Логика для прикрепления файла остается прежней.
+            // Она найдет attach://file1 внутри $mediaObject['media']
+            if (str_contains($mediaObject['media'], 'attach://')) {
+                $fileKey = str_replace('attach://', '', $mediaObject['media']);
+                if (isset($this->files[$fileKey])) {
                     $postFields[$fileKey] = $this->files[$fileKey];
                 }
             }
@@ -643,6 +653,7 @@ final class Message
 
         return $this->api->callAPI('editMessageMedia', $params);
     }
+
 
 
 
