@@ -12,7 +12,6 @@ use ZhenyaGR\TGZ\Dto\ChatDto;
 class TGZ
 {
     use ErrorHandler;
-
     public ApiInterface $api;
     public UpdateContext $context;
     public string $parseModeDefault = '';
@@ -675,5 +674,12 @@ class TGZ
         return ChatDto::fromArray($chatData);
     }
 
+    protected function TGAPIErrorMSG($response, $params): string
+    {
+        $function_params['error_code'] = $response['error_code'];
+        $function_params['description'] = $response['description'];
+        $function_params['request_params'] = $params;
+        return "Telegram API error:\n" . $this->formatArray($function_params);
+    }
 
 }
