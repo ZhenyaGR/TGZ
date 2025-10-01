@@ -614,6 +614,8 @@ final class Message
 
         if (isset($this->media)) {
 
+            $postFields['media'] = json_encode($this->media, JSON_THROW_ON_ERROR);
+
             if ($this->parse_mode !== null) {
                 $postFields['parse_mode'] = $this->parse_mode;
             }
@@ -623,7 +625,7 @@ final class Message
             }
 
             foreach ($this->media as $item) {
-                if (strpos($item['media'], 'attach://') === 0) {
+                if (isset($item['media']) && strpos($item['media'], 'attach://') === 0) {
                     $fileKey = str_replace('attach://', '', $item['media']);
                     $postFields[$fileKey] = $this->files[$fileKey];
                 }
@@ -641,6 +643,7 @@ final class Message
 
         return $this->api->callAPI('editMessageMedia', $params);
     }
+
 
 
     private function getIdentifier(?string $messageID = null,
