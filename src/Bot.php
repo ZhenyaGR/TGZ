@@ -1021,7 +1021,7 @@ class Bot
     {
         $handler = $action->getHandler();
         if ($handler !== null) {
-            return $handler(...$other_files);
+            return $handler($this->tg, ...$other_files);
         }
 
         $messageData = $action->getMessageData();
