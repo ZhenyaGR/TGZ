@@ -689,7 +689,7 @@ class TGZ
         $result = "Array (\n";
 
         foreach ($array as $key => $value) {
-            if (is_string($value) && ($decoded = json_decode($value, true)) !== null) {
+            if (!is_array($value) && ($decoded = json_decode($value, true)) !== null) {
                 // Если значение — JSON, декодируем его в массив
                 $value = $decoded;
             }
