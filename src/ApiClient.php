@@ -5,18 +5,22 @@ declare(strict_types=1);
 namespace ZhenyaGR\TGZ;
 
 use ZhenyaGR\TGZ\Contracts\ApiInterface;
-use ZhenyaGR\TGZ;
-
 class ApiClient implements ApiInterface
 {
     private const API_BASE_URL = 'https://api.telegram.org';
     private string $apiUrl;
     private string $apiFileUrl;
+    private TGZ $tgz;
 
     public function __construct(string $token)
     {
         $this->apiUrl = self::API_BASE_URL  . '/bot' . $token . '/';
         $this->apiFileUrl = self::API_BASE_URL  . '/file/bot' . $token . '/';
+    }
+
+    public function addTgz(TGZ $tgz)
+    {
+        $this->tgz = $tgz;
     }
 
     public function callAPI(string $method, ?array $params = []): array
@@ -31,7 +35,6 @@ class ApiClient implements ApiInterface
         $responseJson = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-
         curl_close($ch);
 
         $response = json_decode($responseJson, true, 512, JSON_THROW_ON_ERROR);
@@ -40,7 +43,7 @@ class ApiClient implements ApiInterface
             return $response;
         }
 
-        throw new \RuntimeException(\TGZ::TGAPIErrorMSG($response, $params));
+        throw new \RuntimeException($this->tgz->TGAPIErrorMSG($response, $params));
     }
 
 

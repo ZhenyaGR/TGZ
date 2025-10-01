@@ -19,6 +19,7 @@ class TGZ
 
     public function __construct(ApiInterface $api, UpdateContext $context)
     {
+        $api->addTgz($this);
         $this->api = $api;
         $this->context = $context;
     }

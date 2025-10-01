@@ -94,6 +94,8 @@ class LongPoll
                 // Мы передаем один и тот же объект $this->api, а не создаем его заново.
                 $tg_instance = new TGZ($this->api, $context);
 
+                $this->api->addTgz($tg_instance);
+
                 // ШАГ 3: Вызываем обработчик пользователя и явно передаем ему
                 // полностью готовый к работе экземпляр TGZ.
                 $handler($tg_instance);
