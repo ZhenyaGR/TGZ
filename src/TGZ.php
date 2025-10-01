@@ -694,6 +694,10 @@ class TGZ
                 $value = $decoded;
             }
 
+            if (is_object($value)) {
+                $result .= $space . "  [$key] => " . $this->formatArray((array) $value, $indent + 1);
+            }
+
             if (is_array($value)) {
                 $result .= $space . "  [$key] => " . $this->formatArray($value, $indent + 1);
             } else {
