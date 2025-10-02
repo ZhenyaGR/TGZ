@@ -49,6 +49,47 @@ class LongPoll
         return new self($api, $timeout);
     }
 
+    private function get_updates($recursion = false)
+    {
+        $url = $this->api->getApiUrl().'getUpdates?'.http_build_query(
+                [
+                    'offset'          => $this->offset,
+                    'timeout'         => $this->timeout,
+                    'allowed_updates' => [],
+                    // Можно указать, какие типы обновлений получать
+                ],
+            );
+
+        // Подавляем вывод Warning, чтобы обработать его вручную
+        $response = @file_get_contents($url);
+
+        if ($response === false && $recursion === false) {
+
+            return $this->get_updates(true);
+
+        }
+
+        if ($response === false && $recursion === true) {
+            $error = error_get_last();
+            $errorMessage = "Не удалось выполнить запрос к Telegram API.";
+
+            // Если информация об ошибке доступна, формируем детальное сообщение
+            if ($error !== null) {
+                $errorMessage = sprintf(
+                    "Ошибка file_get_contents: %s в файле %s на строке %d",
+                    $error['message'],
+                    $error['file'],
+                    $error['line']
+                );
+            }
+
+            return throw new \RuntimeException($errorMessage);
+        }
+
+        return $response;
+
+    }
+
     /**
      * Запускает бесконечный цикл прослушивания обновлений от Telegram.
      *
@@ -65,37 +106,8 @@ class LongPoll
         echo "Long Poll запущен... Нажмите Ctrl+C для остановки.\n";
 
         while (true) {
-            $url = $this->api->getApiUrl().'getUpdates?'.http_build_query(
-                    [
-                        'offset'          => $this->offset,
-                        'timeout'         => $this->timeout,
-                        'allowed_updates' => [],
-                        // Можно указать, какие типы обновлений получать
-                    ],
-                );
 
-            // Подавляем вывод Warning, чтобы обработать его вручную
-            $response = @file_get_contents($url);
-
-            // Если функция вернула false, значит произошла ошибка
-            if ($response === false) {
-
-                $error = error_get_last();
-                $errorMessage = "Не удалось выполнить запрос к Telegram API.";
-
-                // Если информация об ошибке доступна, формируем детальное сообщение
-                if ($error !== null) {
-                    $errorMessage = sprintf(
-                        "Ошибка file_get_contents: %s в файле %s на строке %d",
-                        $error['message'],
-                        $error['file'],
-                        $error['line']
-                    );
-                }
-
-
-                throw new \RuntimeException($errorMessage);
-            }
+            $response = $this->get_updates();
 
             $response_array = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
 
