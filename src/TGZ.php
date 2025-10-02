@@ -581,10 +581,12 @@ class TGZ
     }
 
     /**
-     * Извлекает данные пользователя из любого подходящего поля в текущем событии.
+     * Извлекает данные пользователя из любого подходящего поля в текущем
+     * событии.
      *
-     * Этот метод универсален и ищет данные пользователя ('from') в таких событиях,
-     * как message, callback_query, inline_query, my_chat_member и других.
+     * Этот метод универсален и ищет данные пользователя ('from') в таких
+     * событиях, как message, callback_query, inline_query, my_chat_member и
+     * других.
      *
      * @return UserDto Объект пользователя.
      * @throws LogicException Если данные пользователя не найдены в событии.
@@ -707,4 +709,15 @@ class TGZ
         return $result . $space . ")\n";
     }
 
+    private array $botButtons = [];
+
+    public function setBotButtons(array $buttons): void
+    {
+        $this->botButtons = $buttons;
+    }
+
+    public function getBotButtons(): array
+    {
+        return $this->botButtons;
+    }
 }

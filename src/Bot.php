@@ -773,6 +773,8 @@ class Bot
 
         $user_id = $this->context->getUserId();
 
+        $this->tg->setBotButtons($this->buttons['btn']);
+
         if ($user_id) {
             $accessIds = $route->getAccessIds();
             if (!empty($accessIds) && !in_array($user_id, $accessIds)) {
@@ -885,6 +887,10 @@ class Bot
         return null;
     }
 
+    /**
+     * @throws \JsonException
+     * @throws \Exception
+     */
     private function constructMessage($messageData): array
     {
         $text = $messageData['text'] ?? '';
@@ -918,14 +924,14 @@ class Bot
         }
 
         if (isset($messageData['kbd'])) {
-            $this->constructKbd(
+            $msg = $this->constructKbd(
                 $msg, $messageData['kbd'], $messageData['inline'],
                 $messageData['oneTime'], $messageData['resize'],
             );
         }
 
         if (isset($messageData['remove_keyboard'])) {
-            $msg->kbd(remove_keyboard: true);
+            $msg->removeKbd();
         }
 
         if (isset($messageData['editText'])
@@ -944,7 +950,10 @@ class Bot
 
     }
 
-    private function constructKbd(&$msg, $kbd, $inline, $oneTime, $resize)
+    /**
+     * @throws \JsonException
+     */
+    private function constructKbd(Message $msg, array $kbd, bool $inline, bool $oneTime, bool $resize): Message
     {
         $keyboardLayout = [];
         $definedButtons = $this->buttons['btn'];
@@ -984,8 +993,15 @@ class Bot
         }
 
         if (!empty($keyboardLayout)) {
-            $msg->kbd($keyboardLayout, $inline, $oneTime, $resize);
+
+            if ($inline) {
+                $msg->inlineKbd($keyboardLayout);
+            } else {
+                $msg->kbd($keyboardLayout, $oneTime, $resize);
+            }
         }
+
+        return $msg;
 
     }
 

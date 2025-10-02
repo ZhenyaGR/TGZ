@@ -42,45 +42,100 @@ final class Message
         $this->TGZ = $TGZ;
     }
 
+    private function findBotButtons(array $gettingButtons, bool $inline): array
+    {
+        $botButtons = $this->TGZ->getBotButtons();
+
+        foreach ($gettingButtons as $key => $row) {
+
+            foreach ($row as $key_2 => $button) {
+                if (is_string($button)){
+
+                    if (isset($botButtons[$button])) {
+                        if ($inline) {
+                            $gettingButtons[$key][$key_2] = $this->TGZ->buttonCallback($button, $botButtons[$button]);
+                        } else {
+                            $gettingButtons[$key][$key_2] = $this->TGZ->buttonText($botButtons[$button]);
+                        }
+                    } else {
+                        throw new \RuntimeException("Не удалось найти кнопку $button");
+                    }
+
+                }
+            }
+        }
+
+        return $gettingButtons;
+    }
+
+
     /**
-     * Добавляет клавиатуру или inline-клавиатуру и удаляет клавиатуру
+     * Добавляет inline-клавиатуру к сообщению
      *
      * @param array $buttons
-     * @param bool  $inline
-     * @param bool  $one_time_keyboard
-     * @param bool  $resize_keyboard
-     * @param bool  $remove_keyboard
+     *
+     * @return Message
+     *
+     * @throws \JsonException
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/inlineKbd
+     */
+    public function inlineKbd(array $buttons,
+    ): Message {
+
+        $buttons = $this->findBotButtons($buttons, true);
+
+        $kbd = [
+            'inline_keyboard' => $buttons,
+        ];
+
+        $this->kbd = [
+            'reply_markup' => json_encode($kbd, JSON_THROW_ON_ERROR),
+        ];
+
+        return $this;
+    }
+    /**
+     * Добавляет клавиатуру к сообщению
+     *
+     * @param array $buttons
+     * @param bool  $one_time
+     * @param bool  $resize
      *
      * @return Message
      *
      * @throws \JsonException
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/kbd
      */
-    public function kbd(
-        array $buttons = [],
-        bool $inline = false,
-        bool $one_time_keyboard = false,
-        bool $resize_keyboard = false,
-        bool $remove_keyboard = false,
-    ): self {
-        if ($remove_keyboard) {
-            $keyboardConfig = ['remove_keyboard' => true];
-            $this->kbd = [
-                'reply_markup' => json_encode(
-                    $keyboardConfig, JSON_THROW_ON_ERROR,
-                ),
-            ];
+    public function kbd(array $buttons, bool $one_time = false,
+        bool $resize = false,
+    ): Message {
 
-            return $this;
-        }
+        $buttons = $this->findBotButtons($buttons, false);
 
-        $kbd = $inline
-            ? ['inline_keyboard' => $buttons]
-            : [
-                'keyboard'          => $buttons,
-                'resize_keyboard'   => $resize_keyboard,
-                'one_time_keyboard' => $one_time_keyboard,
-            ];
+        $kbd = [
+            'keyboard'          => $buttons,
+            'resize_keyboard'   => $resize,
+            'one_time_keyboard' => $one_time,
+        ];
+
+        $this->kbd = [
+            'reply_markup' => json_encode($kbd, JSON_THROW_ON_ERROR),
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Удаляет клавиатуру
+     *
+     * @return Message
+     *
+     * @throws \JsonException
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/removeKbd
+     */
+    public function removeKbd(): Message
+    {
+        $kbd = ['remove_keyboard' => true];
 
         $this->kbd = [
             'reply_markup' => json_encode($kbd, JSON_THROW_ON_ERROR),
@@ -344,7 +399,8 @@ final class Message
 
     /**
      * Добавляет превью к сообщению с помощью ссылки.
-     * Теперь этот метод только сохраняет URL, а вся логика применяется в момент отправки.
+     * Теперь этот метод только сохраняет URL, а вся логика применяется в
+     * момент отправки.
      *
      * @param string $url
      *
@@ -355,6 +411,7 @@ final class Message
     public function mediaPreview(string $url): static
     {
         $this->media_preview_url = $url;
+
         return $this;
     }
 
@@ -403,16 +460,21 @@ final class Message
         $url = $this->media_preview_url;
         $invisibleCharacter = '​'; // U+200B ZERO-WIDTH SPACE
 
-        if ($this->parse_mode === 'MarkdownV2' || $this->parse_mode === 'Markdown') {
+        if ($this->parse_mode === 'MarkdownV2'
+            || $this->parse_mode === 'Markdown'
+        ) {
             $this->text = "[$invisibleCharacter](".$url.")".$this->text;
         } elseif ($this->parse_mode === 'HTML') {
-            $this->text = "<a href=\"".$url."\">".$invisibleCharacter."</a>".$this->text;
+            $this->text = "<a href=\"".$url."\">".$invisibleCharacter."</a>"
+                .$this->text;
         } else {
             // Если parse_mode не задан, используем entities
             $this->text = $invisibleCharacter.$this->text;
 
             $lengthInUtf16 = strlen(
-                    mb_convert_encoding($invisibleCharacter, 'UTF-16LE', 'UTF-8'),
+                    mb_convert_encoding(
+                        $invisibleCharacter, 'UTF-16LE', 'UTF-8',
+                    ),
                 ) / 2;
 
             $entity = [
@@ -471,7 +533,9 @@ final class Message
             }
 
             if ($this->entities !== null) {
-                $params['entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
+                $params['entities'] = json_encode(
+                    $this->entities, JSON_THROW_ON_ERROR,
+                );
             }
 
             return $this->api->callAPI('sendMessage', $params);
@@ -533,7 +597,9 @@ final class Message
             }
 
             if ($this->entities !== null) {
-                $contentParams['entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
+                $contentParams['entities'] = json_encode(
+                    $this->entities, JSON_THROW_ON_ERROR,
+                );
             }
 
         } else {
@@ -580,7 +646,9 @@ final class Message
             }
 
             if ($this->entities !== null) {
-                $contentParams['caption_entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
+                $contentParams['caption_entities'] = json_encode(
+                    $this->entities, JSON_THROW_ON_ERROR,
+                );
             }
         } else {
             throw new \Exception(
@@ -630,7 +698,9 @@ final class Message
             }
 
             // 3. Кодируем в JSON именно этот ОДИН объект
-            $postFields['media'] = json_encode($mediaObject, JSON_THROW_ON_ERROR);
+            $postFields['media'] = json_encode(
+                $mediaObject, JSON_THROW_ON_ERROR,
+            );
 
             // Логика для прикрепления файла остается прежней.
             // Она найдет attach://file1 внутри $mediaObject['media']
@@ -653,8 +723,6 @@ final class Message
 
         return $this->api->callAPI('editMessageMedia', $params);
     }
-
-
 
 
     private function getIdentifier(?string $messageID = null,
@@ -680,15 +748,17 @@ final class Message
     private function sendMediaGroup(array $params): array
     {
         $params1 = [
-            'caption'    => $this->text,
+            'caption' => $this->text,
         ];
 
-        if($this->parse_mode !== null) {
+        if ($this->parse_mode !== null) {
             $params1['parse_mode'] = $this->parse_mode;
         }
 
         if ($this->entities !== null) {
-            $params1['caption_entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
+            $params1['caption_entities'] = json_encode(
+                $this->entities, JSON_THROW_ON_ERROR,
+            );
         }
 
         $this->media[0] = array_merge($this->media[0], $params1);
@@ -760,12 +830,14 @@ final class Message
     private function mediaSend(string $type, $params)
     {
         $params['caption'] = $this->text;
-        if($this->parse_mode !== null) {
+        if ($this->parse_mode !== null) {
             $params['parse_mode'] = $this->parse_mode;
         }
 
         if ($this->entities !== null) {
-            $params['caption_entities'] = json_encode($this->entities, JSON_THROW_ON_ERROR);
+            $params['caption_entities'] = json_encode(
+                $this->entities, JSON_THROW_ON_ERROR,
+            );
         }
 
         $params[$type] = str_contains($this->media[0]['media'], 'attach://')
