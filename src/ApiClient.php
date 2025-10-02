@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZhenyaGR\TGZ;
 
+use ZhenyaGR\TGZ\Utils\EnvironmentDetector;
 use ZhenyaGR\TGZ\Contracts\ApiInterface;
 class ApiClient implements ApiInterface
 {
@@ -31,6 +32,13 @@ class ApiClient implements ApiInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
+        if (EnvironmentDetector::isCli()) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        }
+
+
 
         $responseJson = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
