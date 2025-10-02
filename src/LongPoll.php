@@ -103,7 +103,6 @@ class LongPoll
      */
     public function listen(Closure $handler): void
     {
-        echo "Long Poll запущен... Нажмите Ctrl+C для остановки.\n";
 
         while (true) {
 
