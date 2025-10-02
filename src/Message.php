@@ -53,7 +53,7 @@ final class Message
 
                     if (isset($botButtons[$button])) {
                         if ($inline) {
-                            $gettingButtons[$key][$key_2] = $this->TGZ->buttonCallback($button, $botButtons[$button]);
+                            $gettingButtons[$key][$key_2] = $this->TGZ->buttonCallback( $botButtons[$button],$button);
                         } else {
                             $gettingButtons[$key][$key_2] = $this->TGZ->buttonText($botButtons[$button]);
                         }
