@@ -48,6 +48,10 @@ final class Message
 
         foreach ($gettingButtons as $key => $row) {
 
+            if (!is_array($row)) {
+                throw new \RuntimeException("Неправильный формат клавиатуры");
+            }
+
             foreach ($row as $key_2 => $button) {
                 if (is_string($button)){
 
