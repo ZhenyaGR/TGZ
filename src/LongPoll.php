@@ -57,6 +57,7 @@ class LongPoll
      *                         один аргумент: готовый к работе объект TGZ.
      *                         Пример: function(TGZ $tg) {ваш код}
      *
+     * @throws \JsonException
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/longpoll
      */
     public function listen(Closure $handler): void
@@ -64,21 +65,41 @@ class LongPoll
         echo "Long Poll запущен... Нажмите Ctrl+C для остановки.\n";
 
         while (true) {
-            // Используем наш унифицированный API клиент
-            $response = json_decode(
-                file_get_contents(
-                    $this->api->getApiUrl() . 'getUpdates?' . http_build_query(
-                        [
-                            'offset'          => $this->offset,
-                            'timeout'         => $this->timeout,
-                            'allowed_updates' => [],
-                            // Можно указать, какие типы обновлений получать
-                        ],
-                    ),
-                ), true, 512, JSON_THROW_ON_ERROR,
-            );
+            $url = $this->api->getApiUrl().'getUpdates?'.http_build_query(
+                    [
+                        'offset'          => $this->offset,
+                        'timeout'         => $this->timeout,
+                        'allowed_updates' => [],
+                        // Можно указать, какие типы обновлений получать
+                    ],
+                );
 
-            $updates = $response['result'];
+            // Подавляем вывод Warning, чтобы обработать его вручную
+            $response = @file_get_contents($url);
+
+            // Если функция вернула false, значит произошла ошибка
+            if ($response === false) {
+
+                $error = error_get_last();
+                $errorMessage = "Не удалось выполнить запрос к Telegram API.";
+
+                // Если информация об ошибке доступна, формируем детальное сообщение
+                if ($error !== null) {
+                    $errorMessage = sprintf(
+                        "Ошибка file_get_contents: %s в файле %s на строке %d",
+                        $error['message'],
+                        $error['file'],
+                        $error['line']
+                    );
+                }
+
+
+                throw new \RuntimeException($errorMessage);
+            }
+
+            $response_array = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+
+            $updates = $response_array['result'];
 
             if (empty($updates)) {
                 continue; // Если обновлений нет, просто начинаем следующий запрос
