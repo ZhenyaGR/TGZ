@@ -667,10 +667,23 @@ class Bot
             foreach ($this->routes['callback_query'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
-                    if ($condition === $callback_data) {
-                        $this->dispatchAnswer($route, $type);
 
-                        return;
+                    if (preg_match('/%[swn]/', $condition)) {
+                        $regex = $this->convertCommandPatternToRegex(
+                            $condition,
+                        );
+                        if (preg_match($regex, $callback_data, $matches)) {
+                            $args = array_slice($matches, 1);
+                            $this->dispatchAnswer($route, $type, $args);
+
+                            return;
+                        }
+                    } else {
+                        if ($condition === $callback_data) {
+                            $this->dispatchAnswer($route, $type);
+
+                            return;
+                        }
                     }
                 }
             }
@@ -720,7 +733,7 @@ class Bot
 
     private function convertCommandPatternToRegex(string $pattern): string
     {
-        // Находим все "токены": паттерны (%w и т.д.) или группы непробельных символов (\S+)
+        // Находим все "токены": паттерны (%s %w %n)
         preg_match_all('/%[swn]|\S+/u', $pattern, $matches);
         $tokens = $matches[0];
 
