@@ -8,6 +8,7 @@ use LogicException;
 use ZhenyaGR\TGZ\Contracts\ApiInterface;
 use ZhenyaGR\TGZ\Dto\UserDto;
 use ZhenyaGR\TGZ\Dto\ChatDto;
+use ZhenyaGR\TGZ\Utils\EnvironmentDetector;
 
 class TGZ
 {
@@ -26,8 +27,10 @@ class TGZ
 
     public static function create(string $token): self
     {
-        http_response_code(200);
-        echo 'ok';
+        if (!EnvironmentDetector::isCli()) {
+            http_response_code(200);
+            echo 'ok';
+        }
 
         $api = new ApiClient($token);
         $context = UpdateContext::fromWebhook();
