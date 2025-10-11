@@ -492,7 +492,7 @@ class TGZ
      *
      * @return array
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/getUpdate
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getupdate
      */
     public function getUpdate(): array
     {
@@ -504,7 +504,7 @@ class TGZ
      *
      * @return ?string
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getcallbackdata
      */
     public function getCallbackData(): ?string
     {
@@ -516,7 +516,7 @@ class TGZ
      *
      * @return ?string
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getqueryid
      */
     public function getQueryId(): ?string
     {
@@ -528,7 +528,7 @@ class TGZ
      *
      * @return ?string
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#gettype
      */
     public function getType(): ?string
     {
@@ -540,7 +540,7 @@ class TGZ
      *
      * @return ?string
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getmsgid
      */
     public function getMsgId(): ?string
     {
@@ -552,7 +552,7 @@ class TGZ
      *
      * @return ?string
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getchatid
      */
     public function getText(): ?string
     {
@@ -562,11 +562,11 @@ class TGZ
     /**
      * Возвращает переменную user_id
      *
-     * @return ?string
+     * @return ?int user_id
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getuserid
      */
-    public function getUserId(): ?string
+    public function getUserId(): ?int
     {
         return $this->context->getUserId();
     }
@@ -576,7 +576,7 @@ class TGZ
      *
      * @return ?string
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getchatid
      */
     public function getChatId(): ?string
     {
@@ -594,7 +594,7 @@ class TGZ
      * @return UserDto Объект пользователя.
      * @throws LogicException Если данные пользователя не найдены в событии.
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getuserdto
      */
     public function getUserDto(): UserDto
     {
@@ -635,7 +635,7 @@ class TGZ
      * @return ChatDto Объект чата.
      * @throws LogicException Если данные чата не найдены в событии.
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get#getchatdto
      */
     public function getChatDto(): ChatDto
     {
