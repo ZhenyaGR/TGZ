@@ -1089,15 +1089,23 @@ class Bot
     private function findActionById(string $id): ?Action
     {
         foreach ($this->routes as $type => $actions) {
-            if ($type === 'fallback') {
-                if ($this->routes['fallback']?->getId() === $id) {
-                    return $this->routes['fallback'];
-                }
-                continue;
+            if (is_array($actions) && isset($actions[$id])) {
+                return $actions[$id];
             }
+        }
 
-            if (isset($actions->$id)) {
-                return $actions->$id;
+        $singleActionRoutes = [
+            'inline_fallback', 'start_command', 'referral_command',
+            'edit_message', 'sticker_fallback', 'message_fallback',
+            'photo_fallback', 'video_fallback', 'audio_fallback',
+            'voice_fallback', 'document_fallback', 'video_note_fallback',
+            'new_chat_members', 'left_chat_member', 'fallback'
+        ];
+
+        foreach ($singleActionRoutes as $routeName) {
+            $action = $this->routes[$routeName];
+            if ($action instanceof Action && $action->getId() === $id) {
+                return $action;
             }
         }
 
@@ -1107,5 +1115,6 @@ class Bot
 
         return null;
     }
+
 
 }
