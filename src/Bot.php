@@ -527,23 +527,6 @@ class Bot
                     $conditions = (array)$route->getCondition();
                     foreach ($conditions as $condition) {
                         if ($condition === $text) {
-                            if (!empty($route->button_redirect)) {
-                                $targetAction = $this->findActionById(
-                                    $route->button_redirect,
-                                );
-
-                                if ($targetAction === null) {
-                                    throw new \LogicException(
-                                        "Button redirect target with ID '{$route->button_redirect}' not found.",
-                                    );
-                                }
-
-                                $this->executeAction($targetAction);
-
-                                return;
-
-                            }
-
                             $this->dispatchAnswer($route, 'text_button');
 
                             return;
@@ -784,6 +767,26 @@ class Bot
     {
         [$route, $type, $other_data] = $this->ctx;
 
+        if (!empty($route->redirect_to)) {
+            $targetAction = $this->findActionById($route->redirect_to);
+
+            if ($targetAction === null) {
+                throw new \LogicException(
+                    "Redirect target with ID '{$route->redirect_to}' not found.",
+                );
+            }
+
+            $query_id = $this->context->getQueryId();
+
+            if ($query_id && !empty($route->getQueryText())) {
+                $this->tg->answerCallbackQuery(
+                    $query_id, ['text' => $route->getQueryText()],
+                );
+            }
+
+            return $this->executeAction($targetAction, $other_data);
+        }
+
         $user_id = $this->context->getUserId();
 
         $this->tg->setBotButtons($this->buttons['btn']);
@@ -808,26 +811,6 @@ class Bot
 
                 return null;
             }
-        }
-
-        if (!empty($route->button_redirect)) {
-            $targetAction = $this->findActionById($route->button_redirect);
-
-            if ($targetAction === null) {
-                throw new \LogicException(
-                    "Button redirect target with ID '{$route->button_redirect}' not found.",
-                );
-            }
-
-            $query_id = $this->context->getQueryId();
-
-            if ($query_id && !empty($route->getQueryText())) {
-                $this->tg->answerCallbackQuery(
-                    $query_id, ['text' => $route->getQueryText()],
-                );
-            }
-
-            return $this->executeAction($targetAction, $other_data);
         }
 
         $handler = $route->getHandler();

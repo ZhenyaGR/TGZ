@@ -11,7 +11,7 @@ class Action
     private $handler;
     public array $messageData = [];
     public string $queryText = '';
-    public string $button_redirect = '';
+    public string $redirect_to = '';
     public \Closure|null $middleware_handler = null;
     private array $access_ids = [];
     private array $no_access_ids = [];
@@ -69,7 +69,7 @@ class Action
      */
     public function redirect(string $id): self
     {
-        $this->button_redirect = $id;
+        $this->redirect_to = $id;
 
         return $this;
     }
