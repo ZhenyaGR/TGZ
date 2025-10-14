@@ -17,6 +17,8 @@ class LongPoll
     private ApiInterface $api;
     private int $timeout;
     private int $offset = 0;
+    private bool $skipOldUpdates = false;
+
 
     /**
      * Конструктор принимает зависимости. Он используется "под капотом"
@@ -91,6 +93,19 @@ class LongPoll
     }
 
     /**
+     * Указывает, следует ли пропускать накопившиеся обновления.
+     * Если вызвать этот метод, бот начнет обработку только с новых сообщений, пришедших после его запуска.
+     *
+     * @return self
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/longpoll
+     */
+    public function skipOldUpdates(): self
+    {
+        $this->skipOldUpdates = true;
+        return $this;
+    }
+
+    /**
      * Запускает бесконечный цикл прослушивания обновлений от Telegram.
      *
      * @param Closure $handler Анонимная функция, которая будет вызвана для
@@ -103,6 +118,27 @@ class LongPoll
      */
     public function listen(Closure $handler): void
     {
+
+        if ($this->skipOldUpdates) {
+            $url = $this->api->getApiUrl().'getUpdates?'.http_build_query(
+                    ['limit' => 1, 'offset' => -1]
+                );
+
+            $response = @file_get_contents($url);
+
+            if ($response !== false) {
+                try {
+                    $data = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+                    if (!empty($data['result'])) {
+                        $lastUpdate = end($data['result']);
+                        $this->offset = $lastUpdate['update_id'] + 1;
+                    }
+                } catch (\JsonException $e) {
+                    // Просто начнем с offset = 0, как и раньше.
+                }
+            }
+        }
+
 
         while (true) {
 
