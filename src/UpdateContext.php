@@ -21,6 +21,7 @@ class UpdateContext
     {
         $input = file_get_contents('php://input');
         $update = json_decode($input, true);
+
         return new self($update);
     }
 
@@ -46,7 +47,7 @@ class UpdateContext
     {
         return $this->update['message']['from']['id']
             ?? $this->update['edited_message']['from']['id']
-            ?? $this->update['callback_query']['message']['from']['id']
+            ?? $this->update['callback_query']['from']['id']
             ?? $this->update['inline_query']['from']['id']
             ?? null;
     }
@@ -82,21 +83,28 @@ class UpdateContext
 
     public function getType(): ?string
     {
-        if (isset($this->update['message'])) {
-            $type = (isset($this->update['message']['entities'][0]['type'])
-                && $this->update['message']['entities'][0]['type']
-                === 'bot_command') ? 'bot_command' : 'text';
-        } elseif (isset($this->update['callback_query'])) {
-            $type = 'callback_query';
-        } elseif (isset($this->update['edited_message'])) {
-            $type = 'edited_message';
-        } elseif (isset($this->update['inline_query'])) {
-            $type = 'inline_query';
-        } else {
-            $type = null;
+        if (isset($this->update['callback_query'])) {
+            return 'callback_query';
         }
 
-        return $type;
+        if (isset($this->update['edited_message'])) {
+            return 'edited_message';
+        }
+        if (isset($this->update['inline_query'])) {
+            return 'inline_query';
+        }
+
+        if (isset($this->update['message'])) {
+             if (!empty($this->update['message']['entities'])
+                && $this->update['message']['entities'][0]['type']
+                === 'bot_command'
+            ) {
+                return 'bot_command';
+            }
+            return 'text';
+        }
+
+        return null;
     }
 
 
