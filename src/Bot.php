@@ -752,6 +752,8 @@ class Bot
             $other_data,
         ];
 
+        $this->tg->setBotButtons($this->buttons['btn']);
+
         $next = function(): void {
             $this->processAnswer();
         };
@@ -788,8 +790,6 @@ class Bot
         }
 
         $user_id = $this->context->getUserId();
-
-        $this->tg->setBotButtons($this->buttons['btn']);
 
         if ($user_id) {
             $accessIds = $route->getAccessIds();
