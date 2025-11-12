@@ -1053,11 +1053,15 @@ class Bot
      *
      * @throws \InvalidArgumentException Если один из маршрутов не найден.
      *
+     * @return Bot
+     *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/redirect
      */
-    public function redirect(string $id, string $to_id): void
+    public function redirect(string $id, string $to_id): Bot
     {
         $this->pendingRedirects[] = ['from' => $id, 'to' => $to_id];
+
+        return $this;
     }
 
     private function processRedirects(): void
