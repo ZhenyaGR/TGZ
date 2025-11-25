@@ -13,6 +13,8 @@ class Pagination
     private string $nextText = ">";     // Следующая страница
     private null|string $returnButtonText = null;
     private null|string $returnButtonCallbackData = null;
+    private null|string $firstText = null;
+    private null|string $lastText = null;
 
     public function __construct() {}
 
@@ -137,6 +139,31 @@ class Pagination
         return $this;
     }
 
+    /**
+     * Устанавливает текст на кнопках навигации ("Предыдущая страница",
+     * "Следующая страница")
+     *
+     * @param string $firstText Первая страница
+     * @param string $lastText Последняя страница
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setSigns
+     */
+    public function setSideSigns(string $firstText, string $lastText): self
+    {
+        if ($firstText === '' || $lastText === '') {
+            throw new \LogicException(
+                'FirstText или LastText не должны быть пустыми',
+            );
+        }
+
+        $this->firstText = $firstText;
+        $this->lastText = $lastText;
+
+        return $this;
+    }
+
 
     /**
      * Добавляет кнопку "Назад"
@@ -195,6 +222,13 @@ class Pagination
                     'text'          => $this->prevText,
                     'callback_data' => $this->callbackPrefix.($this->page - 1),
                 ];
+
+                if ($this->firstText !== null) {
+                    $navigationRow[] = [
+                        'text'          => $this->firstText,
+                        'callback_data' => $this->callbackPrefix.(1),
+                    ];
+                }
             }
 
             if ($this->page !== $totalPages) {
@@ -202,6 +236,13 @@ class Pagination
                     'text'          => $this->nextText,
                     'callback_data' => $this->callbackPrefix.($this->page + 1),
                 ];
+
+                if ($this->lastText !== null) {
+                    $navigationRow[] = [
+                        'text'          => $this->firstText,
+                        'callback_data' => $this->callbackPrefix.($totalPages),
+                    ];
+                }
             }
 
             $keyboard[] = $navigationRow;
@@ -219,14 +260,3 @@ class Pagination
         return $keyboard;
     }
 }
-
-
-//$kbd = $tg->pagination()
-//    ->setItems($items)        // массив из кнопок
-//    ->setPerPage(5)           // количество кнопок на странице
-//    ->setColumns(1)           // количество колонок
-//    ->setPage(1)              // опционально: текущая страница
-//    ->setPrefix('shop_page_') // префикс для callback
-//    ->setSigns(prevText: '<', nextText: '>') // кнопки вперед-назад
-//    ->addReturnButton(buttonText: "Назад", callbackData: "back") // добавить кнопку возврата
-//    ->create();
