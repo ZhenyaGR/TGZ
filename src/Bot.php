@@ -45,7 +45,7 @@ class Bot
 
     private \Closure|null $middleware_handler = null;
 
-    public function __construct(TGZ $tg = null)
+    public function __construct(TGZ|null $tg = null)
     {
         $this->tg = $tg;
         $this->context = $tg?->context;
@@ -75,7 +75,7 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/btn
      */
-    public function btn(string $id, string $text = null): Action
+    public function btn(string $id, string|null $text = null): Action
     {
         $this->buttons['btn'][$id] = $text ?? $id;
 
@@ -95,7 +95,7 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onBotCommand
      */
-    public function onBotCommand(string $id, array|string $command = null,
+    public function onBotCommand(string $id, array|string|null $command = null,
     ): Action {
         $route = new Action($id, $command ?? $id);
         $this->routes['bot_command'][$id] = $route;
@@ -158,7 +158,7 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCommand
      */
-    public function onCommand(string $id, array|string $command = null): Action
+    public function onCommand(string $id, array|string|null $command = null): Action
     {
         $route = new Action($id, $command ?? $id);
         $this->routes['command'][$id] = $route;
@@ -176,7 +176,7 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onText
      */
-    public function onText(string $id, array|string $text = null): Action
+    public function onText(string $id, array|string|null $text = null): Action
     {
         $route = new Action($id, $text ?? $id);
         $this->routes['text_exact'][$id] = $route;
@@ -194,7 +194,7 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onTextPreg
      */
-    public function onTextPreg(string $id, array|string $pattern = null): Action
+    public function onTextPreg(string $id, array|string|null $pattern = null): Action
     {
         $route = new Action($id, $pattern ?? $id);
         $this->routes['text_preg'][$id] = $route;
@@ -212,7 +212,7 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallback
      */
-    public function onCallback(string $id, array|string $data = null): Action
+    public function onCallback(string $id, array|string|null $data = null): Action
     {
         $route = new Action($id, $data ?? $id);
         $this->routes['callback_query'][$id] = $route;
