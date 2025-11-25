@@ -216,6 +216,7 @@ class Pagination
 
         if ($totalPages > 1) {
             $navigationRow = [];
+            $sideNavigationRow = [];
 
             if ($this->page !== 1) {
                 $navigationRow[] = [
@@ -224,8 +225,8 @@ class Pagination
                 ];
 
                 if ($this->firstText !== null) {
-                    $navigationRow[] = [
-                        'text'          => $this->firstText,
+                    $sideNavigationRow[] = [
+                        'text'          => $this->lastText,
                         'callback_data' => $this->callbackPrefix.(1),
                     ];
                 }
@@ -238,7 +239,7 @@ class Pagination
                 ];
 
                 if ($this->lastText !== null) {
-                    $navigationRow[] = [
+                    $sideNavigationRow[] = [
                         'text'          => $this->firstText,
                         'callback_data' => $this->callbackPrefix.($totalPages),
                     ];
@@ -246,6 +247,7 @@ class Pagination
             }
 
             $keyboard[] = $navigationRow;
+            $keyboard[] = $sideNavigationRow;
         }
 
         if ($this->returnButtonText !== null
