@@ -127,6 +127,18 @@ class TGZ
     }
 
     /**
+     * Метод создает объект класса Pagination для конструктора страниц
+     *
+     * @return \ZhenyaGR\TGZ\Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/pagination
+     */
+    public function pagination(): Pagination
+    {
+        return new Pagination();
+    }
+
+    /**
      * Метод создает объект класса File для скачивания
      *
      * @param string $file_id
