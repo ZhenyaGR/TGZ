@@ -223,13 +223,6 @@ class Pagination
                     'text'          => $this->prevText,
                     'callback_data' => $this->callbackPrefix.($this->page - 1),
                 ];
-
-                if ($this->firstText !== null) {
-                    $sideNavigationRow[] = [
-                        'text'          => $this->lastText,
-                        'callback_data' => $this->callbackPrefix.(1),
-                    ];
-                }
             }
 
             if ($this->page !== $totalPages) {
@@ -237,17 +230,26 @@ class Pagination
                     'text'          => $this->nextText,
                     'callback_data' => $this->callbackPrefix.($this->page + 1),
                 ];
-
-                if ($this->lastText !== null) {
-                    $sideNavigationRow[] = [
-                        'text'          => $this->firstText,
-                        'callback_data' => $this->callbackPrefix.($totalPages),
-                    ];
-                }
             }
 
             $keyboard[] = $navigationRow;
-            $keyboard[] = $sideNavigationRow;
+
+
+//            if ($this->lastText !== null) {
+//                $sideNavigationRow[] = [
+//                    'text'          => $this->lastText,
+//                    'callback_data' => $this->callbackPrefix.($totalPages),
+//                ];
+//            }
+//
+//            if ($this->firstText !== null) {
+//                $sideNavigationRow[] = [
+//                    'text'          => $this->firstText,
+//                    'callback_data' => $this->callbackPrefix.(1),
+//                ];
+//            }
+//
+//            $keyboard[] = $sideNavigationRow;
         }
 
         if ($this->returnButtonText !== null
