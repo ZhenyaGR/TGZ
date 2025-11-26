@@ -4,6 +4,16 @@ namespace ZhenyaGR\TGZ;
 
 class Pagination
 {
+
+    public const LAYOUT_ROW = 0;   // одна строка из 4 кнопок
+
+    public const LAYOUT_SPLIT = 1; // разделить на две строки
+
+    public const LAYOUT_SMART = 2; // группировать
+
+    private int $navigationLayout = self::LAYOUT_ROW;
+
+
     private array $items;               // Кнопки
     private int $perPage = 5;           // Количество кнопок на странице
     private int $columns = 1;           // Количество колонок
@@ -141,15 +151,14 @@ class Pagination
     }
 
     /**
-     * Устанавливает текст на кнопках навигации ("Предыдущая страница",
-     * "Следующая страница")
+     * Устанавливает текст на кнопках навигации ("Первая страница", "Последняя страница")
      *
      * @param string $firstText Первая страница
-     * @param string $lastText Последняя страница
+     * @param string $lastText  Последняя страница
      *
      * @return Pagination
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setSigns
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setSideSigns
      */
     public function setSideSigns(string $firstText, string $lastText): self
     {
@@ -162,6 +171,23 @@ class Pagination
         $this->firstText = $firstText;
         $this->lastText = $lastText;
         $this->showFirstLast = true;
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает режим отображения кнопок навигации
+     *
+     * @param int $layout Одна из констант: Pagination::LAYOUT_ROW,
+     *                    Pagination::LAYOUT_SPLIT, Pagination::LAYOUT_SMART
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout
+     */
+    public function setNavigationLayout(int $layout): self
+    {
+        $this->navigationLayout = $layout;
 
         return $this;
     }
@@ -217,42 +243,79 @@ class Pagination
         $keyboard = array_chunk($pageItems, $this->columns);
 
         if ($totalPages > 1) {
-            $navigationRow = [];
 
-            // 1 Кнопка начало
+            $innerButtons = [];
+            $outerButtons = [];
+
+            // Кнопка начало
             if ($this->showFirstLast && $this->page > 1) {
-                $navigationRow[] = [
+                $outerButtons['first'] = [
                     'text'          => $this->firstText,
                     'callback_data' => $this->callbackPrefix . '1',
                 ];
             }
 
-            // 2 Кнопка Назад
+            // Кнопка предыдущая
             if ($this->page > 1) {
-                $navigationRow[] = [
+                $innerButtons['prev'] = [
                     'text'          => $this->prevText,
                     'callback_data' => $this->callbackPrefix . ($this->page - 1),
                 ];
             }
 
-            // 3 Кнопка вперед
+            // Кнопка вперед
             if ($this->page < $totalPages) {
-                $navigationRow[] = [
+                $innerButtons['next'] = [
                     'text'          => $this->nextText,
                     'callback_data' => $this->callbackPrefix . ($this->page + 1),
                 ];
             }
 
-            // 4 Кнопка конец
+            // Кнопка конец
             if ($this->showFirstLast && $this->page < $totalPages) {
-                $navigationRow[] = [
+                $outerButtons['last'] = [
                     'text'          => $this->lastText,
                     'callback_data' => $this->callbackPrefix . $totalPages,
                 ];
             }
 
-            if (!empty($navigationRow)) {
-                $keyboard[] = $navigationRow;
+            $shouldSplit = false;
+            $totalNavButtons = count($innerButtons) + count($outerButtons);
+
+            switch ($this->navigationLayout) {
+                case self::LAYOUT_SPLIT:
+                    $shouldSplit = !empty($outerButtons);
+                    break;
+
+                case self::LAYOUT_SMART:
+                    $shouldSplit = $totalNavButtons > 2;
+                    break;
+
+                case self::LAYOUT_ROW:
+                default:
+                    $shouldSplit = false;
+                    break;
+            }
+
+            if ($shouldSplit) {
+                if (!empty($innerButtons)) {
+                    $keyboard[] = array_values($innerButtons);
+                }
+
+                if (!empty($outerButtons)) {
+                    $keyboard[] = array_values($outerButtons);
+                }
+
+            } else {
+                $row = [];
+                if (isset($outerButtons['first'])) $row[] = $outerButtons['first'];
+                if (isset($innerButtons['prev']))  $row[] = $innerButtons['prev'];
+                if (isset($innerButtons['next']))  $row[] = $innerButtons['next'];
+                if (isset($outerButtons['last']))  $row[] = $outerButtons['last'];
+
+                if (!empty($row)) {
+                    $keyboard[] = $row;
+                }
             }
         }
 
