@@ -18,6 +18,7 @@ class Bot
             'text_exact'          => [],
             'text_preg'           => [],
             'callback_query'      => [],
+            'callback_query_preg' => [],
             'inline_fallback'     => null,
             'start_command'       => null,
             'referral_command'    => null,
@@ -158,8 +159,8 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCommand
      */
-    public function onCommand(string $id, array|string|null $command = null): Action
-    {
+    public function onCommand(string $id, array|string|null $command = null,
+    ): Action {
         $route = new Action($id, $command ?? $id);
         $this->routes['command'][$id] = $route;
 
@@ -194,8 +195,8 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onTextPreg
      */
-    public function onTextPreg(string $id, array|string|null $pattern = null): Action
-    {
+    public function onTextPreg(string $id, array|string|null $pattern = null,
+    ): Action {
         $route = new Action($id, $pattern ?? $id);
         $this->routes['text_preg'][$id] = $route;
 
@@ -212,10 +213,28 @@ class Bot
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallback
      */
-    public function onCallback(string $id, array|string|null $data = null): Action
-    {
+    public function onCallback(string $id, array|string|null $data = null,
+    ): Action {
         $route = new Action($id, $data ?? $id);
         $this->routes['callback_query'][$id] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Создает маршрут для callback-запроса по регулярному выражению.
+     *
+     * @param string            $id   Уникальный идентификатор.
+     * @param array|string|null $pattern Регулярное выражение для CallbackData.
+     *
+     * @return Action
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallbackPreg
+     */
+    public function onCallbackPreg(string $id, array|string|null $pattern = null,
+    ): Action {
+        $route = new Action($id, $pattern ?? $id);
+        $this->routes['callback_query_preg'][$id] = $route;
 
         return $route;
     }
@@ -646,13 +665,12 @@ class Bot
                 }
             }
 
-            // Проверяем callback_data
+            // Проверяем callback_query
             foreach ($this->routes['callback_query'] as $route) {
                 $conditions = (array)$route->getCondition();
                 foreach ($conditions as $condition) {
-
                     if (preg_match('/%[swn]/', $condition)) {
-                        $regex = $this->convertCommandPatternToRegex(
+                        $regex = $this->convertPatternToRegex(
                             $condition,
                         );
                         if (preg_match($regex, $callback_data, $matches)) {
@@ -665,6 +683,19 @@ class Bot
                         if ($condition === $callback_data) {
                             $this->dispatchAnswer($route, $type);
 
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Проверяем callback_query_preg
+            if (!empty($this->routes['callback_preg'])) {
+                foreach ($this->routes['callback_preg'] as $route) {
+                    $patterns = (array)$route->getCondition();
+                    foreach ($patterns as $pattern) {
+                        if (preg_match($pattern, $callback_data, $matches)) {
+                            $this->dispatchAnswer($route, $type, $matches); // Передаем все совпадения
                             return;
                         }
                     }
@@ -698,14 +729,15 @@ class Bot
         if (!empty($this->context->getUpdateData()['message'][$route_type])
             && $this->routes[$fallback_key] !== null
         ) {
-
-            $file_id = File::getFileId($this->context->getUpdateData(), $route_type);
+            $file_id = File::getFileId(
+                $this->context->getUpdateData(), $route_type,
+            );
             $file = new File($file_id, $this->tg->api);
 
             $this->dispatchAnswer(
                 $this->routes[$fallback_key],
                 'text',
-                [$file]
+                [$file],
             );
 
             return true;
@@ -743,6 +775,25 @@ class Bot
 
         return '/'.$regex.'/u';
     }
+
+    private function convertPatternToRegex(string $pattern): string
+    {
+        $regex = preg_quote($pattern, '/');
+
+        $replacements = [
+            '%n' => '(\d+)',             // Число
+            '%w' => '([a-zA-Z0-9_]+)',   // Слово (включая _)
+            '%s' => '(.+)',              // Всё остальное
+        ];
+
+        $regex = str_replace(
+            array_keys($replacements), array_values($replacements), $regex,
+        );
+
+        // 3. Добавляем границы строки
+        return '/^'.$regex.'$/u';
+    }
+
 
     private function dispatchAnswer($route, $type, array $other_data = [])
     {
@@ -949,8 +1000,9 @@ class Bot
     /**
      * @throws \JsonException
      */
-    private function constructKbd(Message $msg, array $kbd, bool $inline, bool $oneTime, bool $resize): Message
-    {
+    private function constructKbd(Message $msg, array $kbd, bool $inline,
+        bool $oneTime, bool $resize,
+    ): Message {
         $keyboardLayout = [];
         $definedButtons = $this->buttons['btn'];
 
@@ -989,7 +1041,6 @@ class Bot
         }
 
         if (!empty($keyboardLayout)) {
-
             if ($inline) {
                 $msg->inlineKbd($keyboardLayout);
             } else {
@@ -1001,7 +1052,7 @@ class Bot
 
     }
 
-    public function tgz(TGZ $TGZ):self
+    public function tgz(TGZ $TGZ): self
     {
         $this->tg = $TGZ;
         $this->context = $TGZ->context;
@@ -1051,9 +1102,9 @@ class Bot
      * @param string $id    ID исходного маршрута (откуда редирект).
      * @param string $to_id ID целевого маршрута (куда редирект).
      *
-     * @throws \InvalidArgumentException Если один из маршрутов не найден.
-     *
      * @return Bot
+     *
+     * @throws \InvalidArgumentException Если один из маршрутов не найден.
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/redirect
      */
@@ -1103,7 +1154,7 @@ class Bot
             'edit_message', 'sticker_fallback', 'message_fallback',
             'photo_fallback', 'video_fallback', 'audio_fallback',
             'voice_fallback', 'document_fallback', 'video_note_fallback',
-            'new_chat_members', 'left_chat_member', 'fallback'
+            'new_chat_members', 'left_chat_member', 'fallback',
         ];
 
         foreach ($singleActionRoutes as $routeName) {
