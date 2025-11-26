@@ -690,8 +690,8 @@ class Bot
             }
 
             // Проверяем callback_query_preg
-            if (!empty($this->routes['callback_preg'])) {
-                foreach ($this->routes['callback_preg'] as $route) {
+            if (!empty($this->routes['callback_query_preg'])) {
+                foreach ($this->routes['callback_query_preg'] as $route) {
                     $patterns = (array)$route->getCondition();
                     foreach ($patterns as $pattern) {
                         if (preg_match($pattern, $callback_data, $matches)) {
