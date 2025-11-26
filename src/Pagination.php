@@ -15,6 +15,7 @@ class Pagination
     private null|string $returnButtonCallbackData = null;
     private null|string $firstText = null;
     private null|string $lastText = null;
+    private bool $showFirstLast = false;
 
     public function __construct() {}
 
@@ -160,6 +161,7 @@ class Pagination
 
         $this->firstText = $firstText;
         $this->lastText = $lastText;
+        $this->showFirstLast = true;
 
         return $this;
     }
@@ -216,7 +218,6 @@ class Pagination
 
         if ($totalPages > 1) {
             $navigationRow = [];
-            $sideNavigationRow = [];
 
             if ($this->page !== 1) {
                 $navigationRow[] = [
@@ -232,24 +233,31 @@ class Pagination
                 ];
             }
 
+
+            if ($this->showFirstLast) {
+                $sideNavigationRow = [];
+
+                if ($this->page !== 1) {
+                    $sideNavigationRow[] = [
+                        'text'          => $this->firstText,
+                        'callback_data' => $this->callbackPrefix.(1),
+                    ];
+                }
+
+                if ($this->page !== $totalPages) {
+                    $sideNavigationRow[] = [
+                        'text'          => $this->lastText,
+                        'callback_data' => $this->callbackPrefix.($totalItems),
+                    ];
+                }
+
+                if (count($navigationRow) === 1 && count($sideNavigationRow) === 1) {
+                    $navigationRow += $sideNavigationRow;
+                }
+
+            }
             $keyboard[] = $navigationRow;
 
-
-//            if ($this->lastText !== null) {
-//                $sideNavigationRow[] = [
-//                    'text'          => $this->lastText,
-//                    'callback_data' => $this->callbackPrefix.($totalPages),
-//                ];
-//            }
-//
-//            if ($this->firstText !== null) {
-//                $sideNavigationRow[] = [
-//                    'text'          => $this->firstText,
-//                    'callback_data' => $this->callbackPrefix.(1),
-//                ];
-//            }
-//
-//            $keyboard[] = $sideNavigationRow;
         }
 
         if ($this->returnButtonText !== null
