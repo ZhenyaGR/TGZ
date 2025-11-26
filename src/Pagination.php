@@ -5,10 +5,31 @@ namespace ZhenyaGR\TGZ;
 class Pagination
 {
 
+    /**
+     * Все 4 кнопки будут находиться на одной строке
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_row
+     *
+     */
     public const LAYOUT_ROW = 0;   // одна строка из 4 кнопок
 
+    /**
+     * Кнопки "Предыдущая страница" и "Следующая страница" будут находиться на одной строке
+     * Кнопки "Первая страница" и "Последняя страница" будут находиться на второй строке
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_split
+     *
+     */
     public const LAYOUT_SPLIT = 1; // разделить на две строки
 
+
+    /**
+     * Кнопки разных типов будут находиться на одной строке только при условии, что их 2
+     * Иначе будут на разных
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_smart
+     *
+     */
     public const LAYOUT_SMART = 2; // группировать
 
     private int $navigationLayout = self::LAYOUT_ROW;
@@ -151,7 +172,8 @@ class Pagination
     }
 
     /**
-     * Устанавливает текст на кнопках навигации ("Первая страница", "Последняя страница")
+     * Устанавливает текст на кнопках навигации ("Первая страница", "Последняя
+     * страница")
      *
      * @param string $firstText Первая страница
      * @param string $lastText  Последняя страница
@@ -243,7 +265,6 @@ class Pagination
         $keyboard = array_chunk($pageItems, $this->columns);
 
         if ($totalPages > 1) {
-
             $innerButtons = [];
             $outerButtons = [];
 
@@ -251,7 +272,7 @@ class Pagination
             if ($this->showFirstLast && $this->page > 1) {
                 $outerButtons['first'] = [
                     'text'          => $this->firstText,
-                    'callback_data' => $this->callbackPrefix . '1',
+                    'callback_data' => $this->callbackPrefix.'1',
                 ];
             }
 
@@ -259,7 +280,7 @@ class Pagination
             if ($this->page > 1) {
                 $innerButtons['prev'] = [
                     'text'          => $this->prevText,
-                    'callback_data' => $this->callbackPrefix . ($this->page - 1),
+                    'callback_data' => $this->callbackPrefix.($this->page - 1),
                 ];
             }
 
@@ -267,7 +288,7 @@ class Pagination
             if ($this->page < $totalPages) {
                 $innerButtons['next'] = [
                     'text'          => $this->nextText,
-                    'callback_data' => $this->callbackPrefix . ($this->page + 1),
+                    'callback_data' => $this->callbackPrefix.($this->page + 1),
                 ];
             }
 
@@ -275,7 +296,7 @@ class Pagination
             if ($this->showFirstLast && $this->page < $totalPages) {
                 $outerButtons['last'] = [
                     'text'          => $this->lastText,
-                    'callback_data' => $this->callbackPrefix . $totalPages,
+                    'callback_data' => $this->callbackPrefix.$totalPages,
                 ];
             }
 
@@ -308,10 +329,18 @@ class Pagination
 
             } else {
                 $row = [];
-                if (isset($outerButtons['first'])) $row[] = $outerButtons['first'];
-                if (isset($innerButtons['prev']))  $row[] = $innerButtons['prev'];
-                if (isset($innerButtons['next']))  $row[] = $innerButtons['next'];
-                if (isset($outerButtons['last']))  $row[] = $outerButtons['last'];
+                if (isset($outerButtons['first'])) {
+                    $row[] = $outerButtons['first'];
+                }
+                if (isset($innerButtons['prev'])) {
+                    $row[] = $innerButtons['prev'];
+                }
+                if (isset($innerButtons['next'])) {
+                    $row[] = $innerButtons['next'];
+                }
+                if (isset($outerButtons['last'])) {
+                    $row[] = $outerButtons['last'];
+                }
 
                 if (!empty($row)) {
                     $keyboard[] = $row;
