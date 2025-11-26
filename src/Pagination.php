@@ -15,6 +15,7 @@ class Pagination
 
     /**
      * Кнопки "Предыдущая страница" и "Следующая страница" будут находиться на одной строке
+     *
      * Кнопки "Первая страница" и "Последняя страница" будут находиться на второй строке
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_split
@@ -25,6 +26,7 @@ class Pagination
 
     /**
      * Кнопки разных типов будут находиться на одной строке только при условии, что их 2
+     *
      * Иначе будут на разных
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_smart
