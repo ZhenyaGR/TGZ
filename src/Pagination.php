@@ -219,45 +219,41 @@ class Pagination
         if ($totalPages > 1) {
             $navigationRow = [];
 
-            if ($this->page !== 1) {
+            // 1 Кнопка начало
+            if ($this->showFirstLast && $this->page > 1) {
+                $navigationRow[] = [
+                    'text'          => $this->firstText,
+                    'callback_data' => $this->callbackPrefix . '1',
+                ];
+            }
+
+            // 2 Кнопка Назад
+            if ($this->page > 1) {
                 $navigationRow[] = [
                     'text'          => $this->prevText,
-                    'callback_data' => $this->callbackPrefix.($this->page - 1),
+                    'callback_data' => $this->callbackPrefix . ($this->page - 1),
                 ];
             }
 
-            if ($this->page !== $totalPages) {
+            // 3 Кнопка вперед
+            if ($this->page < $totalPages) {
                 $navigationRow[] = [
                     'text'          => $this->nextText,
-                    'callback_data' => $this->callbackPrefix.($this->page + 1),
+                    'callback_data' => $this->callbackPrefix . ($this->page + 1),
                 ];
             }
 
-
-            if ($this->showFirstLast) {
-                $sideNavigationRow = [];
-
-                if ($this->page !== 1) {
-                    $sideNavigationRow[] = [
-                        'text'          => $this->firstText,
-                        'callback_data' => $this->callbackPrefix.(1),
-                    ];
-                }
-
-                if ($this->page !== $totalPages) {
-                    $sideNavigationRow[] = [
-                        'text'          => $this->lastText,
-                        'callback_data' => $this->callbackPrefix.($totalItems),
-                    ];
-                }
-
-                if (count($navigationRow) === 1 && count($sideNavigationRow) === 1) {
-                    $navigationRow += $sideNavigationRow;
-                }
-
+            // 4 Кнопка конец
+            if ($this->showFirstLast && $this->page < $totalPages) {
+                $navigationRow[] = [
+                    'text'          => $this->lastText,
+                    'callback_data' => $this->callbackPrefix . $totalPages,
+                ];
             }
-            $keyboard[] = $navigationRow;
 
+            if (!empty($navigationRow)) {
+                $keyboard[] = $navigationRow;
+            }
         }
 
         if ($this->returnButtonText !== null
