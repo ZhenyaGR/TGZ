@@ -14,9 +14,11 @@ class Pagination
     public const LAYOUT_ROW = 0;   // одна строка из 4 кнопок
 
     /**
-     * Кнопки "Предыдущая страница" и "Следующая страница" будут находиться на одной строке
+     * Кнопки "Предыдущая страница" и "Следующая страница" будут находиться на
+     * одной строке
      *
-     * Кнопки "Первая страница" и "Последняя страница" будут находиться на второй строке
+     * Кнопки "Первая страница" и "Последняя страница" будут находиться на
+     * второй строке
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_split
      *
@@ -25,7 +27,8 @@ class Pagination
 
 
     /**
-     * Кнопки разных типов будут находиться на одной строке только при условии, что их 2
+     * Кнопки разных типов будут находиться на одной строке только при условии,
+     * что их 2
      *
      * Иначе будут на разных
      *
@@ -49,6 +52,7 @@ class Pagination
     private null|string $firstText = null;
     private null|string $lastText = null;
     private bool $showFirstLast = false;
+    private null|int $totalItems = null;
 
     public function __construct() {}
 
@@ -64,6 +68,26 @@ class Pagination
     public function setItems(array $items): self
     {
         $this->items = $items;
+
+        return $this;
+    }
+
+
+    /**
+     * Устанавливает максимальное количество элементов, из которых будет
+     * состоять список
+     *
+     * Удобно, чтобы не передавать весь список кнопок, если их слишком много
+     *
+     * @param int $totalItems
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setTotalItems
+     */
+    public function setTotalItems(int $totalItems): self
+    {
+        $this->totalItems = $totalItems;
 
         return $this;
     }
@@ -254,7 +278,7 @@ class Pagination
             return [];
         }
 
-        $totalItems = count($this->items);
+        $totalItems = $this->totalItems ?? count($this->items);
         $totalPages = (int)ceil($totalItems / $this->perPage);
 
         if ($this->page > $totalPages) {
