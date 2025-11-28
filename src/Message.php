@@ -436,24 +436,6 @@ final class Message
         return $this;
     }
 
-    /**
-     * Отправляет действие
-     *
-     * @param string|null $action
-     *
-     * @return Message
-     *
-     * @throws \Exception
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/action
-     */
-    public function action(?string $action = 'typing'): self
-    {
-        $this->TGZ->sendAction($action);
-
-        return $this;
-    }
-
     private function applyMediaPreview(): void
     {
         // Если URL для превью не был установлен, ничего не делаем.

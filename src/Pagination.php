@@ -326,7 +326,6 @@ class Pagination
                 ];
             }
 
-            $shouldSplit = false;
             $totalNavButtons = count($innerButtons) + count($outerButtons);
 
             switch ($this->navigationLayout) {

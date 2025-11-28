@@ -270,7 +270,7 @@ class TGZ
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/sendAction
      */
-    public function sendAction(?string $action = 'typing'): static
+    public function sendAction(?string $action = 'typing'): self
     {
         if (!in_array($action, [
             'typing',
