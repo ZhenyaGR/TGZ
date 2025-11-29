@@ -266,6 +266,19 @@ class Pagination
     }
 
     /**
+     * Возвращает максимальное количество страниц
+     *
+     * @return int
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/getTotalPage
+     */
+    public function getTotalPage(): int
+    {
+        $totalItems = $this->totalItems ?? count($this->items);
+        return (int)ceil($totalItems / $this->perPage);
+    }
+
+    /**
      * Собирает страницу
      *
      * @return array
@@ -278,8 +291,7 @@ class Pagination
             return [];
         }
 
-        $totalItems = $this->totalItems ?? count($this->items);
-        $totalPages = (int)ceil($totalItems / $this->perPage);
+        $totalPages = $this->getTotalPage();
 
         if ($this->page > $totalPages) {
             $this->page = $totalPages;
