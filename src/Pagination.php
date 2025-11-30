@@ -324,7 +324,7 @@ class Pagination
 
         $keyboard = array_chunk($pageItems, $this->columns);
 
-        if (!empty($this->headerButtons)) {
+        if ($this->headerButtons !== null) {
             array_unshift($keyboard, $this->headerButtons);
         }
 
