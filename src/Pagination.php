@@ -53,6 +53,7 @@ class Pagination
     private null|string $lastText = null;
     private bool $showFirstLast = false;
     private null|int $totalItems = null;
+    private null|array $headerButtons = null;
 
     public function __construct() {}
 
@@ -240,7 +241,6 @@ class Pagination
         return $this;
     }
 
-
     /**
      * Добавляет кнопку "Назад"
      *
@@ -261,6 +261,28 @@ class Pagination
 
         $this->returnButtonText = $text;
         $this->returnButtonCallbackData = $callbackData;
+
+        return $this;
+    }
+
+    /**
+     * Добавляет ряд кнопок в начало страницы
+     *
+     * @param array $buttons Ряд кнопок вида [[button], [button]]
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/addHeaderButtons
+     */
+    public function addHeaderButtons(array $buttons): self
+    {
+        if (empty($buttons)) {
+            throw new \LogicException(
+                'Ряд не должен быть пустым',
+            );
+        }
+
+        $this->headerButtons = $buttons;
 
         return $this;
     }
@@ -301,6 +323,10 @@ class Pagination
         $pageItems = array_slice($this->items, $offset, $this->perPage);
 
         $keyboard = array_chunk($pageItems, $this->columns);
+
+        if (!empty($this->headerButtons)) {
+            array_unshift($keyboard, $this->headerButtons);
+        }
 
         if ($totalPages > 1) {
             $innerButtons = [];
