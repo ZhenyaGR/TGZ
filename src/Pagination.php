@@ -2,13 +2,8 @@
 
 namespace ZhenyaGR\TGZ;
 
-
-
 class Pagination
 {
-    private PaginationLayout $navigationLayout = PaginationLayout::ROW;
-    private PaginationMode $mode = PaginationMode::ARROWS;
-
     private array $items;               // Кнопки
     private int $perPage = 5;           // Количество кнопок на странице
     private int $columns = 1;           // Количество колонок
@@ -23,6 +18,13 @@ class Pagination
     private bool $showFirstLast = false;
     private null|int $totalItems = null;
     private null|array $headerButtons = null;
+    private PaginationLayout $navigationLayout = PaginationLayout::ROW;
+    private PaginationMode $mode = PaginationMode::ARROWS;
+    private PaginationNumberStyle|\Closure $numberStyle = PaginationNumberStyle::CLASSIC;
+    private int $MaxPageBtn = 5;
+    private string|null $ActiveBtnFormatPattern = null;
+    private string|null $ActiveBtnFormatPatternLeft = null;
+    private string|null $ActiveBtnFormatPatternRight = null;
 
     public function __construct() {}
 
@@ -39,6 +41,82 @@ class Pagination
     public function setMode(PaginationMode $mode): self
     {
         $this->mode = $mode;
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает максимальное количество кнопок страниц
+     *
+     * @param int $max
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setMaxPageBtn
+     */
+    public function setMaxPageBtn(int $max): self
+    {
+        $this->MaxPageBtn = $max;
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает стиль для кнопок номеров
+     *
+     * Либо готовые стили: PaginationNumberStyle::CLASSIC и
+     * PaginationNumberStyle::EMOJI
+     *
+     * Либо анонимная функция, которая принимает номер страницы и возвращает
+     * текст для кнопки
+     *
+     * @param PaginationNumberStyle|callable $style
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNumberStyle
+     */
+    public function setNumberStyle(PaginationNumberStyle|callable $style): self
+    {
+        if (is_callable($style)) {
+            $this->numberStyle = \Closure::fromCallable($style);
+        } else {
+            $this->numberStyle = $style;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает текст, которым будет выделяться активная кнопка
+     *
+     * Либо указать символы с двух сторон. Пример: ->setActivePageFormat('- ',
+     * ' -');
+     *
+     * Либо указать паттерн для sprintf. Пример: ->setActivePageFormat('- %s
+     * -');
+     *
+     * Результат в обоих примерах будет выглядеть так:
+     *
+     * 1, 2, - 3 -, 4, 5
+     *
+     *
+     * @param string      $left_or_pattern
+     * @param string|null $right
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setActivePageFormat
+     */
+    public function setActivePageFormat(string $left_or_pattern,
+        string|null $right = null,
+    ): self {
+        if ($right === null) {
+            $this->ActiveBtnFormatPattern = $left_or_pattern;
+        } else {
+            $this->ActiveBtnFormatPatternLeft = $left_or_pattern;
+            $this->ActiveBtnFormatPatternRight = $right;
+        }
 
         return $this;
     }
@@ -214,7 +292,8 @@ class Pagination
      * Устанавливает режим отображения кнопок навигации
      *
      * @param PaginationLayout $layout Одна из констант: PaginationLayout::ROW,
-     *                    PaginationLayout::SPLIT, PaginationLayout::SMART
+     *                                 PaginationLayout::SPLIT,
+     *                                 PaginationLayout::SMART
      *
      * @return Pagination
      *
@@ -425,6 +504,19 @@ enum PaginationMode: int
     case NUMBERS = 1;   // 1 2 3
 }
 
+enum PaginationNumberStyle: int
+{
+    /**
+     * 1, 2, 3, ...
+     */
+    case CLASSIC = 0;
+
+    /**
+     * 1️⃣, 2️⃣, 3️⃣, ...
+     */
+    case EMOJI = 1;
+}
+
 enum PaginationLayout: int
 {
     /**
@@ -459,26 +551,5 @@ enum PaginationLayout: int
     case SMART = 2;
 }
 
-// setMaxPageBtn(int $max)
-// Максимальное количество кнопок страниц
 
-// setActivePageFormat(string $left_or_pattern, string $right)
-// Какой текст добавлять активной кнопке (вокруг)
-// Либо левый/правый, либо sprintf
 
-// public const NUMBER_STILE_CLASSIC = 0;    // 1 2 3
-// public const NUMBER_STILE_EMOJI = 1;      // 1️⃣ 2️⃣ 3️⃣
-// private int $number_stile = self::NUMBER_STILE_CLASSIC;
-
-// setNumberStyle(int|callable $style)
-// Стиль номеров (1,2,3; 1️⃣,2️⃣,3️⃣; closure)
-
-// public const MODE_ARROWS = 0;     // < >
-// public const MODE_NUMBERS = 1;    // 1 2 3
-// private int $mode = self::MODE_ARROWS;
-// setMode(int $mode)
-
-// setBtnOffset(int)
-// Отступ активной кнопки от "края"
-// (край будет заполняться предыдущими числами)
-// Вопросительно
