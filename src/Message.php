@@ -589,7 +589,7 @@ final class Message
             }
 
         } else {
-            throw new \Exception(
+            throw new \LogicException(
                 'Необходимо установить свойство text перед вызовом sendEditText',
             );
         }
@@ -698,7 +698,7 @@ final class Message
             }
 
         } else {
-            throw new \Exception(
+            throw new \LogicException(
                 'Необходимо добавить медиа перед вызовом editMedia',
             );
         }
