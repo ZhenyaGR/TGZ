@@ -2,43 +2,12 @@
 
 namespace ZhenyaGR\TGZ;
 
+
+
 class Pagination
 {
-
-    /**
-     * Все 4 кнопки будут находиться на одной строке
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_row
-     *
-     */
-    public const LAYOUT_ROW = 0;   // одна строка из 4 кнопок
-
-    /**
-     * Кнопки "Предыдущая страница" и "Следующая страница" будут находиться на
-     * одной строке
-     *
-     * Кнопки "Первая страница" и "Последняя страница" будут находиться на
-     * второй строке
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_split
-     *
-     */
-    public const LAYOUT_SPLIT = 1; // разделить на две строки
-
-
-    /**
-     * Кнопки разных типов будут находиться на одной строке только при условии,
-     * что их 2
-     *
-     * Иначе будут на разных
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#layout_smart
-     *
-     */
-    public const LAYOUT_SMART = 2; // группировать
-
-    private int $navigationLayout = self::LAYOUT_ROW;
-
+    private PaginationLayout $navigationLayout = PaginationLayout::ROW;
+    private PaginationMode $mode = PaginationMode::ARROWS;
 
     private array $items;               // Кнопки
     private int $perPage = 5;           // Количество кнопок на странице
@@ -56,6 +25,23 @@ class Pagination
     private null|array $headerButtons = null;
 
     public function __construct() {}
+
+    /**
+     * Устанавливает вид кнопок навигации (Стрелки или Цифры)
+     *
+     * @param PaginationMode $mode Одна из констант: PaginationMode::ARROWS,
+     *                             PaginationMode::NUMBERS
+     *
+     * @return Pagination
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setMode
+     */
+    public function setMode(PaginationMode $mode): self
+    {
+        $this->mode = $mode;
+
+        return $this;
+    }
 
     /**
      * Устанавливает массив кнопок, из которых будут собираться страницы
@@ -227,14 +213,14 @@ class Pagination
     /**
      * Устанавливает режим отображения кнопок навигации
      *
-     * @param int $layout Одна из констант: Pagination::LAYOUT_ROW,
-     *                    Pagination::LAYOUT_SPLIT, Pagination::LAYOUT_SMART
+     * @param PaginationLayout $layout Одна из констант: PaginationLayout::ROW,
+     *                    PaginationLayout::SPLIT, PaginationLayout::SMART
      *
      * @return Pagination
      *
      * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout
      */
-    public function setNavigationLayout(int $layout): self
+    public function setNavigationLayout(PaginationLayout $layout): self
     {
         $this->navigationLayout = $layout;
 
@@ -249,9 +235,9 @@ class Pagination
      *
      * @return Pagination
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/addReturnButton
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/addReturnBtn
      */
-    public function addReturnButton(string $text, string $callbackData): self
+    public function addReturnBtn(string $text, string $callbackData): self
     {
         if ($text === '' || $callbackData === '') {
             throw new \LogicException(
@@ -272,9 +258,9 @@ class Pagination
      *
      * @return Pagination
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/addHeaderButtons
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/addHeaderBtn
      */
-    public function addHeaderButtons(array $buttons): self
+    public function addHeaderBtn(array $buttons): self
     {
         if (empty($buttons)) {
             throw new \LogicException(
@@ -297,6 +283,7 @@ class Pagination
     public function getTotalPage(): int
     {
         $totalItems = $this->totalItems ?? count($this->items);
+
         return (int)ceil($totalItems / $this->perPage);
     }
 
@@ -367,15 +354,15 @@ class Pagination
             $totalNavButtons = count($innerButtons) + count($outerButtons);
 
             switch ($this->navigationLayout) {
-                case self::LAYOUT_SPLIT:
+                case PaginationLayout::SPLIT:
                     $shouldSplit = !empty($outerButtons);
                     break;
 
-                case self::LAYOUT_SMART:
+                case PaginationLayout::SMART:
                     $shouldSplit = $totalNavButtons > 2;
                     break;
 
-                case self::LAYOUT_ROW:
+                case PaginationLayout::ROW:
                 default:
                     $shouldSplit = false;
                     break;
@@ -423,3 +410,75 @@ class Pagination
         return $keyboard;
     }
 }
+
+enum PaginationMode: int
+{
+    /**
+     * Стандартные стрелки навигации "Предыдущая страница" и "Следующая
+     * страница"
+     */
+    case ARROWS = 0;    // < >
+
+    /**
+     * Несколько номеров страниц на строке
+     */
+    case NUMBERS = 1;   // 1 2 3
+}
+
+enum PaginationLayout: int
+{
+    /**
+     * Все 4 кнопки будут находиться на одной строке
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#возможные-значения-константы
+     *
+     */
+    case ROW = 0;
+
+    /**
+     * Кнопки "Предыдущая страница" и "Следующая страница" будут находиться на
+     * одной строке
+     *
+     * Кнопки "Первая страница" и "Последняя страница" будут находиться на
+     * второй строке
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#возможные-значения-константы
+     *
+     */
+    case SPLIT = 1;
+
+    /**
+     * Кнопки разных типов будут находиться на одной строке только при условии,
+     * что их 2
+     *
+     * Иначе будут на разных
+     *
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout#возможные-значения-константы
+     *
+     */
+    case SMART = 2;
+}
+
+// setMaxPageBtn(int $max)
+// Максимальное количество кнопок страниц
+
+// setActivePageFormat(string $left_or_pattern, string $right)
+// Какой текст добавлять активной кнопке (вокруг)
+// Либо левый/правый, либо sprintf
+
+// public const NUMBER_STILE_CLASSIC = 0;    // 1 2 3
+// public const NUMBER_STILE_EMOJI = 1;      // 1️⃣ 2️⃣ 3️⃣
+// private int $number_stile = self::NUMBER_STILE_CLASSIC;
+
+// setNumberStyle(int|callable $style)
+// Стиль номеров (1,2,3; 1️⃣,2️⃣,3️⃣; closure)
+
+// public const MODE_ARROWS = 0;     // < >
+// public const MODE_NUMBERS = 1;    // 1 2 3
+// private int $mode = self::MODE_ARROWS;
+// setMode(int $mode)
+
+// setBtnOffset(int)
+// Отступ активной кнопки от "края"
+// (край будет заполняться предыдущими числами)
+// Вопросительно
