@@ -137,7 +137,6 @@ class Pagination
         return $this;
     }
 
-
     /**
      * Устанавливает максимальное количество элементов, из которых будет
      * состоять список
@@ -395,86 +394,14 @@ class Pagination
         }
 
         if ($totalPages > 1) {
-            $innerButtons = [];
-            $outerButtons = [];
 
-            // Кнопка начало
-            if ($this->showFirstLast && $this->page > 1) {
-                $outerButtons['first'] = [
-                    'text'          => $this->firstText,
-                    'callback_data' => $this->callbackPrefix.'1',
-                ];
+            if ($this->mode === PaginationMode::ARROWS) {
+                $keyboard = $this->createArrowsKbd($keyboard, $totalPages);
             }
+//            else {
+//
+//            }
 
-            // Кнопка предыдущая
-            if ($this->page > 1) {
-                $innerButtons['prev'] = [
-                    'text'          => $this->prevText,
-                    'callback_data' => $this->callbackPrefix.($this->page - 1),
-                ];
-            }
-
-            // Кнопка вперед
-            if ($this->page < $totalPages) {
-                $innerButtons['next'] = [
-                    'text'          => $this->nextText,
-                    'callback_data' => $this->callbackPrefix.($this->page + 1),
-                ];
-            }
-
-            // Кнопка конец
-            if ($this->showFirstLast && $this->page < $totalPages) {
-                $outerButtons['last'] = [
-                    'text'          => $this->lastText,
-                    'callback_data' => $this->callbackPrefix.$totalPages,
-                ];
-            }
-
-            $totalNavButtons = count($innerButtons) + count($outerButtons);
-
-            switch ($this->navigationLayout) {
-                case PaginationLayout::SPLIT:
-                    $shouldSplit = !empty($outerButtons);
-                    break;
-
-                case PaginationLayout::SMART:
-                    $shouldSplit = $totalNavButtons > 2;
-                    break;
-
-                case PaginationLayout::ROW:
-                default:
-                    $shouldSplit = false;
-                    break;
-            }
-
-            if ($shouldSplit) {
-                if (!empty($innerButtons)) {
-                    $keyboard[] = array_values($innerButtons);
-                }
-
-                if (!empty($outerButtons)) {
-                    $keyboard[] = array_values($outerButtons);
-                }
-
-            } else {
-                $row = [];
-                if (isset($outerButtons['first'])) {
-                    $row[] = $outerButtons['first'];
-                }
-                if (isset($innerButtons['prev'])) {
-                    $row[] = $innerButtons['prev'];
-                }
-                if (isset($innerButtons['next'])) {
-                    $row[] = $innerButtons['next'];
-                }
-                if (isset($outerButtons['last'])) {
-                    $row[] = $outerButtons['last'];
-                }
-
-                if (!empty($row)) {
-                    $keyboard[] = $row;
-                }
-            }
         }
 
         if ($this->returnButtonText !== null
@@ -488,6 +415,96 @@ class Pagination
 
         return $keyboard;
     }
+
+    private function createArrowsKbd($keyboard, $totalPages): array
+    {
+        $innerButtons = [];
+        $outerButtons = [];
+
+        // Кнопка начало
+        if ($this->showFirstLast && $this->page > 1) {
+            $outerButtons['first'] = [
+                'text'          => $this->firstText,
+                'callback_data' => $this->callbackPrefix.'1',
+            ];
+        }
+
+        // Кнопка предыдущая
+        if ($this->page > 1) {
+            $innerButtons['prev'] = [
+                'text'          => $this->prevText,
+                'callback_data' => $this->callbackPrefix.($this->page - 1),
+            ];
+        }
+
+        // Кнопка вперед
+        if ($this->page < $totalPages) {
+            $innerButtons['next'] = [
+                'text'          => $this->nextText,
+                'callback_data' => $this->callbackPrefix.($this->page + 1),
+            ];
+        }
+
+        // Кнопка конец
+        if ($this->showFirstLast && $this->page < $totalPages) {
+            $outerButtons['last'] = [
+                'text'          => $this->lastText,
+                'callback_data' => $this->callbackPrefix.$totalPages,
+            ];
+        }
+
+        $totalNavButtons = count($innerButtons) + count($outerButtons);
+
+        switch ($this->navigationLayout) {
+            case PaginationLayout::SPLIT:
+                $shouldSplit = !empty($outerButtons);
+                break;
+
+            case PaginationLayout::SMART:
+                $shouldSplit = $totalNavButtons > 2;
+                break;
+
+            case PaginationLayout::ROW:
+                $shouldSplit = false;
+                break;
+        }
+
+        if ($shouldSplit) {
+            if (!empty($innerButtons)) {
+                $keyboard[] = array_values($innerButtons);
+            }
+
+            if (!empty($outerButtons)) {
+                $keyboard[] = array_values($outerButtons);
+            }
+
+        } else {
+            $row = [];
+            if (isset($outerButtons['first'])) {
+                $row[] = $outerButtons['first'];
+            }
+            if (isset($innerButtons['prev'])) {
+                $row[] = $innerButtons['prev'];
+            }
+            if (isset($innerButtons['next'])) {
+                $row[] = $innerButtons['next'];
+            }
+            if (isset($outerButtons['last'])) {
+                $row[] = $outerButtons['last'];
+            }
+
+            if (!empty($row)) {
+                $keyboard[] = $row;
+            }
+        }
+        return $keyboard;
+    }
+
+    private function createNumbersKbd(): array
+    {
+        return [];
+    }
+
 }
 
 enum PaginationMode: int
