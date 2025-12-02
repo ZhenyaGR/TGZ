@@ -394,14 +394,11 @@ class Pagination
         }
 
         if ($totalPages > 1) {
-
             if ($this->mode === PaginationMode::ARROWS) {
                 $keyboard = $this->createArrowsKbd($keyboard, $totalPages);
+            } elseif ($this->mode === PaginationMode::NUMBERS) {
+                $keyboard = $this->createNumbersKbd($keyboard, $totalPages);
             }
-//            else {
-//
-//            }
-
         }
 
         if ($this->returnButtonText !== null
@@ -497,13 +494,93 @@ class Pagination
                 $keyboard[] = $row;
             }
         }
+
         return $keyboard;
     }
 
-    private function createNumbersKbd(): array
+    private function createNumbersKbd(array $keyboard, int $totalPages): array
     {
-        return [];
+        $maxVisible = $this->MaxPageBtn;
+        $current = $this->page;
+
+        if ($totalPages <= $maxVisible) {
+            $start = 1;
+            $end = $totalPages;
+        } else {
+            $half = (int)floor($maxVisible / 2);
+            $start = $current - $half;
+            $end = $start + $maxVisible - 1;
+
+            if ($start < 1) {
+                $start = 1;
+                $end = $maxVisible;
+            }
+
+            if ($end > $totalPages) {
+                $end = $totalPages;
+                $start = $totalPages - $maxVisible + 1;
+            }
+        }
+
+        $row = [];
+        for ($i = $start; $i <= $end; $i++) {
+            $text = $this->formatPageNumber($i);
+
+            if ($i === $current) {
+                $text = $this->decorateActivePage($text);
+            }
+
+            $row[] = [
+                'text'          => $text,
+                'callback_data' => $this->callbackPrefix.$i,
+            ];
+        }
+
+        $keyboard[] = $row;
+
+        return $keyboard;
     }
+
+    private function formatPageNumber(int $number): string
+    {
+        if ($this->numberStyle instanceof \Closure) {
+            return ($this->numberStyle)($number);
+        }
+
+        return match ($this->numberStyle) {
+            PaginationNumberStyle::EMOJI => $this->toEmojiNumber($number),
+            PaginationNumberStyle::CLASSIC => (string)$number,
+        };
+    }
+
+    private function decorateActivePage(string $text): string
+    {
+        if ($this->ActiveBtnFormatPattern !== null) {
+            return sprintf($this->ActiveBtnFormatPattern, $text);
+        }
+
+        if ($this->ActiveBtnFormatPatternLeft !== null) {
+            return $this->ActiveBtnFormatPatternLeft.$text
+                .($this->ActiveBtnFormatPatternRight ?? '');
+        }
+
+        return $text;
+    }
+
+    private function toEmojiNumber(int $number): string
+    {
+        $map = [
+            '0' => '0️⃣', '1' => '1️⃣', '2' => '2️⃣', '3' => '3️⃣',
+            '4' => '4️⃣',
+            '5' => '5️⃣', '6' => '6️⃣', '7' => '7️⃣', '8' => '8️⃣',
+            '9' => '9️⃣',
+        ];
+
+        return str_replace(
+            array_keys($map), array_values($map), (string)$number,
+        );
+    }
+
 
 }
 
