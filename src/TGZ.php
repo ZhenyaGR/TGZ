@@ -356,10 +356,7 @@ class TGZ
      */
     public function buttonCallback(string $buttonText, string $buttonData,
     ): array {
-        return [
-            'text'          => $buttonText,
-            "callback_data" => $buttonData,
-        ];
+        return Button::cb($buttonText, $buttonData);
     }
 
     /**
@@ -374,16 +371,13 @@ class TGZ
      */
     public function buttonUrl(string $buttonText, string $buttonUrl): array
     {
-        return [
-            'text' => $buttonText,
-            "url"  => $buttonUrl,
-        ];
+        return Button::url($buttonText, $buttonUrl);
     }
 
     /**
      * Создает текстовую кнопку
      *
-     * Устаревший алиас метода Keyboard::btn()
+     * Устаревший алиас метода Keyboard::text()
      *
      * @param string $buttonText Текст кнопки
      *
@@ -391,9 +385,7 @@ class TGZ
      */
     public function buttonText(string $buttonText): array
     {
-        return [
-            'text' => $buttonText,
-        ];
+        return Button::text($buttonText);
     }
 
     /**

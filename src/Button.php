@@ -2,7 +2,7 @@
 
 namespace ZhenyaGR\TGZ;
 
-class Keyboard {
+class Button {
 
     /**
      * Inline кнопка с Callback Data
@@ -12,7 +12,7 @@ class Keyboard {
      *
      * @return array
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/keyboard#cb
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/button#cb
      */
     public static function cb(string $text, string $data): array
     {
@@ -27,7 +27,7 @@ class Keyboard {
      *
      * @return array
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/keyboard#url
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/button#url
      */
     public static function url(string $text, string $url): array
     {
@@ -42,7 +42,7 @@ class Keyboard {
      *
      * @return array
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/keyboard#webApp
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/button#webApp
      */
     public static function webApp(string $text, string $url): array
     {
@@ -56,9 +56,9 @@ class Keyboard {
      *
      * @return array
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/keyboard#btn
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/button#text
      */
-    public static function btn(string $text): array
+    public static function text(string $text): array
     {
         return ['text' => $text];
     }
@@ -70,7 +70,7 @@ class Keyboard {
      *
      * @return array
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/keyboard#contact
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/button#contact
      */
     public static function contact(string $text): array
     {
@@ -84,7 +84,7 @@ class Keyboard {
      *
      * @return array
      *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/keyboard#location
+     * @see https://zhenyagr.github.io/TGZ-Doc/classes/button#location
      */
     public static function location(string $text): array
     {
