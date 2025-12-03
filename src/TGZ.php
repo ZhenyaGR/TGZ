@@ -347,12 +347,12 @@ class TGZ
     /**
      * Создает callback-кнопку
      *
+     * Устаревший алиас метода Keyboard::cb()
+     *
      * @param string $buttonText Текст кнопки
      * @param string $buttonData Данные кнопки
      *
      * @return array
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons
      */
     public function buttonCallback(string $buttonText, string $buttonData,
     ): array {
@@ -365,12 +365,12 @@ class TGZ
     /**
      * Создает url-кнопку
      *
+     * Устаревший алиас метода Keyboard::url()
+     *
      * @param string $buttonText Текст кнопки
      * @param string $buttonUrl  URL
      *
      * @return array
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons
      */
     public function buttonUrl(string $buttonText, string $buttonUrl): array
     {
@@ -383,11 +383,11 @@ class TGZ
     /**
      * Создает текстовую кнопку
      *
+     * Устаревший алиас метода Keyboard::btn()
+     *
      * @param string $buttonText Текст кнопки
      *
      * @return array
-     *
-     * @see https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons
      */
     public function buttonText(string $buttonText): array
     {
