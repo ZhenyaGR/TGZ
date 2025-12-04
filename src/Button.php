@@ -2,8 +2,8 @@
 
 namespace ZhenyaGR\TGZ;
 
-class Button {
-
+class Button
+{
     /**
      * Inline кнопка с Callback Data
      *
@@ -23,7 +23,7 @@ class Button {
      * Inline кнопка-ссылка
      *
      * @var string $text Текст кнопки
-     * @var string $url Ссылка
+     * @var string $url  Ссылка
      *
      * @return array
      *
@@ -38,7 +38,7 @@ class Button {
      * Inline кнопка для WebApp
      *
      * @var string $text Текст кнопки
-     * @var string $url Ссылка на приложение
+     * @var string $url  Ссылка на приложение
      *
      * @return array
      *
@@ -90,5 +90,4 @@ class Button {
     {
         return ['text' => $text, 'request_location' => true];
     }
-
 }

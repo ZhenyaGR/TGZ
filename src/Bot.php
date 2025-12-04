@@ -558,7 +558,8 @@ class Bot
                     $patterns = (array)$route->getCondition();
                     foreach ($patterns as $pattern) {
                         if (preg_match($pattern, $text, $matches)) {
-                            $this->dispatchAnswer($route, $type, $matches);
+                            $args = array_slice($matches, 1);
+                            $this->dispatchAnswer($route, $type, $args);
 
                             return;
                         }
@@ -695,7 +696,8 @@ class Bot
                     $patterns = (array)$route->getCondition();
                     foreach ($patterns as $pattern) {
                         if (preg_match($pattern, $callback_data, $matches)) {
-                            $this->dispatchAnswer($route, $type, $matches); // Передаем все совпадения
+                            $args = array_slice($matches, 1);
+                            $this->dispatchAnswer($route, $type, $args); // Передаем все совпадения
                             return;
                         }
                     }
