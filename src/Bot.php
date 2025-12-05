@@ -999,9 +999,6 @@ class Bot
 
     }
 
-    /**
-     * @throws \JsonException
-     */
     private function constructKbd(Message $msg, array $kbd, bool $inline,
         bool $oneTime, bool $resize,
     ): Message {
@@ -1026,12 +1023,14 @@ class Bot
                             ];
                         }
                     }
-                } elseif (is_array($button)
-                    && ($inline
-                        && (isset($button['callback_data'])
-                            || isset($button['url'])))
-                ) {
-                    $keyboardRow[] = $button;
+                } elseif (is_array($button)) {
+                    // ИСПРАВЛЕННАЯ ЛОГИКА
+                    if ($inline && (isset($button['callback_data']) || isset($button['url']))) {
+                        $keyboardRow[] = $button;
+                    } elseif (!$inline && isset($button['text'])) {
+                        // Разрешаем массивы для обычной клавиатуры, если есть поле text
+                        $keyboardRow[] = $button;
+                    }
                 }
 
             }
