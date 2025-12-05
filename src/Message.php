@@ -826,9 +826,76 @@ final class Message
             );
         }
 
-        $params[$type] = str_contains($this->media[0]['media'], 'attach://')
+        // Получаем то, что отправляем (файл или ссылку)
+        $payload = str_contains($this->media[0]['media'], 'attach://')
             ? $this->files['file1'] : $this->media[0]['media'];
 
-        return $this->api->callAPI('send'.ucfirst($type), $params);
+        $params[$type] = $payload;
+
+        try {
+            return $this->api->callAPI('send'.ucfirst($type), $params);
+        } catch (\RuntimeException $e) {
+            $errorMsg = $e->getMessage();
+
+            // Проверяем, похожа ли ошибка на проблемы с форматом
+            $isFormatError = str_contains($errorMsg, 'IMAGE_PROCESS_FAILED') ||
+                str_contains($errorMsg, 'wrong type of the web page content');
+
+            // Если ошибка формата и мы отправляли ссылку — проводим расследование
+            if ($isFormatError && is_string($payload) && filter_var($payload, FILTER_VALIDATE_URL)) {
+                $this->diagnoseUrlError($payload, $errorMsg);
+            }
+
+            // Если диагностика ничего не дала или это не URL — пробрасываем ошибку дальше
+            throw $e;
+        }
+    }
+
+    /**
+     * Диагностирует проблему с URL после сбоя отправки.
+     * Бросает уточненное исключение, если находит проблему.
+     */
+    private function diagnoseUrlError(string $url, string $originalError): void
+    {
+        // Настраиваем контекст с таймаутом, чтобы бот не вис надолго при проверке
+        $ctx = stream_context_create(['http' => ['method' => 'HEAD', 'timeout' => 3]]);
+
+        // Получаем заголовки (без скачивания файла)
+        $headers = @get_headers($url, 1, $ctx);
+
+        if ($headers === false) {
+            return; // Не удалось подключиться, оставляем оригинальную ошибку
+        }
+
+        // Нормализуем ключ Content-Type (может быть в разном регистре)
+        $contentType = null;
+        foreach ($headers as $key => $value) {
+            if (strtolower($key) === 'content-type') {
+                $contentType = is_array($value) ? end($value) : $value;
+                break;
+            }
+        }
+
+        if ($contentType) {
+            // Если сервер говорит, что это SVG
+            if (str_contains(strtolower($contentType), 'svg')) {
+                throw new \RuntimeException(
+                    "❌ Ошибка: Telegram не принимает формат SVG.\n" .
+                    "🕵️ Диагностика: По ссылке обнаружен Content-Type: '{$contentType}'.\n" .
+                    "💡 Решение: Используйте .png или .jpg версию изображения.\n" .
+                    "Ссылка: {$url}"
+                );
+            }
+
+            // Если сервер говорит, что это HTML (например, страница ошибки или cloudflare)
+            if (str_contains(strtolower($contentType), 'text/html')) {
+                throw new \RuntimeException(
+                    "❌ Ошибка: По ссылке находится не картинка, а HTML-страница.\n" .
+                    "🕵️ Диагностика: Content-Type: '{$contentType}'.\n" .
+                    "💡 Причина: Возможно, ссылка ведет на страницу просмотра, а не на сам файл, или сайт включил защиту от ботов.\n" .
+                    "Ссылка: {$url}"
+                );
+            }
+        }
     }
 }
