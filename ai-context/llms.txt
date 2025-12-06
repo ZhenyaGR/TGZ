@@ -1,160 +1,195 @@
-# Table of contents
+# TGZ Library Documentation
 
-Документация библиотеки TGZ
+> Powerful PHP library for creating Telegram bots with Webhook & LongPoll support
 
-## Web links
+## Table of Contents
 
-- [home](https://zhenyagr.github.io/TGZ-Doc/)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/action)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/access)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/audio)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/dice)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/doc)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/editCaption)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/editText)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/func)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/gif)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/img)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/inlineKbd)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/kbd)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/middleware)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/noAccess)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/params)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/parseMode)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/query)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/redirect)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/removeKbd)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/reply)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/sticker)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/text)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/video)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/voice)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/bot)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/btn)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/middleware)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onAudio)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onBotCommand)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallback)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallbackPreg)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCommand)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onDefault)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onDocument)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onEditedMessage)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onInline)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onLeftChatMember)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onMessage)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onNewChatMember)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onPhoto)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onReferral)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onStart)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onSticker)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onText)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onTextPreg)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVideo)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVideoNote)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVoice)
-- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/redirect)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/run)
-- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/tgz)
-- [Button](https://zhenyagr.github.io/TGZ-Doc/classes/button)
-- [DTO](https://zhenyagr.github.io/TGZ-Doc/classes/dto)
-- [File](https://zhenyagr.github.io/TGZ-Doc/classes/file)
-- [File](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFileId)
-- [File](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFileInfo)
-- [File](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFilePath)
-- [File](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFileSize)
-- [File](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/save)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inline)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/address)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/coordinates)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/create)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/description)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/fileID)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/fileUrl)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/id)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/kbd)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/mimeType)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/params)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/parseMode)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/text)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/thumb)
-- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/title)
-- [LongPoll](https://zhenyagr.github.io/TGZ-Doc/classes/longpoll)
-- [Классы](https://zhenyagr.github.io/TGZ-Doc/classes/main)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/message)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/audio)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/dice)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/doc)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editCaption)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editMedia)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editText)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/gif)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/img)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/inlineKbd)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/kbd)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/mediaPreview)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/params)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/parseMode)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/removeKbd)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/reply)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/send)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/sticker)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/text)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/video)
-- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/voice)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/pagination)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/addReturnBtn)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/create)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/getTotalPage)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setActivePageFormat)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setColumns)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setItems)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setMaxPageBtn)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setMode)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNumberStyle)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setPage)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setPerPage)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setPrefix)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setSideSigns)
-- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setSigns)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/poll)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/addAnswers)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/close)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/closeDate)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/correctAnswer)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/explanation)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/isAnonymous)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/multipleAnswers)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/openPeriod)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/parseMode)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/question)
-- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/send)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgz)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/answers)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/callAPI)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/copyMsg)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/defaultParseMode)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/delMsg)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/errors)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/file)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/getFileID)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/initVars)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/inline)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/msg)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/pagination)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/poll)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/reply)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/sendAction)
-- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/sendMessage)
-- [Примеры ботов](https://zhenyagr.github.io/TGZ-Doc/install/examples)
-- [Установка и подключение библиотеки](https://zhenyagr.github.io/TGZ-Doc/install/requirements)
-- [Получение обновлений](https://zhenyagr.github.io/TGZ-Doc/using/getting-updates)
-- [Обработчики](https://zhenyagr.github.io/TGZ-Doc/using/handlers)
-- [Использование](https://zhenyagr.github.io/TGZ-Doc/using/main)
-- [Конструктор Сообщений](https://zhenyagr.github.io/TGZ-Doc/using/messages)
-- [Middleware (Промежуточное ПО)](https://zhenyagr.github.io/TGZ-Doc/using/middleware)
-- [Пагинация страниц](https://zhenyagr.github.io/TGZ-Doc/using/pagination)
-- [Конструктор опросов](https://zhenyagr.github.io/TGZ-Doc/using/poll)
+### Начало работы
+
+- [Почему TGZ?](https://zhenyagr.github.io/TGZ-Doc/install/who_tgz.md): Обзор возможностей библиотеки: Webhook/LongPoll, цепочки методов, роутинг и работа с медиа.
+- [Примеры ботов](https://zhenyagr.github.io/TGZ-Doc/install/examples.md): Коллекция примеров кода: Echo-бот, LongPoll, Webhook и использование конструктора Bot.
+
+### Использование
+
+- [Получение обновлений](https://zhenyagr.github.io/TGZ-Doc/using/getting-updates.md): Настройка методов получения обновлений: Long Polling для разработки и Webhook для продакшена.
+- [Конструктор сообщений](https://zhenyagr.github.io/TGZ-Doc/using/messages.md): Работа с Fluent Interface для создания, форматирования и отправки сообщений.
+- [Конструктор опросов](https://zhenyagr.github.io/TGZ-Doc/using/poll.md): Создание и отправка опросов и викторин.
+- [Обработчики](https://zhenyagr.github.io/TGZ-Doc/using/handlers.md): Маршрутизация событий (команды, текст, кнопки, медиа) в классе Bot.
+- [Middleware](https://zhenyagr.github.io/TGZ-Doc/using/middleware.md): Промежуточное ПО для фильтрации запросов, логирования и проверки прав доступа.
+- [Пагинация страниц](https://zhenyagr.github.io/TGZ-Doc/using/pagination.md): Инструмент для автоматической генерации постраничной навигации в клавиатурах.
+
+### Классы
+
+- [TGZ](https://zhenyagr.github.io/TGZ-Doc/classes/tgz.md): Основной класс библиотеки.
+- [LongPoll](https://zhenyagr.github.io/TGZ-Doc/classes/longpoll.md): Класс для запуска бота в режиме Long Polling.
+- [Bot](https://zhenyagr.github.io/TGZ-Doc/classes/bot.md): Конструктор для создания логики бота.
+- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/action.md): Вспомогательный класс для установки действий.
+- [Message](https://zhenyagr.github.io/TGZ-Doc/classes/message.md): Конструктор сообщений.
+- [Button](https://zhenyagr.github.io/TGZ-Doc/classes/button.md): Вспомогательный класс для создания кнопок.
+- [File](https://zhenyagr.github.io/TGZ-Doc/classes/file.md): Класс для работы с файлами.
+- [Poll](https://zhenyagr.github.io/TGZ-Doc/classes/poll.md): Класс для создания опросов.
+- [Pagination](https://zhenyagr.github.io/TGZ-Doc/classes/pagination.md): Класс для пагинации страниц.
+- [Inline](https://zhenyagr.github.io/TGZ-Doc/classes/inline.md): Класс для создания инлайн-ответов.
+- [DTO](https://zhenyagr.github.io/TGZ-Doc/classes/dto.md): Объекты данных UserDto и ChatDto.
+
+#### TGZ
+
+- [msg](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/msg.md): Создает экземпляр класса Message для отправки сообщений.
+- [poll](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/poll.md): Создает экземпляр класса Poll для создания опросов.
+- [pagination](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/pagination.md): Создает экземпляр класса Pagination для генерации страниц.
+- [inline](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/inline.md): Создает экземпляр класса Inline для ответов на Inline-запросы.
+- [file](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/file.md): Создает экземпляр класса File для работы с файлами (скачивание, инфо).
+- [initVars](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/initVars.md): Инициализирует основные переменные (chat_id, user_id, text) из входящего обновления.
+- [get](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/get.md): Методы получения данных из обновления (getChatId, getText и др.).
+- [getFileID](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/getFileID.md): Загружает файл по URL и возвращает его file_id.
+- [defaultParseMode](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/defaultParseMode.md): Устанавливает режим разметки по умолчанию для всех сообщений.
+- [errors](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/errors.md): Настройка обработки и логирования ошибок (ErrorHandler).
+- [sendMessage](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/sendMessage.md): Отправляет текстовое сообщение в указанный чат (прямой метод).
+- [reply](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/reply.md): Отправляет ответ на текущее сообщение (сокращенный метод).
+- [copyMsg](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/copyMsg.md): Копирует сообщение из одного чата в другой.
+- [delMsg](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/delMsg.md): Удаляет сообщение по его ID.
+- [sendAction](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/sendAction.md): Отправляет статус действия бота (например, 'typing').
+- [answers](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/answers.md): Методы для ответа на callback (answerCallbackQuery) и inline запросы.
+- [callAPI](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/callAPI.md): Выполняет произвольный метод Telegram Bot API.
+
+#### Bot
+
+- [onStart](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onStart.md): Обработчик команды /start.
+- [onBotCommand](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onBotCommand.md): Обработчик стандартных команд (начинающихся с /).
+- [onCommand](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCommand.md): Обработчик кастомных команд с поддержкой аргументов и плейсхолдеров.
+- [onReferral](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onReferral.md): Обработчик реферальных ссылок (параметры в /start).
+- [onText](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onText.md): Обработчик точного совпадения текста сообщения.
+- [onTextPreg](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onTextPreg.md): Обработчик текста сообщения по регулярному выражению.
+- [btn](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/btn.md): Определяет кнопку и привязывает к ней действие (для меню).
+- [onCallback](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallback.md): Обработчик нажатия на Inline-кнопку.
+- [onCallbackPreg](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onCallbackPreg.md): Обработчик callback_data по регулярному выражению.
+- [onInline](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onInline.md): Обработчик входящих Inline-запросов.
+- [onPhoto](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onPhoto.md): Срабатывает при получении изображения.
+- [onVideo](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVideo.md): Срабатывает при получении видео.
+- [onAudio](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onAudio.md): Срабатывает при получении аудиофайла.
+- [onVoice](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVoice.md): Срабатывает при получении голосового сообщения.
+- [onVideoNote](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onVideoNote.md): Срабатывает при получении видео-сообщения ('кружочка').
+- [onDocument](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onDocument.md): Срабатывает при получении документа.
+- [onSticker](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onSticker.md): Срабатывает при получении стикера.
+- [onNewChatMember](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onNewChatMember.md): Срабатывает при вступлении новых участников в чат.
+- [onLeftChatMember](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onLeftChatMember.md): Срабатывает при выходе участника из чата.
+- [onEditedMessage](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onEditedMessage.md): Срабатывает при редактировании сообщения пользователем.
+- [onMessage](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onMessage.md): Обработчик любого текстового сообщения (fallback для текста).
+- [onDefault](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/onDefault.md): Глобальный fallback-обработчик для любых необработанных событий.
+- [redirect](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/redirect.md): Перенаправляет выполнение на другой маршрут.
+- [middleware](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/middleware.md): Регистрирует глобальное Middleware для бота.
+- [tgz](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/tgz.md): Передает экземпляр TGZ в конструктор Bot.
+- [run](https://zhenyagr.github.io/TGZ-Doc/classes/botMethods/run.md): Запускает обработку обновлений и маршрутизацию.
+
+#### Action
+
+- [func](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/func.md): Выполняет пользовательскую функцию-обработчик.
+- [access](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/access.md): Ограничивает доступ к маршруту по ID пользователя (белый список).
+- [noAccess](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/noAccess.md): Запрещает доступ к маршруту по ID пользователя (черный список).
+- [middleware](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/middleware.md): Регистрирует Middleware для конкретного маршрута.
+- [redirect](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/redirect.md): Перенаправляет на другой маршрут (например, 'Назад').
+- [text](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/text.md): Отправляет текстовое сообщение в ответ на событие.
+- [parseMode](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/parseMode.md): Устанавливает режим разметки для ответа.
+- [query](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/query.md): Показывает всплывающее уведомление (alert) на callback-запрос.
+- [img](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/img.md): Прикрепляет изображение к ответу.
+- [video](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/video.md): Прикрепляет видео к ответу.
+- [audio](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/audio.md): Прикрепляет аудио к ответу.
+- [voice](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/voice.md): Отправляет голосовое сообщение.
+- [doc](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/doc.md): Прикрепляет документ к ответу.
+- [gif](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/gif.md): Прикрепляет GIF к ответу.
+- [sticker](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/sticker.md): Отправляет стикер.
+- [kbd](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/kbd.md): Добавляет Reply-клавиатуру к сообщению.
+- [inlineKbd](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/inlineKbd.md): Добавляет Inline-клавиатуру к сообщению.
+- [removeKbd](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/removeKbd.md): Удаляет Reply-клавиатуру у пользователя.
+- [reply](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/reply.md): Делает сообщение ответом (reply) на входящее.
+- [params](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/params.md): Добавляет дополнительные параметры API к запросу.
+- [editText](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/editText.md): Редактирует текст исходного сообщения (для callback).
+- [editCaption](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/editCaption.md): Редактирует подпись к медиа (для callback).
+
+#### Message
+
+- [text](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/text.md): Устанавливает текст сообщения.
+- [img](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/img.md): Добавляет изображение (или альбом).
+- [video](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/video.md): Добавляет видео (или альбом).
+- [audio](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/audio.md): Добавляет аудио.
+- [voice](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/voice.md): Добавляет голосовое сообщение.
+- [doc](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/doc.md): Добавляет документ.
+- [gif](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/gif.md): Добавляет GIF.
+- [sticker](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/sticker.md): Добавляет стикер.
+- [dice](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/dice.md): Отправляет анимированный эмодзи-кубик.
+- [mediaPreview](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/mediaPreview.md): Добавляет скрытую ссылку для превью.
+- [kbd](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/kbd.md): Добавляет Reply-клавиатуру.
+- [inlineKbd](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/inlineKbd.md): Добавляет Inline-клавиатуру.
+- [removeKbd](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/removeKbd.md): Удаляет клавиатуру.
+- [parseMode](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/parseMode.md): Устанавливает режим разметки.
+- [reply](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/reply.md): Устанавливает ID сообщения для ответа.
+- [params](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/params.md): Устанавливает дополнительные параметры.
+- [send](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/send.md): Отправляет сформированное сообщение.
+- [editText](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editText.md): Редактирует текст сообщения по ID.
+- [editCaption](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editCaption.md): Редактирует подпись медиа по ID.
+- [editMedia](https://zhenyagr.github.io/TGZ-Doc/classes/messageMethods/editMedia.md): Заменяет медиа в сообщении по ID.
+
+#### File
+
+- [getFileId](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFileId.md): Получает file_id из сообщения.
+- [getFileInfo](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFileInfo.md): Получает информацию о файле через API.
+- [getFileSize](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFileSize.md): Возвращает размер файла.
+- [getFilePath](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/getFilePath.md): Возвращает прямую ссылку на файл (для скачивания).
+- [save](https://zhenyagr.github.io/TGZ-Doc/classes/fileMethods/save.md): Скачивает и сохраняет файл локально.
+
+#### Poll
+
+- [question](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/question.md): Устанавливает вопрос опроса.
+- [addAnswers](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/addAnswers.md): Добавляет варианты ответов.
+- [isAnonymous](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/isAnonymous.md): Настраивает анонимность опроса.
+- [multipleAnswers](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/multipleAnswers.md): Разрешает выбор нескольких вариантов.
+- [openPeriod](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/openPeriod.md): Устанавливает время жизни опроса.
+- [closeDate](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/closeDate.md): Устанавливает дату закрытия опроса.
+- [close](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/close.md): Отправляет опрос закрытым.
+- [parseMode](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/parseMode.md): Устанавливает разметку для объяснений.
+- [correctAnswer](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/correctAnswer.md): Устанавливает правильный ответ (для викторин).
+- [explanation](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/explanation.md): Добавляет пояснение к викторине.
+- [send](https://zhenyagr.github.io/TGZ-Doc/classes/pollMethods/send.md): Отправляет опрос.
+
+#### Pagination
+
+- [setItems](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setItems.md): Устанавливает массив элементов для пагинации.
+- [setPerPage](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setPerPage.md): Задает количество элементов на странице.
+- [setPrefix](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setPrefix.md): Устанавливает префикс для callback_data.
+- [setPage](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setPage.md): Устанавливает текущую страницу.
+- [setColumns](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setColumns.md): Задает количество колонок.
+- [setNavigationLayout](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNavigationLayout.md): Настраивает расположение кнопок навигации.
+- [setMode](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setMode.md): Переключает вид навигации (стрелки/цифры).
+- [setSigns](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setSigns.md): Настраивает символы стрелок навигации.
+- [setSideSigns](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setSideSigns.md): Включает кнопки 'В начало/В конец'.
+- [setMaxPageBtn](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setMaxPageBtn.md): Лимит кнопок страниц.
+- [setNumberStyle](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setNumberStyle.md): Стиль цифр (обычные/эмодзи).
+- [setActivePageFormat](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/setActivePageFormat.md): Формат отображения активной страницы.
+- [addReturnBtn](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/addReturnBtn.md): Добавляет кнопку 'Назад' под пагинацией.
+- [getTotalPage](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/getTotalPage.md): Возвращает общее количество страниц.
+- [create](https://zhenyagr.github.io/TGZ-Doc/classes/paginationMethods/create.md): Генерирует массив кнопок для клавиатуры.
+
+#### Inline
+
+- [id](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/id.md): Устанавливает ID результата.
+- [title](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/title.md): Устанавливает заголовок.
+- [description](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/description.md): Устанавливает описание.
+- [text](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/text.md): Устанавливает текст сообщения при выборе.
+- [fileUrl](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/fileUrl.md): Устанавливает URL файла.
+- [fileID](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/fileID.md): Устанавливает file_id файла.
+- [mimeType](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/mimeType.md): Устанавливает MIME-тип контента.
+- [coordinates](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/coordinates.md): Устанавливает координаты.
+- [address](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/address.md): Устанавливает адрес.
+- [thumb](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/thumb.md): Устанавливает миниатюру.
+- [kbd](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/kbd.md): Добавляет Inline-клавиатуру к результату.
+- [parseMode](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/parseMode.md): Устанавливает режим разметки.
+- [params](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/params.md): Добавляет доп. параметры.
+- [create](https://zhenyagr.github.io/TGZ-Doc/classes/inlineMethods/create.md): Собирает массив результата.
+
+
+### Other
+
+- [Action](https://zhenyagr.github.io/TGZ-Doc/classes/actionMethods/dice.md)
+- [buttons](https://zhenyagr.github.io/TGZ-Doc/classes/tgzMethods/buttons.md): Методы для простой сборки клавиатуры.
+- [Untitled](https://zhenyagr.github.io/TGZ-Doc/index.md)
+
